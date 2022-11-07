@@ -94,7 +94,7 @@ public class Main extends JavaPlugin {
             this.landManager = new LandManager(this);
             this.groupManager = new GroupManager(this);
         } catch (NullPointerException e) {
-            Bukkit.getConsoleSender().sendMessage("[SurvivalTop] Is your config.yml updated/set up correctly?");
+            Bukkit.getLogger().severe("[SurvivalTop] Is your config.yml updated/set up correctly?");
             getServer().getPluginManager().disablePlugin(this);
         }
 

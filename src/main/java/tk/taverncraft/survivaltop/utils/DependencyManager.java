@@ -35,17 +35,17 @@ public class DependencyManager {
             String landType = main.getConfig().getString("land-type", "griefprevention").toLowerCase();
             String depPlugin = pluginMap.get(landType);
             if (depPlugin == null) {
-                Bukkit.getLogger().severe("Failed to find a dependency for " + landType + ", did" +
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for " + landType + ", did" +
                     " you make a typo in the config?");
                 return false;
             }
             landCheckPassed = isDependencyEnabled(depPlugin);
 
             if (landCheckPassed) {
-                Bukkit.getLogger().info("Successfully integrated with: " + depPlugin + " for land" +
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: " + depPlugin + " for land" +
                     " type!");
             } else {
-                Bukkit.getLogger().severe("Failed to integrate with: " + depPlugin + " for land " +
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: " + depPlugin + " for land " +
                     "type!");
                 return false;
             }
@@ -56,17 +56,17 @@ public class DependencyManager {
             String groupType = main.getConfig().getString("group-type", "factionsuuid").toLowerCase();
             String depPlugin = pluginMap.get(groupType);
             if (depPlugin == null) {
-                Bukkit.getLogger().severe("Failed to find a dependency for " + groupType + ", did" +
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for " + groupType + ", did" +
                     " you make a typo in the config?");
                 return false;
             }
             groupCheckPassed = isDependencyEnabled(depPlugin);
 
             if (groupCheckPassed) {
-                Bukkit.getLogger().info("Successfully integrated with: " + depPlugin + " for " +
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: " + depPlugin + " for " +
                     "group type!");
             } else {
-                Bukkit.getLogger().severe("Failed to integrate with: " + depPlugin + " for group " +
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: " + depPlugin + " for group " +
                     "type!");
                 return false;
             }
@@ -80,7 +80,7 @@ public class DependencyManager {
             Bukkit.getServer().getPluginManager().getPlugin(plugin).isEnabled()) {
             return true;
         }
-        Bukkit.getLogger().severe("There appears to be a missing dependency: " + plugin + ". Have" +
+        Bukkit.getLogger().severe("[SurvivalTop] There appears to be a missing dependency: " + plugin + ". Have" +
             " you installed it correctly?");
         return false;
     }
