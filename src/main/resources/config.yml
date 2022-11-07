@@ -13,7 +13,7 @@ enable-group: false
 
 # the group-type option only works if enable-groups is set to true and the relevant plugin is installed
 # for the sake of clarity, links to the plugins are provided below
-# options supported are as listed:
+# options supported are as listed, defaults to FactionsUuid if not specified and enable-group is true:
 # - FactionsUuid (https://www.spigotmc.org/resources/factionsuuid.1035/)
 # - KingdomsX (https://www.spigotmc.org/resources/kingdomsx.77670/)
 # - mcMMOParty (https://www.spigotmc.org/resources/official-mcmmo-original-author-returns.64348/)
@@ -78,8 +78,8 @@ minimum-wealth: 0
 # if true, will include blocks in land for calculating wealth (requires a land claim plugin)
 include-land: true
 
-# options supported are listed below:
-# - GriefPrevention (default)
+# options supported are listed below, defaults to GriefPrevention if not specified and include-land is true:
+# - GriefPrevention
 # - Residence
 # - UltimateClaims
 # - GriefDefender
@@ -132,5 +132,5 @@ include-bal: false
 # this section contains plugin-specific configurations that should be ignored if not used
 
 # towny advanced
-town-size: 16
+town-block-size: 16
 

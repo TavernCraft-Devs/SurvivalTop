@@ -56,7 +56,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
             } else {
                 claims = getClaimsByPlayer(name);
             }
-            int townSize = this.main.getConfig().getInt("town-size", 16);
+            int townSize = this.main.getConfig().getInt("town-block-size", 16);
             for (TownBlock claim : claims) {
                 World world = claim.getWorldCoord().getBukkitWorld();
                 int x = claim.getX() * townSize;
