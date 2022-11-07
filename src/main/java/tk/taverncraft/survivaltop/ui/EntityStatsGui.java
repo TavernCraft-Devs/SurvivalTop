@@ -1,5 +1,7 @@
 package tk.taverncraft.survivaltop.ui;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import org.bukkit.Bukkit;
@@ -53,6 +55,11 @@ public class EntityStatsGui extends GuiHelper {
         double containerValue = values[3];
         double landValue = blockValue + spawnerValue + containerValue;
         double totalValue = balValue + landValue;
+
+        // formatting to 2dp
+        balValue = new BigDecimal(balValue).setScale(2, RoundingMode.CEILING).doubleValue();
+        totalValue = new BigDecimal(totalValue).setScale(2, RoundingMode.CEILING).doubleValue();
+
 
         inv.setItem(10, createGuiItem(Material.BEACON, "Total Combined Wealth", true,"Total Wealth: " + totalValue));
         if (main.getConfig().getBoolean("include-bal", false)) {
