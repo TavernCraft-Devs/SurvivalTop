@@ -23,9 +23,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
      * Constructor for CrashClaimHandler.
      */
     public CrashClaimHandler(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("CrashClaim")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     /**

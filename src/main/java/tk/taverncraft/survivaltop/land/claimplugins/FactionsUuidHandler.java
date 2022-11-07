@@ -31,9 +31,7 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
      * Constructor for FactionsUuidHandler.
      */
     public FactionsUuidHandler(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("Factions")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     /**

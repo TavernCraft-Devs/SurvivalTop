@@ -30,13 +30,14 @@ public class DependencyManager {
     }
 
     public boolean hasDependenciesLoaded() {
-        boolean landCheckPassed = true;
+        boolean landCheckPassed;
         if (main.getConfig().getBoolean("include-land")) {
             String landType = main.getConfig().getString("land-type", "griefprevention").toLowerCase();
             String depPlugin = pluginMap.get(landType);
             if (depPlugin == null) {
                 Bukkit.getLogger().severe("Failed to find a dependency for " + landType + ", did" +
                     " you make a typo in the config?");
+                return false;
             }
             landCheckPassed = isDependencyEnabled(depPlugin);
 
@@ -46,16 +47,18 @@ public class DependencyManager {
             } else {
                 Bukkit.getLogger().severe("Failed to integrate with: " + depPlugin + " for land " +
                     "type!");
+                return false;
             }
         }
 
-        boolean groupCheckPassed = true;
+        boolean groupCheckPassed;
         if (main.getConfig().getBoolean("enable-group")) {
             String groupType = main.getConfig().getString("group-type", "factionsuuid").toLowerCase();
             String depPlugin = pluginMap.get(groupType);
             if (depPlugin == null) {
                 Bukkit.getLogger().severe("Failed to find a dependency for " + groupType + ", did" +
                     " you make a typo in the config?");
+                return false;
             }
             groupCheckPassed = isDependencyEnabled(depPlugin);
 
@@ -65,10 +68,11 @@ public class DependencyManager {
             } else {
                 Bukkit.getLogger().severe("Failed to integrate with: " + depPlugin + " for group " +
                     "type!");
+                return false;
             }
         }
 
-        return landCheckPassed && groupCheckPassed;
+        return true;
     }
 
     public boolean isDependencyEnabled(String plugin) {

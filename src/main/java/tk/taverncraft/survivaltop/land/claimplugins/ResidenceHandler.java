@@ -27,9 +27,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
      * Constructor for ResidenceHandler.
      */
     public ResidenceHandler(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("Residence")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     /**

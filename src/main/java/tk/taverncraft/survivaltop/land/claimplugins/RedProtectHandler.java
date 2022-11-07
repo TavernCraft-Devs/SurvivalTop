@@ -27,9 +27,7 @@ public class RedProtectHandler implements LandClaimPluginHandler  {
      * Constructor for RedProtectHandler.
      */
     public RedProtectHandler(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("RedProtect")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     /**

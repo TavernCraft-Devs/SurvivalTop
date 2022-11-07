@@ -21,9 +21,7 @@ public class McmmoPartyGroup implements GroupHandler {
      * Constructor for McmmoPartyGroup.
      */
     public McmmoPartyGroup(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("mcMMO")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     public List<OfflinePlayer> getPlayers(String name) {

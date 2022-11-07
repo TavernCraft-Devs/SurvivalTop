@@ -18,9 +18,7 @@ public class KingdomsXGroup implements GroupHandler {
      * Constructor for KingdomsXGroup.
      */
     public KingdomsXGroup(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("Kingdoms")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     public List<OfflinePlayer> getPlayers(String name) {

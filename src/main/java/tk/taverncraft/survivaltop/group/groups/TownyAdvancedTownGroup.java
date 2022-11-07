@@ -20,10 +20,8 @@ public class TownyAdvancedTownGroup implements GroupHandler {
      * Constructor for TownyAdvancedTownGroup.
      */
     public TownyAdvancedTownGroup(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("Towny")) {
-            this.main = main;
-            this.api = TownyAPI.getInstance();
-        }
+        this.main = main;
+        this.api = TownyAPI.getInstance();
     }
 
     public List<OfflinePlayer> getPlayers(String name) {

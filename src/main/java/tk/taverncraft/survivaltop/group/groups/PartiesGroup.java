@@ -20,10 +20,8 @@ public class PartiesGroup implements GroupHandler {
      * Constructor for PartiesGroup.
      */
     public PartiesGroup(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("Parties")) {
-            this.main = main;
-            this.api = Parties.getApi();
-        }
+        this.main = main;
+        this.api = Parties.getApi();
     }
 
     public List<OfflinePlayer> getPlayers(String name) {

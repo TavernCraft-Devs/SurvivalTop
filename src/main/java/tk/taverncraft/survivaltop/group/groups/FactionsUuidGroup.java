@@ -26,9 +26,7 @@ public class FactionsUuidGroup implements GroupHandler {
      * Constructor for FactionsUuidGroup.
      */
     public FactionsUuidGroup(Main main) {
-        if (main.getDependencyManager().isDependencyEnabled("Factions")) {
-            this.main = main;
-        }
+        this.main = main;
     }
 
     public List<OfflinePlayer> getPlayers(String name) {
