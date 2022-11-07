@@ -70,6 +70,8 @@ public class LandManager {
             landClaimPluginHandler = new CrashClaimHandler(main);
         } else if (landType.equalsIgnoreCase("factionsuuid")) {
             landClaimPluginHandler = new FactionsUuidHandler(main);
+        } else if (landType.equalsIgnoreCase("townyadvanced")) {
+            landClaimPluginHandler = new TownyAdvancedHandler(main);
         } else {
             landClaimPluginHandler = new GriefPreventionHandler(main);
         }

@@ -42,6 +42,9 @@ public class FactionsUuidGroup implements GroupHandler {
     }
 
     public boolean isValidGroup(String name) {
+        if (name == null) {
+            return false;
+        }
         if (isFilteredGroup(name)) {
             return false;
         }

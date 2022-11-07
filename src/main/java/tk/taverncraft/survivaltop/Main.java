@@ -176,16 +176,7 @@ public class Main extends JavaPlugin {
     }
 
     public boolean groupIsEnabled() {
-        boolean groupIsEnabled = this.getConfig().getBoolean("enable-group", false);
-        if (!groupIsEnabled) {
-            return false;
-        }
-        String groupType = this.getConfig().getString("group-type", "None");
-        boolean isSupportedGroupPlugin = (groupType.equalsIgnoreCase("factionsuuid")
-            || groupType.equalsIgnoreCase("kingdomsx")
-            || groupType.equalsIgnoreCase("mcmmoparty")
-            || groupType.equalsIgnoreCase("parties"));
-        return isSupportedGroupPlugin;
+        return this.getConfig().getBoolean("enable-group", false);
     }
 
     public static Economy getEconomy() {

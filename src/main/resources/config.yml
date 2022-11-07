@@ -19,6 +19,8 @@ enable-group: false
 # - KingdomsX (https://www.spigotmc.org/resources/kingdomsx.77670/)
 # - mcMMOParty (https://www.spigotmc.org/resources/official-mcmmo-original-author-returns.64348/)
 # - Parties (https://www.spigotmc.org/resources/parties-an-advanced-parties-manager.3709/)
+# - TownyAdvancedTown (https://www.spigotmc.org/resources/towny-advanced.72694/)
+# - TownyAdvancedNation (https://www.spigotmc.org/resources/towny-advanced.72694/)
 group-type: None
 
 # language file to use (feel free to add your own lang file within the lang folder of the plugin and put the name here)
@@ -86,6 +88,7 @@ include-land: true
 # - CrashClaim
 # - FactionsUuid
 # - RedProtect
+# - TownyAdvanced
 land-type: GriefPrevention
 
 # if true, spawners will be included as part of land wealth in calculations
@@ -121,4 +124,14 @@ include-bal: false
 # %survtop_entity_total_wealth_{name}% - total wealth of entity as last calculated in leaderboard update
 # %survtop_entity_land_wealth_{name}% - land wealth of entity as last calculated in leaderboard update
 # %survtop_entity_bal_wealth_{name}% - balance wealth of entity as last calculated in leaderboard update
+
+#####################################################################################
+#                                                                                   #
+#                     Miscellaneous (ignore section if not using)                   #
+#                                                                                   #
+#####################################################################################
+# this section contains plugin-specific configurations that should be ignored if not used
+
+# towny advanced
+town-size: 16
 

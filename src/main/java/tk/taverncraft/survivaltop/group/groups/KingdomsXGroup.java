@@ -29,6 +29,9 @@ public class KingdomsXGroup implements GroupHandler {
     }
 
     public boolean isValidGroup(String name) {
+        if (name == null) {
+            return false;
+        }
         Kingdom kingdom = Kingdoms.get().getDataHandlers().getKingdomManager().getData(name);
         return kingdom != null;
     }

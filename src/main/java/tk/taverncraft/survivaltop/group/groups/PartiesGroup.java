@@ -38,6 +38,9 @@ public class PartiesGroup implements GroupHandler {
     }
 
     public boolean isValidGroup(String name) {
+        if (name == null) {
+            return false;
+        }
         Party party = api.getParty(name);
         return party != null;
     }

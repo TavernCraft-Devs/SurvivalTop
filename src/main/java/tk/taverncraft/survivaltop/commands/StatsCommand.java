@@ -49,6 +49,9 @@ public class StatsCommand {
         String name;
         if (this.main.groupIsEnabled()) {
             name = this.main.getGroupManager().getGroupOfPlayer(player.getName());
+            if (!this.validationManager.groupExist(name, sender)) {
+                return true;
+            }
         } else {
             name = player.getName();
         }

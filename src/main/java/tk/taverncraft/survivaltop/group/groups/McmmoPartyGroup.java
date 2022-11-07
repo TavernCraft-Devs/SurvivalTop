@@ -38,6 +38,9 @@ public class McmmoPartyGroup implements GroupHandler {
     }
 
     public boolean isValidGroup(String name) {
+        if (name == null) {
+            return false;
+        }
         Party party = PartyManager.getParty(name);
         return party != null;
     }

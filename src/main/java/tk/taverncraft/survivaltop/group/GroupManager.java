@@ -10,6 +10,8 @@ import tk.taverncraft.survivaltop.group.groups.KingdomsXGroup;
 import tk.taverncraft.survivaltop.group.groups.McmmoPartyGroup;
 import tk.taverncraft.survivaltop.group.groups.NoneGroup;
 import tk.taverncraft.survivaltop.group.groups.PartiesGroup;
+import tk.taverncraft.survivaltop.group.groups.TownyAdvancedNationGroup;
+import tk.taverncraft.survivaltop.group.groups.TownyAdvancedTownGroup;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
 
 /**
@@ -42,6 +44,10 @@ public class GroupManager {
             groupHandler = new McmmoPartyGroup(main);
         } else if (groupType.equalsIgnoreCase("parties")) {
             groupHandler = new PartiesGroup(main);
+        } else if (groupType.equalsIgnoreCase("townyadvancedtown")) {
+            groupHandler = new TownyAdvancedTownGroup(main);
+        } else if (groupType.equalsIgnoreCase("townyadvancednation")) {
+            groupHandler = new TownyAdvancedNationGroup(main);
         } else {
             groupHandler = new NoneGroup(main);
         }
