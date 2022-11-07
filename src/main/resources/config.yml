@@ -1,0 +1,124 @@
+#####################################################################################
+#                                                                                   #
+#                        General Configurations (Do not skip)                       #
+#                                                                                   #
+#####################################################################################
+
+# by default, the term entity in this plugin refers to players
+# however, if enable-groups is set to true, then entity refers to a group (e.g. factions, kingdom)
+# this option should only be set to true for users who wish to show group-based leaderboards
+# make sure a valid group-type is set below and the relevant plugin is installed
+# otherwise, if enabled without a valid group-type, plugin will still disable group
+enable-group: false
+
+# the group-type option only works if enable-groups is set to true and the relevant plugin is installed
+# for the sake of clarity, links to the plugins are provided below
+# options supported are as listed:
+# - None (default)
+# - FactionsUuid (https://www.spigotmc.org/resources/factionsuuid.1035/)
+# - KingdomsX (https://www.spigotmc.org/resources/kingdomsx.77670/)
+# - mcMMOParty (https://www.spigotmc.org/resources/official-mcmmo-original-author-returns.64348/)
+# - Parties (https://www.spigotmc.org/resources/parties-an-advanced-parties-manager.3709/)
+group-type: None
+
+# language file to use (feel free to add your own lang file within the lang folder of the plugin and put the name here)
+lang-file: 'en.yml'
+
+# if true, will provide a detailed gui for viewing entity stats including individual item/block breakdowns
+# if false, will provide only basic entity stats in chat without detailed breakdown
+# for small servers without the computing resources or enormous servers worried about lags, set this to false
+use-gui-stats: true
+
+#####################################################################################
+#                                                                                   #
+#                   Storage Configurations (ignore if not using)                    #
+#                                                                                   #
+#####################################################################################
+
+# whether to write updated entity data to file/mysql or not at all
+# options here include: MySQL, YAML and None
+# note that information storage is not required for this plugin since the results of updates are stored in cache
+# as of the latest version of this plugin, the storage only serves a purpose if you have your own means to make use of this information
+# it is thus recommended setting this to None if you have a large player-base, lag issues or have no use for storing the information
+storage-type: None
+
+# mysql connection details (ignore if not using)
+host: 127.0.0.1
+port: 3306
+user: survtop
+password: password
+database-name: survtop
+table-name: survtop
+
+#####################################################################################
+#                                                                                   #
+#                 Leaderboard Configuration (ignore if not using)                   #
+#                                                                                   #
+#####################################################################################
+
+# interval (in seconds) between updating the leaderboard (set to -1 to disable)
+# not recommended updating too frequently, especially if you have a large player-base
+# plugin reloads will restart/update this interval count from the point of reload
+update-interval: 3600
+
+# if true, will first update leaderboard on server start
+# if false, will first update leaderboard upon reaching the specified interval
+update-on-start: false
+
+# minimum wealth (inclusive) required to be included on the leaderboard - 0 will disallow negative wealth on leaderboard
+minimum-wealth: 0
+
+#####################################################################################
+#                                                                                   #
+#             Land Claim Plugin Integration (ignore section if not using)           #
+#                                                                                   #
+#####################################################################################
+
+# if true, will include blocks in land for calculating wealth (requires a land claim plugin)
+include-land: true
+
+# options supported are listed below:
+# - GriefPrevention (default)
+# - Residence
+# - UltimateClaims
+# - GriefDefender
+# - KingdomsX
+# - CrashClaim
+# - FactionsUuid
+# - RedProtect
+land-type: GriefPrevention
+
+# if true, spawners will be included as part of land wealth in calculations
+# also requires include-land to be true!
+# note that checks for spawners are more expensive and you should consider disabling this if updates take too long
+include-spawners: false
+
+# if true, containers (chest, trapped_chest, hopper, dropper, furnace) will be included as part of land wealth in calculations
+# also requires include-land to be true!
+# note that checks for containers are the most expensive and you should consider disabling this if updates take too long
+include-containers: false
+
+#####################################################################################
+#                                                                                   #
+#                 Vault Integration (ignore section if not using)                   #
+#                                                                                   #
+#####################################################################################
+
+# if true, will include player /balance in calculating wealth (requires vault)
+include-bal: false
+
+#####################################################################################
+#                                                                                   #
+#            Section for PAPI placeholders (ignore section if not using)            #
+#                                                                                   #
+#####################################################################################
+# list of PAPI placeholders are provided below
+# {} brackets indicate variable names e.g. {position} represents leaderboard position and {name} represents entity name
+
+# %survtop_top_name_{position}% - name of entity at specified leaderboard position
+# %survtop_top_wealth_{position}% - wealth of entity at specified leaderboard position
+# %survtop_entity_position_{name}% - position of entity for its given name
+# %survtop_entity_total_wealth_{name}% - total wealth of entity as last calculated in leaderboard update
+# %survtop_entity_land_wealth_{name}% - land wealth of entity as last calculated in leaderboard update
+# %survtop_entity_bal_wealth_{name}% - balance wealth of entity as last calculated in leaderboard update
+

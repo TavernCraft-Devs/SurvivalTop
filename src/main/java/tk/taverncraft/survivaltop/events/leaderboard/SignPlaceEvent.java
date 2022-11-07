@@ -1,0 +1,70 @@
+package tk.taverncraft.survivaltop.events.leaderboard;
+
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.SignChangeEvent;
+
+import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.leaderboard.SignHelper;
+import tk.taverncraft.survivaltop.utils.MessageManager;
+
+/**
+ * SignPlaceEvent checks for when a SurvivalTop sign is broken.
+ */
+public class SignPlaceEvent implements Listener {
+
+    private final String signAddPerm = "survtop.sign.add";
+    Main main;
+
+    /**
+     * Constructor for SignPlaceEvent.
+     */
+    public SignPlaceEvent(Main main) {
+        this.main = main;
+    }
+
+    @EventHandler
+    private void onSignPlace(SignChangeEvent e) {
+        Block block = e.getBlock();
+
+        if (!block.getType().toString().contains("WALL_SIGN")) {
+            return;
+        }
+
+        BlockState state = block.getState();
+        if (!(state instanceof Sign)) {
+            return;
+        }
+
+        String line1 = e.getLine(0);
+        String line2 = e.getLine(1);
+
+        SignHelper signHelper = new SignHelper(main);
+        if (!signHelper.isSurvTopSign(line1, line2)) {
+            return;
+        }
+
+        Player player = e.getPlayer();
+
+        if (!player.hasPermission(signAddPerm)) {
+            e.setCancelled(true);
+            MessageManager.sendMessage(player, "no-survtop-sign-add-permission");
+            return;
+        }
+
+        assert line2 != null;
+        if (main.getLeaderboardManager().isUpdating()) {
+            signHelper.updateSign(e.getBlock(), null, Integer.parseInt(line2), "Updating...", "Updating...");
+        } else {
+            signHelper.updateSign(e.getBlock(), null, Integer.parseInt(line2), "Not updated", "Not updated");
+        }
+        MessageManager.sendMessage(player, "survtop-sign-placed",
+                new String[]{"%rank%"},
+                new String[]{line2});
+    }
+}
+

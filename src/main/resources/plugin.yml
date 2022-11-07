@@ -1,0 +1,12 @@
+name: SurvivalTop
+version: ${project.version}
+main: tk.taverncraft.survivaltop.Main
+author: tjtanjin - FrozenFever
+softdepend: [GriefPrevention, Residence, UltimateClaims, GriefDefender, Kingdoms, CrashClaim,
+             Factions, Parties, mcMMO, Vault]
+description: A simple plugin to calculate player wealth in land!
+api-version: 1.13
+commands:
+  survivaltop:
+    description: Base command for the plugin
+    aliases: [st]
