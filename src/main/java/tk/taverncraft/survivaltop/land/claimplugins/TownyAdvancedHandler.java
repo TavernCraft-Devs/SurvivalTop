@@ -37,7 +37,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      * Constructor for TownyAdvancedHandler.
      */
     public TownyAdvancedHandler(Main main) {
-        if (main.isDependencyEnabled("Towny")) {
+        if (main.getDependencyManager().isDependencyEnabled("Towny")) {
             this.main = main;
             this.api = TownyAPI.getInstance();
         }

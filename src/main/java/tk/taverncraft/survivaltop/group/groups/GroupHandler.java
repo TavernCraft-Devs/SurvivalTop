@@ -10,4 +10,5 @@ public interface GroupHandler {
     boolean isValidGroup(String name);
     List<String> getGroups();
     String getGroupOfPlayer(String playerName);
+    String getGroupLeader(String name);
 }

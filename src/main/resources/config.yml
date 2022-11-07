@@ -14,14 +14,13 @@ enable-group: false
 # the group-type option only works if enable-groups is set to true and the relevant plugin is installed
 # for the sake of clarity, links to the plugins are provided below
 # options supported are as listed:
-# - None (default)
 # - FactionsUuid (https://www.spigotmc.org/resources/factionsuuid.1035/)
 # - KingdomsX (https://www.spigotmc.org/resources/kingdomsx.77670/)
 # - mcMMOParty (https://www.spigotmc.org/resources/official-mcmmo-original-author-returns.64348/)
 # - Parties (https://www.spigotmc.org/resources/parties-an-advanced-parties-manager.3709/)
 # - TownyAdvancedTown (https://www.spigotmc.org/resources/towny-advanced.72694/)
 # - TownyAdvancedNation (https://www.spigotmc.org/resources/towny-advanced.72694/)
-group-type: None
+group-type: FactionsUuid
 
 # language file to use (feel free to add your own lang file within the lang folder of the plugin and put the name here)
 lang-file: 'en.yml'

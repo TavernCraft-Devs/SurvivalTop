@@ -230,7 +230,7 @@ public class EntityStatsManager {
                 initialTask.cancel();
             }
             statsInitialTask.remove(uuid);
-            BukkitTask finalTask = statsInitialTask.get(uuid);
+            BukkitTask finalTask = statsUiTask.get(uuid);
             if (finalTask != null) {
                 finalTask.cancel();
             }

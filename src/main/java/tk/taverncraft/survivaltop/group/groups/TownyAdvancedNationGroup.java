@@ -23,7 +23,7 @@ public class TownyAdvancedNationGroup implements GroupHandler {
      * Constructor for TownyAdvancedNationGroup.
      */
     public TownyAdvancedNationGroup(Main main) {
-        if (main.isDependencyEnabled("Towny")) {
+        if (main.getDependencyManager().isDependencyEnabled("Towny")) {
             this.main = main;
             this.api = TownyAPI.getInstance();
         }
@@ -78,5 +78,14 @@ public class TownyAdvancedNationGroup implements GroupHandler {
         } catch (TownyException e) {
             return null;
         }
+    }
+
+    public String getGroupLeader(String name) {
+        Nation nation = api.getNation(name);
+        if (nation == null) {
+            return null;
+        }
+
+        return nation.getKing().getName();
     }
 }

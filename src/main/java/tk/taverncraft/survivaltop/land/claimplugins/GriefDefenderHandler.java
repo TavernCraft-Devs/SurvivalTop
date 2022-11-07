@@ -24,7 +24,7 @@ public class GriefDefenderHandler implements LandClaimPluginHandler {
      * Constructor for GriefDefenderHandler.
      */
     public GriefDefenderHandler(Main main) {
-        if (main.isDependencyEnabled("GriefDefender")) {
+        if (main.getDependencyManager().isDependencyEnabled("GriefDefender")) {
             this.main = main;
         }
     }

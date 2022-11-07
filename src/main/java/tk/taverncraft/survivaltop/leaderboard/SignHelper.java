@@ -164,7 +164,18 @@ public class SignHelper {
         PlayerHeadHelper playerHeadHelper = new PlayerHeadHelper();
         Block skullAboveBlockBehindSign = playerHeadHelper.getSkullAboveBlockBehindSign(block);
         Block skullAboveSign = playerHeadHelper.getSkullAboveSign(block);
-        OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+        OfflinePlayer player;
+        if (main.groupIsEnabled()) {
+            String leader = main.getGroupManager().getGroupLeader(name);
+            if (leader == null) {
+                player = Bukkit.getOfflinePlayer("MHF_QUESTION");
+            } else {
+                player = Bukkit.getOfflinePlayer(leader);
+            }
+        } else {
+            player = Bukkit.getOfflinePlayer(name);
+        }
+
         if (player != null) {
             playerHeadHelper.update(player, skullAboveBlockBehindSign, skullAboveSign);
         }

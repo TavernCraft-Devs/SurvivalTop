@@ -32,7 +32,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
      * Constructor for UltimateClaimsHandler.
      */
     public UltimateClaimsHandler(Main main) {
-        if (main.isDependencyEnabled("UltimateClaims")) {
+        if (main.getDependencyManager().isDependencyEnabled("UltimateClaims")) {
             this.main = main;
             this.ultimateClaims = (UltimateClaims) getServer().getPluginManager().getPlugin("UltimateClaims");
         }

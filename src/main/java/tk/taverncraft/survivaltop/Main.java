@@ -45,6 +45,7 @@ public class Main extends JavaPlugin {
 
     // managers
     private ConfigManager configManager;
+    private DependencyManager dependencyManager;
     private LandManager landManager;
     private GroupManager groupManager;
     private EntityStatsManager entityStatsManager;
@@ -85,6 +86,7 @@ public class Main extends JavaPlugin {
         this.getCommand("survivaltop").setExecutor(new CommandParser(this));
 
         try {
+            this.dependencyManager = new DependencyManager(this);
             this.storageManager = new StorageManager(this);
             this.entityStatsManager = new EntityStatsManager(this);
             this.serverStatsManager = new ServerStatsManager(this);
@@ -131,6 +133,10 @@ public class Main extends JavaPlugin {
 
         // placeholderapi setup
         checkPlaceholderAPI();
+
+        if (!this.getDependencyManager().hasDependenciesLoaded()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
     }
 
     /**
@@ -225,6 +231,10 @@ public class Main extends JavaPlugin {
 
     public ConfigManager getConfigManager() { return configManager; }
 
+    public DependencyManager getDependencyManager() {
+        return this.dependencyManager;
+    }
+
     public LandManager getLandManager() {
         return landManager;
     }
@@ -245,16 +255,5 @@ public class Main extends JavaPlugin {
 
     public UUID getConsoleUuid() {
         return consoleUuid;
-    }
-
-    public boolean isDependencyEnabled(String plugin) {
-        if (Bukkit.getServer().getPluginManager().getPlugin(plugin) != null &&
-            Bukkit.getServer().getPluginManager().getPlugin(plugin).isEnabled()) {
-            return true;
-        }
-        Bukkit.getLogger().severe("There appears to be a missing dependency: " + plugin + ". Have" +
-            " you installed it correctly?");
-        Bukkit.getPluginManager().disablePlugin(this);
-        return false;
     }
 }

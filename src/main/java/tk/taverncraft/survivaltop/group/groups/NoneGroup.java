@@ -31,4 +31,6 @@ public class NoneGroup implements GroupHandler {
     public String getGroupOfPlayer(String playerName) {
         return null;
     }
+
+    public String getGroupLeader(String name) { return null; }
 }

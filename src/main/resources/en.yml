@@ -5,7 +5,7 @@ prefix: '&6[&bSurvivalTop&6] '
 
 # general messages
 reload-success: '&aSurvivalTop has been reloaded!'
-reload-fail: '&cFailed to load config/message files. Check for error/missing fields in them or contact the author if you believe this to be an error.'
+reload-fail: '&cFailed to load config/message files. Check console for errors and double check your config or contact the author if you believe this to be an error.'
 invalid-command: '&cInvalid command, type &6/st help&c!'
 no-permission: '&cYou do not have the permission to run this command!'
 entity-not-exist: '&cThe name you entered does not exist!' # %entity%

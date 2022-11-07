@@ -64,7 +64,7 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_position_")) {
             String[] args = params.split("_", 4);
             try {
-                String entityName = args[3];
+                String entityName = args[2];
                 return main.getServerStatsManager().getPositionOfEntity(entityName);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "None";

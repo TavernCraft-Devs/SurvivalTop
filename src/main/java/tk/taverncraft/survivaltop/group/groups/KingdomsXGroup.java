@@ -18,7 +18,7 @@ public class KingdomsXGroup implements GroupHandler {
      * Constructor for KingdomsXGroup.
      */
     public KingdomsXGroup(Main main) {
-        if (main.isDependencyEnabled("Kingdoms")) {
+        if (main.getDependencyManager().isDependencyEnabled("Kingdoms")) {
             this.main = main;
         }
     }
@@ -49,6 +49,14 @@ public class KingdomsXGroup implements GroupHandler {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         KingdomPlayer kPlayer = KingdomPlayer.getKingdomPlayer(player.getUniqueId());
         Kingdom kingdom = kPlayer.getKingdom();
+        if (kingdom == null) {
+            return null;
+        }
+        return kingdom.getName();
+    }
+
+    public String getGroupLeader(String name) {
+        Kingdom kingdom = Kingdoms.get().getDataHandlers().getKingdomManager().getData(name);
         if (kingdom == null) {
             return null;
         }

@@ -26,7 +26,7 @@ public class FactionsUuidGroup implements GroupHandler {
      * Constructor for FactionsUuidGroup.
      */
     public FactionsUuidGroup(Main main) {
-        if (main.isDependencyEnabled("Factions")) {
+        if (main.getDependencyManager().isDependencyEnabled("Factions")) {
             this.main = main;
         }
     }
@@ -82,5 +82,13 @@ public class FactionsUuidGroup implements GroupHandler {
             }
         }
         return false;
+    }
+
+    public String getGroupLeader(String name) {
+        Faction faction = Factions.getInstance().getByTag(name);
+        if (faction == null) {
+            return null;
+        }
+        return faction.getTag();
     }
 }

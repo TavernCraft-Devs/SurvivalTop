@@ -23,7 +23,7 @@ public class ServerStatsManager {
     private ConcurrentHashMap<UUID, Double> entityTotalWealthCache;
     private ConcurrentHashMap<UUID, Double> entityLandWealthCache;
     private ConcurrentHashMap<UUID, Double> entityBalWealthCache;
-    private LinkedHashMap<UUID, Integer> entityPositionCache;
+    private HashMap<UUID, Integer> entityPositionCache;
     private ArrayList<UUID> entityTotalWealthKeys;
     private ArrayList<Double> entityTotalWealthValues;
 
@@ -46,7 +46,7 @@ public class ServerStatsManager {
         entityTotalWealthCache = new ConcurrentHashMap<>();
         entityLandWealthCache = new ConcurrentHashMap<>();
         entityBalWealthCache = new ConcurrentHashMap<>();
-        entityPositionCache = new LinkedHashMap<>();
+        entityPositionCache = new HashMap<>();
         entityTotalWealthKeys = new ArrayList<>();
         entityTotalWealthValues = new ArrayList<>();
         groupUuidToNameMap = new HashMap<>();
@@ -109,8 +109,14 @@ public class ServerStatsManager {
     }
 
     private void updateForGroups(boolean includeLandInWealth, boolean includeBalInWealth) {
-        // reset each update since group uuids are temp
+        // reset cache on each update since unlike players, group uuids are temporary
+        for (Map.Entry<UUID, String> set : groupUuidToNameMap.entrySet()) {
+            this.entityTotalWealthCache.remove(set.getKey());
+            this.entityBalWealthCache.remove(set.getKey());
+            this.entityLandWealthCache.remove(set.getKey());
+        }
         this.groupUuidToNameMap = new HashMap<>();
+        this.groupNameToUuidMap = new HashMap<>();
 
         List<String> groups = this.main.getGroupManager().getGroups();
         for (String group : groups) {
@@ -214,7 +220,7 @@ public class ServerStatsManager {
      */
     private void sortWealthCacheKeyValue(HashMap<UUID, Double> tempSortedCache) {
         Set<UUID> keySet = tempSortedCache.keySet();
-        this.entityPositionCache = new LinkedHashMap<>();
+        this.entityPositionCache = new HashMap<>();
         int i = 0;
         for (Map.Entry<UUID, Double> set : tempSortedCache.entrySet()) {
             this.entityPositionCache.put(set.getKey(), i);
@@ -250,8 +256,10 @@ public class ServerStatsManager {
     }
 
     public String getPositionOfEntity(String entityName) {
-        Integer position = this.entityPositionCache.get(entityName);
+        UUID uuid = this.groupNameToUuidMap.get(entityName);
+        Integer position = this.entityPositionCache.get(uuid);
         if (position != null) {
+            position = position + 1; // index 0
             return String.format("%d", position);
         } else {
             return "None";

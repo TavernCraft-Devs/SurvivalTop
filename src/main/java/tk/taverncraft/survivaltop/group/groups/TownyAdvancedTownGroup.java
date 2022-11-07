@@ -2,6 +2,7 @@ package tk.taverncraft.survivaltop.group.groups;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
+import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import org.bukkit.Bukkit;
@@ -19,7 +20,7 @@ public class TownyAdvancedTownGroup implements GroupHandler {
      * Constructor for TownyAdvancedTownGroup.
      */
     public TownyAdvancedTownGroup(Main main) {
-        if (main.isDependencyEnabled("Towny")) {
+        if (main.getDependencyManager().isDependencyEnabled("Towny")) {
             this.main = main;
             this.api = TownyAPI.getInstance();
         }
@@ -64,5 +65,14 @@ public class TownyAdvancedTownGroup implements GroupHandler {
         } catch (NotRegisteredException e) {
             return null;
         }
+    }
+
+    public String getGroupLeader(String name) {
+        Town town = api.getTown(name);
+        if (town == null) {
+            return null;
+        }
+
+        return town.getMayor().getName();
     }
 }

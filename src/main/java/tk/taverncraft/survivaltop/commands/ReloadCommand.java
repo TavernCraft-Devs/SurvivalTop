@@ -51,6 +51,10 @@ public class ReloadCommand {
             main.getConfigManager().createSpawnersConfig();
             main.getConfigManager().createContainersConfig();
 
+            if (!main.getDependencyManager().hasDependenciesLoaded()) {
+                MessageManager.sendMessage(sender, "reload-fail");
+            }
+
             // reinitialize manager values
             main.getStorageManager().initializeValues();
             main.getServerStatsManager().initializeValues();

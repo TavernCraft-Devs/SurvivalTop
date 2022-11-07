@@ -20,7 +20,7 @@ public class PartiesGroup implements GroupHandler {
      * Constructor for PartiesGroup.
      */
     public PartiesGroup(Main main) {
-        if (main.isDependencyEnabled("Parties")) {
+        if (main.getDependencyManager().isDependencyEnabled("Parties")) {
             this.main = main;
             this.api = Parties.getApi();
         }
@@ -61,5 +61,15 @@ public class PartiesGroup implements GroupHandler {
             return null;
         }
         return party.getName();
+    }
+
+    public String getGroupLeader(String name) {
+        Party party = api.getParty(name);
+        if (party == null) {
+            return null;
+        }
+
+        OfflinePlayer player = Bukkit.getOfflinePlayer(party.getLeader());
+        return player.getName();
     }
 }

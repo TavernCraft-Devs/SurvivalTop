@@ -28,7 +28,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      * Constructor for KingdomsXHandler.
      */
     public KingdomsXHandler(Main main) {
-        if (main.isDependencyEnabled("Kingdoms")) {
+        if (main.getDependencyManager().isDependencyEnabled("Kingdoms")) {
             this.main = main;
         }
     }

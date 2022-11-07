@@ -21,7 +21,7 @@ public class McmmoPartyGroup implements GroupHandler {
      * Constructor for McmmoPartyGroup.
      */
     public McmmoPartyGroup(Main main) {
-        if (main.isDependencyEnabled("mcMMO")) {
+        if (main.getDependencyManager().isDependencyEnabled("mcMMO")) {
             this.main = main;
         }
     }
@@ -57,5 +57,9 @@ public class McmmoPartyGroup implements GroupHandler {
     public String getGroupOfPlayer(String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         return PartyAPI.getPartyName(player.getPlayer());
+    }
+
+    public String getGroupLeader(String name) {
+        return PartyAPI.getPartyLeader(name);
     }
 }
