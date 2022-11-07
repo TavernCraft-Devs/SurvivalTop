@@ -34,6 +34,10 @@ public class DependencyManager {
         if (main.getConfig().getBoolean("include-land")) {
             String landType = main.getConfig().getString("land-type", "griefprevention").toLowerCase();
             String depPlugin = pluginMap.get(landType);
+            if (depPlugin == null) {
+                Bukkit.getLogger().severe("Failed to find a dependency for " + landType + ", did" +
+                    " you make a typo in the config?");
+            }
             landCheckPassed = isDependencyEnabled(depPlugin);
 
             if (landCheckPassed) {
@@ -49,6 +53,10 @@ public class DependencyManager {
         if (main.getConfig().getBoolean("enable-group")) {
             String groupType = main.getConfig().getString("group-type", "factionsuuid").toLowerCase();
             String depPlugin = pluginMap.get(groupType);
+            if (depPlugin == null) {
+                Bukkit.getLogger().severe("Failed to find a dependency for " + groupType + ", did" +
+                    " you make a typo in the config?");
+            }
             groupCheckPassed = isDependencyEnabled(depPlugin);
 
             if (groupCheckPassed) {

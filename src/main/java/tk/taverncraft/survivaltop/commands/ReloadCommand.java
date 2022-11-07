@@ -53,6 +53,7 @@ public class ReloadCommand {
 
             if (!main.getDependencyManager().hasDependenciesLoaded()) {
                 MessageManager.sendMessage(sender, "reload-fail");
+                return true;
             }
 
             // reinitialize manager values
