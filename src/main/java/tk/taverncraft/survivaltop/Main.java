@@ -27,6 +27,7 @@ import tk.taverncraft.survivaltop.stats.ServerStatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
 import tk.taverncraft.survivaltop.utils.ConfigManager;
 import tk.taverncraft.survivaltop.utils.DependencyManager;
+import tk.taverncraft.survivaltop.utils.MessageManager;
 import tk.taverncraft.survivaltop.utils.PapiManager;
 import tk.taverncraft.survivaltop.utils.PluginUpdateManager;
 import tk.taverncraft.survivaltop.utils.Metrics;
@@ -59,8 +60,13 @@ public class Main extends JavaPlugin {
     private LeaderboardManager leaderboardManager;
     private StorageManager storageManager;
 
+    // options
+    private boolean includeBalance;
+    private boolean includeLand;
+    private boolean groupEnabled;
+
     // console uuid
-    private UUID consoleUuid;
+    private UUID consoleUuid = UUID.randomUUID();
 
     @Override
     public void onDisable() {
@@ -81,12 +87,10 @@ public class Main extends JavaPlugin {
         this.configManager = new ConfigManager(this);
 
         // config setup
-        configManager.createConfig();
-        configManager.createMessageFile();
-        configManager.createBlocksConfig();
-        configManager.createSpawnersConfig();
-        configManager.createContainersConfig();
-        configManager.createSignsConfig();
+        createConfigs();
+        this.includeBalance = this.getConfig().getBoolean("include-bal", false);
+        this.includeLand = this.getConfig().getBoolean("include-land", false);
+        this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
 
         //this.createScheduleConfig();
         this.getCommand("survivaltop").setTabCompleter(new CommandTabCompleter());
@@ -105,8 +109,6 @@ public class Main extends JavaPlugin {
                     "[SurvivalTop] Is your config.yml updated/set up correctly?");
             getServer().getPluginManager().disablePlugin(this);
         }
-
-        this.consoleUuid = UUID.randomUUID();
 
         int pluginId = 12982;
         Metrics metrics = new Metrics(this, pluginId);
@@ -137,6 +139,15 @@ public class Main extends JavaPlugin {
                 new ViewPageEvent(this), this);
     }
 
+    private void createConfigs() {
+        configManager.createConfig();
+        configManager.createMessageFile();
+        configManager.createBlocksConfig();
+        configManager.createSpawnersConfig();
+        configManager.createContainersConfig();
+        configManager.createSignsConfig();
+    }
+
     /**
      * Loads dependencies.
      */
@@ -148,8 +159,9 @@ public class Main extends JavaPlugin {
         // placeholderapi setup
         checkPlaceholderAPI();
 
-        if (!this.getDependencyManager().hasDependenciesLoaded()) {
-            Bukkit.getPluginManager().disablePlugin(this);
+        if (!this.dependencyManager.checkAllDependencies()) {
+            Bukkit.getLogger().severe("[SurvivalTop] Some options were disabled on startup " +
+                    "to prevent errors, please check your config file!");
         }
     }
 
@@ -206,8 +218,28 @@ public class Main extends JavaPlugin {
         }
     }
 
+    public void disableBal() {
+        this.includeBalance = false;
+    }
+
+    public void disableLand() {
+        this.includeLand = false;
+    }
+
+    public void disableGroup() {
+        this.groupEnabled = false;
+    }
+
+    public boolean balIsIncluded() {
+        return includeBalance;
+    }
+
+    public boolean landIsIncluded() {
+        return includeLand;
+    }
+
     public boolean groupIsEnabled() {
-        return this.getConfig().getBoolean("enable-group", false);
+        return groupEnabled;
     }
 
     public static Economy getEconomy() {

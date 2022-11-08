@@ -54,7 +54,7 @@ public class ReloadCommand {
             main.getConfigManager().createContainersConfig();
 
             // check dependencies
-            if (!main.getDependencyManager().hasDependenciesLoaded()) {
+            if (!main.getDependencyManager().checkAllDependencies()) {
                 MessageManager.sendMessage(sender, "reload-fail");
                 return true;
             }

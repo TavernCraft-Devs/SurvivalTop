@@ -90,7 +90,7 @@ public class LandManager {
         senderBlockForGui = new HashMap<>();
         senderSpawnerForGui = new HashMap<>();
         senderContainerForGui = new HashMap<>();
-        includeLand = main.getConfig().getBoolean("include-land", true);
+        includeLand = main.landIsIncluded();
         includeSpawners = main.getConfig().getBoolean("include-spawners", false);
         includeContainers = main.getConfig().getBoolean("include-containers", false);
     }

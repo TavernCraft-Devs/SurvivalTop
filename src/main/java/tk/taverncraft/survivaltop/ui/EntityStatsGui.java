@@ -76,7 +76,7 @@ public class EntityStatsGui extends GuiHelper {
 
         inv.setItem(10, createGuiItem(Material.BEACON, "Total Combined Wealth",
                 true,"Total Wealth: " + totalValue));
-        if (main.getConfig().getBoolean("include-bal", false)) {
+        if (main.balIsIncluded()) {
             inv.setItem(11, createGuiItem(Material.EMERALD, "Total Balance Wealth",
                     true, "Balance Wealth: " + balValue));
         } else {

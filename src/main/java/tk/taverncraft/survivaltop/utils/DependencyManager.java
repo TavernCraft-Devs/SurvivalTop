@@ -43,18 +43,19 @@ public class DependencyManager {
      *
      * @return true if dependencies are loaded, false otherwise.
      */
-    public boolean hasDependenciesLoaded() {
+    public boolean checkAllDependencies() {
+        boolean balCheckPassed = checkBal();
+        if (!balCheckPassed) {
+            return false;
+        }
+
         boolean landCheckPassed = checkLand();
         if (!landCheckPassed) {
             return false;
         }
 
         boolean groupCheckPassed = checkGroup();
-        if (!groupCheckPassed) {
-            return false;
-        }
-
-        return true;
+        return groupCheckPassed;
     }
 
     /**
@@ -75,19 +76,48 @@ public class DependencyManager {
     }
 
     /**
+     * Check if vault is enabled.
+     *
+     * @return true if plugin is enabled, false otherwise
+     */
+    private boolean checkBal() {
+        boolean enabled;
+        if (main.balIsIncluded()) {
+            String depPlugin = "Vault";
+            if (depPlugin == null) {
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to find Vault plugin even " +
+                    "though balance is included!");
+                main.disableBal();
+                return false;
+            }
+            enabled = isDependencyEnabled(depPlugin);
+
+            if (enabled) {
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with Vault!");
+            } else {
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with Vault!");
+                main.disableBal();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Check if land dependency plugin is enabled.
      *
      * @return true if plugin is enabled, false otherwise
      */
     private boolean checkLand() {
         boolean enabled;
-        if (main.getConfig().getBoolean("include-land")) {
+        if (main.landIsIncluded()) {
             String landType = main.getConfig().getString("land-type",
                 "griefprevention").toLowerCase();
             String depPlugin = pluginMap.get(landType);
             if (depPlugin == null) {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
                     + landType + ", did you make a typo in the config?");
+                main.disableLand();
                 return false;
             }
             enabled = isDependencyEnabled(depPlugin);
@@ -98,6 +128,7 @@ public class DependencyManager {
             } else {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
                     + depPlugin + " for land type!");
+                main.disableLand();
                 return false;
             }
         }
@@ -118,6 +149,7 @@ public class DependencyManager {
             if (depPlugin == null) {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
                     + groupType + ", did you make a typo in the config?");
+                main.disableGroup();
                 return false;
             }
             enabled = isDependencyEnabled(depPlugin);
@@ -128,6 +160,7 @@ public class DependencyManager {
             } else {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
                     + depPlugin + " for group type!");
+                main.disableGroup();
                 return false;
             }
         }

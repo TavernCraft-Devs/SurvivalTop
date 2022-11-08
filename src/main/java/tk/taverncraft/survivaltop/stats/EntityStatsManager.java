@@ -70,11 +70,11 @@ public class EntityStatsManager {
     private void calculateEntityStats(CommandSender sender, String name) {
         double landWealth = 0;
         double balWealth = 0;
-        if (main.getConfig().getBoolean("include-land", false)) {
+        if (main.landIsIncluded()) {
             landWealth = getEntityLandWealth(sender, name);
         }
 
-        if (main.getConfig().getBoolean("include-bal", false)) {
+        if (main.balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
         final double tempLandWealth = landWealth;

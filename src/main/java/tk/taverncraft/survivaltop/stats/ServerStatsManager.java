@@ -64,10 +64,8 @@ public class ServerStatsManager {
         // todo: clean up code logic
 
         try {
-            boolean includeLandInWealth = main.getConfig().getBoolean(
-                    "include-land", false);
-            boolean includeBalInWealth = main.getConfig().getBoolean(
-                    "include-bal", false);
+            boolean includeLandInWealth = main.landIsIncluded();
+            boolean includeBalInWealth = main.balIsIncluded();
             main.getLandManager().resetSenderLists();
             MessageManager.sendMessage(sender, "update-started");
             if (this.main.groupIsEnabled()) {
