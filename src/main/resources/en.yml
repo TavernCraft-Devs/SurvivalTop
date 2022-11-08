@@ -30,7 +30,7 @@ help-text: |
   &a/st stats &b- view your own stats
   &a/st stats <name> &b- view stats of specific entity
   &a/st top &b- view wealth leaderboard
-  &a/st landinfo &b- view block, spawner and container values
+  &a/st iteminfo &b- view item values for calculations
   &a/st update &b- manually trigger leaderboard update
   &a/st help &b- list available commands
   &a/st reload &b- reload the plugin

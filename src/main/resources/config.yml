@@ -1,29 +1,14 @@
 #####################################################################################
 #                                                                                   #
-#                        General Configurations (Do not skip)                       #
+#                              General Configurations                               #
 #                                                                                   #
 #####################################################################################
 
 # an elaborate tutorial and setup guide can be found on our wiki:
 # https://github.com/TavernCraft-Devs/SurvivalTop/wiki
 
-# by default, the term entity in this plugin refers to players
-# however, if enable-groups is set to true, then entity refers to a group (e.g. factions, kingdom)
-# this option should only be set to true for users who wish to show group-based leaderboards
-# make sure a valid group-type is set below and the relevant plugin is installed
-# otherwise, if enabled without a valid group-type, plugin will still disable group
-enable-group: false
-
-# the group-type option only works if enable-groups is set to true and the relevant plugin is installed
-# for the sake of clarity, links to the plugins are provided below
-# options supported are as listed, defaults to FactionsUuid if not specified and enable-group is true:
-# - FactionsUuid (https://www.spigotmc.org/resources/factionsuuid.1035/)
-# - KingdomsX (https://www.spigotmc.org/resources/kingdomsx.77670/)
-# - mcMMOParty (https://www.spigotmc.org/resources/official-mcmmo-original-author-returns.64348/)
-# - Parties (https://www.spigotmc.org/resources/parties-an-advanced-parties-manager.3709/)
-# - TownyAdvancedTown (https://www.spigotmc.org/resources/towny-advanced.72694/)
-# - TownyAdvancedNation (https://www.spigotmc.org/resources/towny-advanced.72694/)
-group-type: FactionsUuid
+# the plugin also comes with placeholder api support that can be found here:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#placeholderapi-support
 
 # language file to use (feel free to add your own lang file within the lang folder of the plugin and put the name here)
 lang-file: 'en.yml'
@@ -35,46 +20,34 @@ use-gui-stats: true
 
 #####################################################################################
 #                                                                                   #
-#                   Storage Configurations (ignore if not using)                    #
+#                               Group Configurations                                #
 #                                                                                   #
 #####################################################################################
 
-# whether to write updated entity data to file/mysql or not at all
-# options here include: MySQL, YAML and None
-# note that information storage is not required for this plugin since the results of updates are stored in cache
-# as of the latest version of this plugin, the storage only serves a purpose if you have your own means to make use of this information
-# it is thus recommended setting this to None if you have a large player-base, lag issues or have no use for storing the information
-storage-type: None
+# by default, the term entity in this plugin refers to players
+# however, if enable-groups is set to true, then entity refers to a group (e.g. factions, kingdom)
+# this option should only be set to true for users who wish to show group-based leaderboards
+# make sure a valid group-type is set below and the relevant plugin is installed
+# otherwise, if enabled without a valid group-type, plugin will still disable group
+enable-group: false
 
-# mysql connection details (ignore if not using)
-host: 127.0.0.1
-port: 3306
-user: survtop
-password: password
-database-name: survtop
-table-name: survtop
+# the group-type option only works if enable-groups is set to true with the relevant plugin installed
+# options supported for group-type can be found on our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#group-options
+group-type: FactionsUuid
 
 #####################################################################################
 #                                                                                   #
-#                 Leaderboard Configuration (ignore if not using)                   #
+#                               Balance Integration                                 #
 #                                                                                   #
 #####################################################################################
 
-# interval (in seconds) between updating the leaderboard (set to -1 to disable)
-# not recommended updating too frequently, especially if you have a large player-base
-# plugin reloads will restart/update this interval count from the point of reload
-update-interval: 3600
-
-# if true, will first update leaderboard on server start
-# if false, will first update leaderboard upon reaching the specified interval
-update-on-start: false
-
-# minimum wealth (inclusive) required to be included on the leaderboard - 0 will disallow negative wealth on leaderboard
-minimum-wealth: 0
+# if true, will include player /balance in calculating wealth (requires vault)
+include-bal: false
 
 #####################################################################################
 #                                                                                   #
-#             Land Claim Plugin Integration (ignore section if not using)           #
+#                            Land Claim Plugin Integration                          #
 #                                                                                   #
 #####################################################################################
 
@@ -105,7 +78,7 @@ include-containers: false
 
 #####################################################################################
 #                                                                                   #
-#                     Inventory Integration (ignore section if not using)           #
+#                              Inventory Integration                                #
 #                                                                                   #
 #####################################################################################
 
@@ -114,39 +87,51 @@ include-inventory: false
 
 #####################################################################################
 #                                                                                   #
-#                 Vault Integration (ignore section if not using)                   #
+#                             Leaderboard Configuration                             #
 #                                                                                   #
 #####################################################################################
 
-# if true, will include player /balance in calculating wealth (requires vault)
-include-bal: false
+# interval (in seconds) between updating the leaderboard (set to -1 to disable)
+# not recommended updating too frequently, especially if you have a large player-base
+# plugin reloads will restart/update this interval count from the point of reload
+update-interval: 3600
+
+# if true, will first update leaderboard on server start
+# if false, will first update leaderboard upon reaching the specified interval
+update-on-start: false
+
+# minimum wealth (inclusive) required to be included on the leaderboard - 0 will disallow negative wealth on leaderboard
+minimum-wealth: 0
 
 #####################################################################################
 #                                                                                   #
-#            Section for PAPI placeholders (ignore section if not using)            #
+#                               Storage Configurations                              #
 #                                                                                   #
 #####################################################################################
-# list of PAPI placeholders are provided below
-# {} brackets indicate variable names e.g. {position} represents leaderboard position and {name} represents entity name
 
-# placeholders for leaderboard
-# %survtop_top_name_{position}% - name of entity at specified leaderboard position
-# %survtop_top_wealth_{position}% - wealth of entity at specified leaderboard position
+# whether to write updated entity data to file/mysql or not at all
+# options here include: MySQL, YAML and None
+# note that information storage is not required for this plugin since the results of updates are stored in cache
+# as of the latest version of this plugin, the storage only serves a purpose if you have your own means to make use of this information
+# it is thus recommended setting this to None if you have a large player-base, lag issues or have no use for storing the information
+storage-type: None
 
-# placeholder for entity information
-# if {name} is omitted, information returned will be that of the sender instead
-# %survtop_entity_position_{name}% - position of entity for its given name
-# %survtop_entity_total_wealth_{name}% - total wealth of entity as last calculated in leaderboard update
-# %survtop_entity_land_wealth_{name}% - land wealth of entity as last calculated in leaderboard update
-# %survtop_entity_bal_wealth_{name}% - balance wealth of entity as last calculated in leaderboard update
+# mysql connection details (ignore if not using)
+host: 127.0.0.1
+port: 3306
+user: survtop
+password: password
+database-name: survtop
+table-name: survtop
 
 #####################################################################################
 #                                                                                   #
-#                     Miscellaneous (ignore section if not using)                   #
+#                             Miscellaneous Configurations                          #
 #                                                                                   #
 #####################################################################################
+
 # this section contains plugin-specific configurations that should be ignored if not used
 
-# towny advanced
+# towny advanced users should make sure this block size is the same as in the towny advanced config
 town-block-size: 16
 

@@ -10,32 +10,32 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**
- * LandInfoCommand contains the execute method for when a user inputs command to view the value of
+ * ItemInfoCommand contains the execute method for when a user inputs command to view the value of
  * blocks/spawners/containers.
  */
-public class LandInfoCommand {
+public class ItemInfoCommand {
 
-    private final String landInfoPerm = "survtop.landinfo";
+    private final String itemInfoPerm = "survtop.iteminfo";
     private ValidationManager validationManager;
 
     /**
-     * Constructor for LandInfoCommand.
+     * Constructor for ItemInfoCommand.
      *
      * @param main plugin class
      */
-    public LandInfoCommand(Main main) {
+    public ItemInfoCommand(Main main) {
         this.validationManager = new ValidationManager(main);
     }
 
     /**
-     * Shows all land info to user.
+     * Shows all item info to user.
      *
      * @param sender user who sent the command
      *
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender) {
-        if (!validationManager.hasPermission(landInfoPerm, sender)) {
+        if (!validationManager.hasPermission(itemInfoPerm, sender)) {
             return true;
         }
 

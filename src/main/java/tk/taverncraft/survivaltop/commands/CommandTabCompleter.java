@@ -18,7 +18,7 @@ public class CommandTabCompleter implements TabCompleter {
     private static final String[] COMMANDS = {
         "top",
         "stats",
-        "landinfo",
+        "iteminfo",
         "update",
         "help",
         "reload"

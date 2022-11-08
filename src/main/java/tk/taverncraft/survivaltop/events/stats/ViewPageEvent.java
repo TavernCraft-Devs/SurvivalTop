@@ -43,13 +43,13 @@ public class ViewPageEvent implements Listener {
             e.setCancelled(true);
         }
 
-        // handle stats page and land info page differently
+        // handle stats page and item info page differently
         int slot = e.getRawSlot();
         if (title.contains("Wealth Stats")) {
             statsMainPageClickHandler(slot, e);
             return;
         }
-        if (title.startsWith("Wealth Calculation Info")) {
+        if (title.startsWith("Item Values Info")) {
             infoMainPageClickHandler(slot, e);
             return;
         }
@@ -65,7 +65,7 @@ public class ViewPageEvent implements Listener {
             return;
         }
 
-        // handle land info pagination
+        // handle item info pagination
         boolean isBlockInfoPage = title.contains("Block Info");
         boolean isSpawnerInfoPage = title.contains("Spawner Info");
         boolean isContainerInfoPage = title.contains("Container Info");

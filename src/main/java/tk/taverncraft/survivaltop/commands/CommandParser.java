@@ -3,7 +3,6 @@ package tk.taverncraft.survivaltop.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import tk.taverncraft.survivaltop.Main;
 
@@ -56,9 +55,9 @@ public class CommandParser implements CommandExecutor {
         case "TOP":
             return new TopCommand(this.main).execute(sender, args);
 
-        // command to view land info
-        case "LANDINFO":
-            return new LandInfoCommand(this.main).execute(sender);
+        // command to view item info
+        case "ITEMINFO":
+            return new ItemInfoCommand(this.main).execute(sender);
 
         // command to manually trigger leaderboard update
         case "UPDATE":

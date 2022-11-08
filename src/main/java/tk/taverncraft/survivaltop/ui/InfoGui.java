@@ -10,7 +10,7 @@ import org.bukkit.inventory.Inventory;
 import tk.taverncraft.survivaltop.Main;
 
 /**
- * InfoGui handles all logic related to showing land info in a GUI.
+ * InfoGui handles all logic related to showing item info in a GUI.
  */
 public class InfoGui extends GuiHelper {
 
@@ -54,11 +54,11 @@ public class InfoGui extends GuiHelper {
     }
 
     /**
-     * Sets up the main page for land info.
+     * Sets up the main page for item info.
      */
     public void setUpMainPage() {
         Inventory inv = Bukkit.createInventory(null, this.mainPageSize,
-                "Wealth Calculation Info" + identifier);
+                "Item Values Info" + identifier);
         for (int i = 0; i < mainPageSize; i++) {
             inv.setItem(i, createGuiItem(background, " ", false));
         }
