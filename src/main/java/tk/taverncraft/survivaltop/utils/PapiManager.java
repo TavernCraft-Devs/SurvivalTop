@@ -62,49 +62,70 @@ public class PapiManager extends PlaceholderExpansion {
                 int index = Integer.parseInt(args[2]) - 1;
                 return main.getServerStatsManager().getEntityWealthAtPosition(index);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                return "None";
+                return "0";
             }
         }
 
-        if (params.startsWith("entity_position_")) {
-            String[] args = params.split("_", 4);
+        if (params.startsWith("entity_position")) {
+            String[] args = params.split("_", 3);
             try {
-                String entityName = args[2];
+                String entityName;
+                if (args.length == 2) {
+                    entityName = player.getName();
+                } else {
+                    entityName = args[2];
+                }
                 return main.getServerStatsManager().getPositionOfEntity(entityName);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "None";
             }
         }
 
-        if (params.startsWith("entity_total_wealth_")) {
+        if (params.startsWith("entity_total_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                String entityName = args[3];
+                String entityName;
+                if (args.length == 3) {
+                    entityName = player.getName();
+                } else {
+                    entityName = args[3];
+                }
                 return main.getServerStatsManager().getEntityTotalWealth(entityName);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
-                return "None";
+                return "0";
             }
         }
 
-        if (params.startsWith("entity_land_wealth_")) {
+        if (params.startsWith("entity_land_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                String entityName = args[3];
+                String entityName;
+                if (args.length == 3) {
+                    entityName = player.getName();
+                } else {
+                    entityName = args[3];
+                }
                 return main.getServerStatsManager().getEntityLandWealth(entityName);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
-                return "None";
+                return "0";
             }
         }
 
-        if (params.startsWith("entity_bal_wealth_")) {
+        if (params.startsWith("entity_bal_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                String entityName = args[3];
+                String entityName;
+                if (args.length == 3) {
+                    entityName = player.getName();
+                } else {
+                    entityName = args[3];
+                }
                 return main.getServerStatsManager().getEntityBalWealth(entityName);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
-                return "None";
+                return "0";
             }
         }
+
         return null; // Placeholder is unknown by the Expansion
     }
 }

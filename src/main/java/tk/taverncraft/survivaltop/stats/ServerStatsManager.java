@@ -306,7 +306,14 @@ public class ServerStatsManager {
      * @return position of given entity
      */
     public String getPositionOfEntity(String entityName) {
-        UUID uuid = this.groupNameToUuidMap.get(entityName);
+        UUID uuid;
+        if (this.main.groupIsEnabled()) {
+            uuid = this.groupNameToUuidMap.get(entityName);
+        } else {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
+            uuid = player.getUniqueId();
+        }
+
         Integer position = this.entityPositionCache.get(uuid);
         if (position != null) {
             position = position + 1; // index 0

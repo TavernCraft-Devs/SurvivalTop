@@ -4,6 +4,9 @@
 #                                                                                   #
 #####################################################################################
 
+# an elaborate tutorial and setup guide can be found on our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki
+
 # by default, the term entity in this plugin refers to players
 # however, if enable-groups is set to true, then entity refers to a group (e.g. factions, kingdom)
 # this option should only be set to true for users who wish to show group-based leaderboards
@@ -117,8 +120,12 @@ include-bal: false
 # list of PAPI placeholders are provided below
 # {} brackets indicate variable names e.g. {position} represents leaderboard position and {name} represents entity name
 
+# placeholders for leaderboard
 # %survtop_top_name_{position}% - name of entity at specified leaderboard position
 # %survtop_top_wealth_{position}% - wealth of entity at specified leaderboard position
+
+# placeholder for entity information
+# if {name} is omitted, information returned will be that of the sender instead
 # %survtop_entity_position_{name}% - position of entity for its given name
 # %survtop_entity_total_wealth_{name}% - total wealth of entity as last calculated in leaderboard update
 # %survtop_entity_land_wealth_{name}% - land wealth of entity as last calculated in leaderboard update
