@@ -54,16 +54,9 @@ include-bal: false
 # if true, will include blocks in land for calculating wealth (requires a land claim plugin)
 include-land: false
 
-# options supported are listed below, defaults to GriefPrevention if not specified and include-land is true:
-# - GriefPrevention
-# - Residence
-# - UltimateClaims
-# - GriefDefender
-# - KingdomsX
-# - CrashClaim
-# - FactionsUuid
-# - RedProtect
-# - TownyAdvanced
+# if you are intending to include land, make sure a valid land type is set below
+# options supported for land-type can be found on our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
 land-type: GriefPrevention
 
 # if true, spawners will be included as part of land wealth in calculations
