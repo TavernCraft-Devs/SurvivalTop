@@ -2,17 +2,11 @@ package tk.taverncraft.survivaltop.storage;
 
 import java.util.UUID;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
- * Empty helper for cases where storage is not required.
+ * Empty helper class that does nothing for cases where storage is not required.
  */
 public class NoneHelper implements StorageHelper {
-    Main main;
 
-    public NoneHelper(Main main) {
-        this.main = main;
-    }
-
+    public NoneHelper() {}
     public void saveToStorage(UUID uuid, double landWealth, double balWealth) {}
 }

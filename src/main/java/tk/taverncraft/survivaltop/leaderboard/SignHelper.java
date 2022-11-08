@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.bukkit.*;
+import org.bukkit.World;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -20,10 +23,12 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
  * SignHelper handles all the operations required to update/remove a leaderboard sign.
  */
 public class SignHelper {
-    Main main;
+    private Main main;
 
     /**
      * Constructor for SignHelper.
+     *
+     * @param main plugin class
      */
     public SignHelper(Main main) {
         this.main = main;
@@ -48,7 +53,8 @@ public class SignHelper {
         String unformattedLine1 = ChatColor.stripColor(line1);
         String unformattedLine2 = ChatColor.stripColor(line2);
 
-        if (unformattedLine1 == null || !unformattedLine1.equalsIgnoreCase("[survivaltop]")) {
+        if (unformattedLine1 == null
+                || !unformattedLine1.equalsIgnoreCase("[survivaltop]")) {
             return false;
         }
 
@@ -79,7 +85,8 @@ public class SignHelper {
         signsConfig.set(key + ".y", block.getY());
         signsConfig.set(key + ".z", block.getZ());
         signsConfig.set(key + ".world", block.getWorld().getName());
-        signsConfig.set(key + ".direction", ((Directional) block.getBlockData()).getFacing().toString());
+        signsConfig.set(key + ".direction",
+                ((Directional) block.getBlockData()).getFacing().toString());
         signsConfig.set(key + ".rank", position);
         signsConfig.set(key + ".entity", name);
         signsConfig.set(key + ".wealth", wealth);
@@ -95,14 +102,18 @@ public class SignHelper {
      * Updates all the signs after every leaderboard update.
      */
     public void updateSigns() throws NullPointerException {
-        for (String key : Objects.requireNonNull(main.getSignsConfig().getConfigurationSection("")).getKeys(false)) {
+        for (String key : Objects.requireNonNull(
+                main.getSignsConfig().getConfigurationSection("")).getKeys(false)) {
             double x = main.getSignsConfig().getDouble(key + ".x");
             double y = main.getSignsConfig().getDouble(key + ".y");
             double z = main.getSignsConfig().getDouble(key + ".z");
-            World world = Bukkit.getWorld(Objects.requireNonNull(main.getSignsConfig().getString(key + ".world")));
+            World world = Bukkit.getWorld(Objects.requireNonNull(
+                    main.getSignsConfig().getString(key + ".world")));
             int position = main.getSignsConfig().getInt(key + ".rank");
-            String savedName = Objects.requireNonNull(main.getSignsConfig().getString(key + ".entity"));
-            String savedWealth = Objects.requireNonNull(main.getSignsConfig().getString(key + ".wealth"));
+            String savedName = Objects.requireNonNull(
+                    main.getSignsConfig().getString(key + ".entity"));
+            String savedWealth = Objects.requireNonNull(
+                    main.getSignsConfig().getString(key + ".wealth"));
             String direction = main.getSignsConfig().getString(key + ".direction");
             Location loc;
             try {
@@ -131,8 +142,8 @@ public class SignHelper {
      * @param savedName last saved entity name
      * @param savedWealth last saved entity wealth
      */
-    public void updateSign(Block block, String direction, int position, String savedName, String savedWealth) {
-        Sign sign = (Sign) block.getState();
+    public void updateSign(Block block, String direction, int position, String savedName,
+            String savedWealth) {
         String name;
         String wealth;
         try {
@@ -143,28 +154,28 @@ public class SignHelper {
             wealth = savedWealth;
         }
 
+        Sign sign = (Sign) block.getState();
         if (direction != null) {
             Directional dir = (Directional) sign.getBlockData();
             dir.setFacing(BlockFace.valueOf(direction));
         }
-
         String signFormat = MessageManager.getSignFormat(new String[]{"%entity%", "%totalwealth%"},
                 new String[]{name, wealth});
         String[] signArr = signFormat.split("\n", 2);
 
-        sign.setLine(0, ChatColor.translateAlternateColorCodes('&', "&b&l[SurvivalTop]"));
-        sign.setLine(1, ChatColor.translateAlternateColorCodes('&', "&e&l" + position));
+        sign.setLine(0, ChatColor.translateAlternateColorCodes('&',
+                "&b&l[SurvivalTop]"));
+        sign.setLine(1, ChatColor.translateAlternateColorCodes('&',
+                "&e&l" + position));
         sign.setLine(2, signArr[0]);
         sign.setLine(3, signArr[1]);
-
         Bukkit.getScheduler().runTask(main, (Runnable) sign::update);
-
         save(block, position, name, wealth);
 
         PlayerHeadHelper playerHeadHelper = new PlayerHeadHelper();
         Block skullAboveBlockBehindSign = playerHeadHelper.getSkullAboveBlockBehindSign(block);
         Block skullAboveSign = playerHeadHelper.getSkullAboveSign(block);
-        OfflinePlayer player;
+        OfflinePlayer player = Bukkit.getOfflinePlayer(name);
         if (main.groupIsEnabled()) {
             String leader = main.getGroupManager().getGroupLeader(name);
             if (leader == null) {
@@ -172,13 +183,8 @@ public class SignHelper {
             } else {
                 player = Bukkit.getOfflinePlayer(leader);
             }
-        } else {
-            player = Bukkit.getOfflinePlayer(name);
         }
-
-        if (player != null) {
-            playerHeadHelper.update(player, skullAboveBlockBehindSign, skullAboveSign);
-        }
+        playerHeadHelper.update(player, skullAboveBlockBehindSign, skullAboveSign);
     }
 
     /**

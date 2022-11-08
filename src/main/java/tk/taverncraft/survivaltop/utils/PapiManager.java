@@ -14,6 +14,11 @@ public class PapiManager extends PlaceholderExpansion {
 
     private final Main main;
 
+    /**
+     * Constructor for PapiManager.
+     *
+     * @param main plugin class
+     */
     public PapiManager(Main main) {
         this.main = main;
     }
@@ -30,12 +35,12 @@ public class PapiManager extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "1.1.12";
+        return "2.0.2";
     }
 
     @Override
     public boolean persist() {
-        return true; // This is required or else PlaceholderAPI will unregister the Expansion on reload
+        return true; // required or else PlaceholderAPI will unregister the Expansion on reload
     }
 
     @Override

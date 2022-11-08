@@ -3,18 +3,20 @@ package tk.taverncraft.survivaltop.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
 import org.bukkit.entity.Player;
+
 import tk.taverncraft.survivaltop.Main;
 
 /**
  * CommandParser contains the onCommand method that handles user command input.
  */
 public class CommandParser implements CommandExecutor {
-    Main main;
+    private Main main;
 
     /**
      * Constructor for CommandParser.
+     *
+     * @param main plugin class
      */
     public CommandParser(Main main) {
         this.main = main;
@@ -22,63 +24,62 @@ public class CommandParser implements CommandExecutor {
 
     /**
      * Entry point of commands.
+     *
+     * @param sender user who sent command
+     * @param cmd command which was executed
+     * @param label alias of the command
+     * @param args arguments following the command
+     *
+     * @return true at end of execution
      */
-    public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
-        if (cmd.getName().equalsIgnoreCase("survivaltop")) {
+    public boolean onCommand(final CommandSender sender, final Command cmd, final String label,
+            final String[] args) {
 
-            // if no arguments provided or is null, return invalid command
-            if (args.length == 0) {
-                return new InvalidCommand(this.main).execute(sender);
-            }
-
-            final String chatCmd = args[0];
-
-            if (chatCmd == null) {
-                return new InvalidCommand(this.main).execute(sender);
-            }
-
-            // command to view own or others' stats
-            if (chatCmd.equals("stats")) {
-                if (args.length == 2) {
-                    return new StatsCommand(this.main).execute(sender, args);
-                } else {
-                    return new StatsCommand(this.main).execute(sender);
-                }
-            }
-
-            // command to view wealth leaderboard
-            if (chatCmd.equals("top")) {
-                return new TopCommand(this.main).execute(sender, args);
-            }
-
-            // command to view blockinfo
-            if (chatCmd.equals("landinfo")) {
-                return new LandInfoCommand(this.main).execute(sender);
-            }
-
-            // command to manually trigger leaderboard update
-            if (chatCmd.equals("update")) {
-                return new UpdateCommand(this.main).execute(sender);
-            }
-
-            // command to view all commands
-            if (chatCmd.equals("help")) {
-                return new HelpCommand(this.main).execute(sender);
-            }
-
-            // command to reload plugin
-            if (chatCmd.equals("reload")) {
-                return new ReloadCommand(this.main).execute(sender);
-            }
-
-            // special command for stats inventory view
-            if (chatCmd.equals("openstatsinv") && sender instanceof Player) {
-                main.getEntityStatsManager().openMainStatsPage(((Player) sender).getUniqueId());
-                return true;
-            }
-
-            return new InvalidCommand(this.main).execute(sender);
+        // if no arguments provided or is null, return invalid command
+        if (args.length == 0) {
+            return new InvalidCommand().execute(sender);
         }
-        return true;
+
+        final String chatCmd = args[0];
+
+        if (chatCmd == null) {
+            return new InvalidCommand().execute(sender);
+        }
+
+        switch (chatCmd.toUpperCase()) {
+
+        // command to view own or others' stats
+        case "STATS":
+            return new StatsCommand(this.main).execute(sender, args);
+
+        // command to view wealth leaderboard
+        case "TOP":
+            return new TopCommand(this.main).execute(sender, args);
+
+        // command to view land info
+        case "LANDINFO":
+            return new LandInfoCommand(this.main).execute(sender);
+
+        // command to manually trigger leaderboard update
+        case "UPDATE":
+            return new UpdateCommand(this.main).execute(sender);
+
+        // command to view all commands
+        case "HELP":
+            return new HelpCommand(this.main).execute(sender);
+
+        // command to reload plugin
+        case "RELOAD":
+            return new ReloadCommand(this.main).execute(sender);
+
+        // special command for stats inventory view
+        case "OPENSTATSINV":
+            main.getEntityStatsManager().openMainStatsPage(this.main.getSenderUuid(sender));
+            return true;
+
+        // all other cases treated as invalid
+        default:
+            return new InvalidCommand().execute(sender);
+        }
     }
 }

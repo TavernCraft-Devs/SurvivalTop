@@ -30,7 +30,8 @@ public class PlayerHeadHelper {
             return null;
         }
         Directional directional = (Directional) data;
-        Location locBehind = block.getRelative(directional.getFacing().getOppositeFace()).getLocation();
+        Location locBehind =
+                block.getRelative(directional.getFacing().getOppositeFace()).getLocation();
         Block skullBlock = locBehind.add(0, 1, 0).getBlock();
         BlockState state = skullBlock.getState();
         if (state instanceof Skull) {
@@ -67,7 +68,8 @@ public class PlayerHeadHelper {
      * @param skullAboveBlockBehindSign skull block above block behind sign
      * @param skullAboveSign skull block above sign
      */
-    public void update(OfflinePlayer player, Block skullAboveBlockBehindSign, Block skullAboveSign) {
+    public void update(OfflinePlayer player, Block skullAboveBlockBehindSign,
+            Block skullAboveSign) {
         if (skullAboveBlockBehindSign != null) {
             BlockState state = skullAboveBlockBehindSign.getState();
             Skull skull = (Skull) state;

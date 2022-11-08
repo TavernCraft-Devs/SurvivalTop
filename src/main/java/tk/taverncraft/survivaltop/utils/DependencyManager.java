@@ -1,10 +1,14 @@
 package tk.taverncraft.survivaltop.utils;
 
-import org.bukkit.Bukkit;
-import tk.taverncraft.survivaltop.Main;
-
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
+
+import tk.taverncraft.survivaltop.Main;
+
+/**
+ * DependencyManager handles the checking for dependencies.
+ */
 public class DependencyManager {
     private Main main;
 
@@ -25,63 +29,108 @@ public class DependencyManager {
         put("parties", "Parties");
     }};
 
+    /**
+     * Constructor for DependencyManager.
+     *
+     * @param main plugin class
+     */
     public DependencyManager(Main main) {
         this.main = main;
     }
 
+    /**
+     * Checks if required dependencies are loaded.
+     *
+     * @return true if dependencies are loaded, false otherwise.
+     */
     public boolean hasDependenciesLoaded() {
-        boolean landCheckPassed;
-        if (main.getConfig().getBoolean("include-land")) {
-            String landType = main.getConfig().getString("land-type", "griefprevention").toLowerCase();
-            String depPlugin = pluginMap.get(landType);
-            if (depPlugin == null) {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for " + landType + ", did" +
-                    " you make a typo in the config?");
-                return false;
-            }
-            landCheckPassed = isDependencyEnabled(depPlugin);
-
-            if (landCheckPassed) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: " + depPlugin + " for land" +
-                    " type!");
-            } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: " + depPlugin + " for land " +
-                    "type!");
-                return false;
-            }
+        boolean landCheckPassed = checkLand();
+        if (!landCheckPassed) {
+            return false;
         }
 
-        boolean groupCheckPassed;
-        if (main.getConfig().getBoolean("enable-group")) {
-            String groupType = main.getConfig().getString("group-type", "factionsuuid").toLowerCase();
-            String depPlugin = pluginMap.get(groupType);
-            if (depPlugin == null) {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for " + groupType + ", did" +
-                    " you make a typo in the config?");
-                return false;
-            }
-            groupCheckPassed = isDependencyEnabled(depPlugin);
-
-            if (groupCheckPassed) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: " + depPlugin + " for " +
-                    "group type!");
-            } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: " + depPlugin + " for group " +
-                    "type!");
-                return false;
-            }
+        boolean groupCheckPassed = checkGroup();
+        if (!groupCheckPassed) {
+            return false;
         }
 
         return true;
     }
 
-    public boolean isDependencyEnabled(String plugin) {
+    /**
+     * Check if a dependency plugin is enabled.
+     *
+     * @param plugin plugin to check for
+     *
+     * @return true if plugin is enabled, false otherwise
+     */
+    private boolean isDependencyEnabled(String plugin) {
         if (Bukkit.getServer().getPluginManager().getPlugin(plugin) != null &&
             Bukkit.getServer().getPluginManager().getPlugin(plugin).isEnabled()) {
             return true;
         }
-        Bukkit.getLogger().severe("[SurvivalTop] There appears to be a missing dependency: " + plugin + ". Have" +
-            " you installed it correctly?");
+        Bukkit.getLogger().severe("[SurvivalTop] There appears to be a missing dependency: "
+                + plugin + ". Have you installed it correctly?");
         return false;
+    }
+
+    /**
+     * Check if land dependency plugin is enabled.
+     *
+     * @return true if plugin is enabled, false otherwise
+     */
+    private boolean checkLand() {
+        boolean enabled;
+        if (main.getConfig().getBoolean("include-land")) {
+            String landType = main.getConfig().getString("land-type",
+                "griefprevention").toLowerCase();
+            String depPlugin = pluginMap.get(landType);
+            if (depPlugin == null) {
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
+                    + landType + ", did you make a typo in the config?");
+                return false;
+            }
+            enabled = isDependencyEnabled(depPlugin);
+
+            if (enabled) {
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: "
+                    + depPlugin + " for land type!");
+            } else {
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
+                    + depPlugin + " for land type!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if group dependency plugin is enabled.
+     *
+     * @return true if plugin is enabled, false otherwise
+     */
+    private boolean checkGroup() {
+        boolean enabled;
+        if (main.getConfig().getBoolean("enable-group")) {
+            String groupType = main.getConfig().getString("group-type",
+                "factionsuuid").toLowerCase();
+            String depPlugin = pluginMap.get(groupType);
+            if (depPlugin == null) {
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
+                    + groupType + ", did you make a typo in the config?");
+                return false;
+            }
+            enabled = isDependencyEnabled(depPlugin);
+
+            if (enabled) {
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: "
+                    + depPlugin + " for group type!");
+            } else {
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
+                    + depPlugin + " for group type!");
+                return false;
+            }
+        }
+        return true;
     }
 }

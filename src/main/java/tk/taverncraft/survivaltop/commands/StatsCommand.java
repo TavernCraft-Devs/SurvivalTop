@@ -16,11 +16,13 @@ public class StatsCommand {
 
     private final String statsSelfPerm = "survtop.stats.self";
     private final String statsOthersPerm = "survtop.stats.others";
-    Main main;
-    ValidationManager validationManager;
+    private Main main;
+    private ValidationManager validationManager;
 
     /**
      * Constructor for StatsCommand.
+     *
+     * @param main plugin class
      */
     public StatsCommand(Main main) {
         this.main = main;
@@ -28,47 +30,7 @@ public class StatsCommand {
     }
 
     /**
-     * Shows user own stats.
-     *
-     * @param sender user who sent the command
-     *
-     * @return true at end of execution
-     */
-    public boolean execute(CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            MessageManager.sendMessage(sender, "player-only-command");
-            return true;
-        }
-
-        if (!validationManager.hasPermission(statsSelfPerm, sender)) {
-            return true;
-        }
-
-        Player player = (Player) sender;
-        UUID uuid = player.getUniqueId();
-        String name;
-        if (this.main.groupIsEnabled()) {
-            name = this.main.getGroupManager().getGroupOfPlayer(player.getName());
-            if (!this.validationManager.groupExist(name, sender)) {
-                return true;
-            }
-        } else {
-            name = player.getName();
-        }
-
-        if (main.getEntityStatsManager().senderHasCalculationInProgress(uuid)) {
-            MessageManager.sendMessage(sender, "calculation-in-progress");
-            return true;
-        }
-
-        main.getEntityStatsManager().setCalculatingStats(sender);
-        MessageManager.sendMessage(sender, "start-calculating-stats");
-        main.getEntityStatsManager().getEntityStats(sender, name);
-        return true;
-    }
-
-    /**
-     * Views the stats of another entity.
+     * Checks if user is requesting stats for self or others and handles request accordingly.
      *
      * @param sender user who sent the command
      * @param args command arguments
@@ -76,36 +38,83 @@ public class StatsCommand {
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender, String[] args) {
-        String name = args[1];
-        if (!validationManager.hasPermission(statsOthersPerm, sender)) {
-            return true;
+        if (args.length == 2) {
+            getStatsForSelf(sender);
+        } else {
+            getStatsForOthers(sender, args);
+        }
+        return true;
+    }
+
+    /**
+     * Shows user stats for self.
+     *
+     * @param sender user who sent the command
+     */
+    private void getStatsForSelf(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            MessageManager.sendMessage(sender, "player-only-command");
+            return;
         }
 
+        if (!validationManager.hasPermission(statsSelfPerm, sender)) {
+            return;
+        }
+
+        Player player = (Player) sender;
+        UUID uuid = player.getUniqueId();
+        String name = player.getName();
+
+        // if group is enabled, get name of the group the player belongs to instead
+        if (this.main.groupIsEnabled()) {
+            name = this.main.getGroupManager().getGroupOfPlayer(name);
+            if (!this.validationManager.groupExist(name, sender)) {
+                return;
+            }
+        }
+
+        // check if there is an ongoing calculation task (guard against spam)
+        if (main.getEntityStatsManager().senderHasCalculationInProgress(uuid)) {
+            MessageManager.sendMessage(sender, "calculation-in-progress");
+            return;
+        }
+
+        MessageManager.sendMessage(sender, "start-calculating-stats");
+        main.getEntityStatsManager().getEntityStats(sender, uuid, name);
+    }
+
+    /**
+     * Shows user stats for others.
+     *
+     * @param sender user who sent the command
+     * @param args command arguments
+     */
+    private void getStatsForOthers(CommandSender sender, String[] args) {
+        String name = args[1];
+        if (!validationManager.hasPermission(statsOthersPerm, sender)) {
+            return;
+        }
+
+        // check if group/player provided exist
         if (this.main.groupIsEnabled()) {
             if (!this.validationManager.groupExist(args[1], sender)) {
-                return true;
+                return;
             }
         } else {
             if (!this.validationManager.playerExist(args[1], sender)) {
-                return true;
+                return;
             }
         }
 
-        UUID uuid;
-        if (sender instanceof Player) {
-            uuid = ((Player) sender).getUniqueId();
-        } else {
-            uuid = main.getConsoleUuid();
-        }
+        UUID uuid = main.getSenderUuid(sender);
 
+        // check if there is an ongoing calculation task (guard against spam)
         if (main.getEntityStatsManager().senderHasCalculationInProgress(uuid)) {
             MessageManager.sendMessage(sender, "calculation-in-progress");
-            return true;
+            return;
         }
 
-        main.getEntityStatsManager().setCalculatingStats(sender);
         MessageManager.sendMessage(sender, "start-calculating-stats");
-        main.getEntityStatsManager().getEntityStats(sender, name);
-        return true;
+        main.getEntityStatsManager().getEntityStats(sender, uuid, name);
     }
 }

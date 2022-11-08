@@ -13,15 +13,17 @@ import tk.taverncraft.survivaltop.leaderboard.SignHelper;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
 /**
- * SignPlaceEvent checks for when a SurvivalTop sign is broken.
+ * SignPlaceEvent checks for when a leaderboard sign is placed.
  */
 public class SignPlaceEvent implements Listener {
 
     private final String signAddPerm = "survtop.sign.add";
-    Main main;
+    private Main main;
 
     /**
      * Constructor for SignPlaceEvent.
+     *
+     * @param main plugin class
      */
     public SignPlaceEvent(Main main) {
         this.main = main;
@@ -42,25 +44,24 @@ public class SignPlaceEvent implements Listener {
 
         String line1 = e.getLine(0);
         String line2 = e.getLine(1);
-
         SignHelper signHelper = new SignHelper(main);
         if (!signHelper.isSurvTopSign(line1, line2)) {
             return;
         }
 
         Player player = e.getPlayer();
-
         if (!player.hasPermission(signAddPerm)) {
             e.setCancelled(true);
             MessageManager.sendMessage(player, "no-survtop-sign-add-permission");
             return;
         }
 
-        assert line2 != null;
         if (main.getLeaderboardManager().isUpdating()) {
-            signHelper.updateSign(e.getBlock(), null, Integer.parseInt(line2), "Updating...", "Updating...");
+            signHelper.updateSign(e.getBlock(), null, Integer.parseInt(line2),
+                    "Updating...", "Updating...");
         } else {
-            signHelper.updateSign(e.getBlock(), null, Integer.parseInt(line2), "Not updated", "Not updated");
+            signHelper.updateSign(e.getBlock(), null, Integer.parseInt(line2),
+                    "Not updated", "Not updated");
         }
         MessageManager.sendMessage(player, "survtop-sign-placed",
                 new String[]{"%rank%"},

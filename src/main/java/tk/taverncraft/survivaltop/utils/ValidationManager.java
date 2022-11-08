@@ -4,9 +4,17 @@ import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
 
+/**
+ * ValidationManager performs basic validation operations.
+ */
 public class ValidationManager {
-    Main main;
+    private Main main;
 
+    /**
+     * Constructor for ValidationManager.
+     *
+     * @param main plugin class
+     */
     public ValidationManager(Main main) {
         this.main = main;
     }

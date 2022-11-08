@@ -7,16 +7,19 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**
- * UpdateCommand contains the execute method for when a user wishes to manually trigger a leaderboard update.
+ * UpdateCommand contains the execute method for when a user wishes to manually trigger a
+ * leaderboard update.
  */
 public class UpdateCommand {
 
     private final String updatePerm = "survtop.update";
-    Main main;
-    ValidationManager validationManager;
+    private Main main;
+    private ValidationManager validationManager;
 
     /**
      * Constructor for UpdateCommand.
+     *
+     * @param main plugin class
      */
     public UpdateCommand(Main main) {
         this.main = main;
@@ -35,12 +38,13 @@ public class UpdateCommand {
             return true;
         }
 
+        // check if there is an existing update ongoing (guard against spam)
         if (main.getLeaderboardManager().isUpdating()) {
             MessageManager.sendMessage(sender, "update-in-progress");
             return true;
         }
 
-        main.getLeaderboardManager().manualUpdateLeaderboard(sender);
+        main.getLeaderboardManager().doManualLeaderboardUpdate(sender);
         return true;
     }
 }

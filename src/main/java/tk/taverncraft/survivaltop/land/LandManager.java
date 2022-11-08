@@ -13,7 +13,7 @@ import tk.taverncraft.survivaltop.land.claimplugins.*;
  * LandManager is responsible for all land value calculations.
  */
 public class LandManager {
-    Main main;
+    private Main main;
 
     // helper classes
     private LandOperationsHelper landOperationsHelper;
@@ -43,6 +43,8 @@ public class LandManager {
 
     /**
      * Constructor for LandManager.
+     *
+     * @param main plugin class
      */
     public LandManager(Main main) throws NullPointerException {
         this.main = main;
@@ -112,14 +114,15 @@ public class LandManager {
      * @param world world to search in
      * @param blockOperations block operations to perform
      */
-    public double getClaimWorth(UUID uuid, double maxX, double minX, double maxY, double minY, double maxZ, double minZ,
-                World world, ArrayList<BiFunction<UUID, Block, Double>> blockOperations) {
+    public double getClaimWorth(UUID uuid, double maxX, double minX, double maxY, double minY,
+            double maxZ, double minZ, World world,
+            ArrayList<BiFunction<UUID, Block, Double>> blockOperations) {
         double blocksWorth = 0;
 
-        for (double i = minX; i < maxX; i++) {
-            for (double j = minY; j < maxY; j++) {
-                for (double k = minZ; k < maxZ; k++) {
-                    Block block = world.getBlockAt((int) i, (int) j, (int) k);
+        for (int i = (int) minX; i < maxX; i++) {
+            for (int j = (int) minY; j < maxY; j++) {
+                for (int k = (int) minZ; k < maxZ; k++) {
+                    Block block = world.getBlockAt(i, j, k);
                     for (BiFunction<UUID, Block, Double> f : blockOperations) {
                         double blockWorth = ((Number) f.apply(uuid, block)).doubleValue();
                         blocksWorth += blockWorth;
@@ -220,6 +223,11 @@ public class LandManager {
         senderContainerForGui.get(uuid).put(itemName, currentCount + amount);
     }
 
+    /**
+     * Calculates spawner worth for all entities.
+     *
+     * @return map of entities uuid to their spawner worth
+     */
     public HashMap<UUID, Double> calculateSpawnerWorthForAll() {
         HashMap<UUID, Double> tempSpawnerCache = new HashMap<>();
         for (Map.Entry<UUID, ArrayList<Block>> map : senderSpawnerListForAll.entrySet()) {
@@ -230,6 +238,14 @@ public class LandManager {
         return tempSpawnerCache;
     }
 
+    /**
+     * Calculates spawner worth for a specified entity.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param useGui whether a gui is used
+     *
+     * @return map of sender uuid to the calculated spawner worth
+     */
     public double calculateSpawnerWorthForIndividual(UUID uuid, boolean useGui) {
         ArrayList<Block> blocks = senderSpawnerListForIndividual.get(uuid);
         if (blocks == null) {
@@ -238,6 +254,11 @@ public class LandManager {
         return landOperationsHelper.processSpawnerWorthForIndividual(blocks, uuid, useGui);
     }
 
+    /**
+     * Calculates container worth for all entities.
+     *
+     * @return map of entities uuid to their container worth
+     */
     public HashMap<UUID, Double> calculateContainerWorthForAll() {
         HashMap<UUID, Double> tempContainerCache = new HashMap<>();
         for (Map.Entry<UUID, ArrayList<Block>> map : senderContainerListForAll.entrySet()) {
@@ -248,6 +269,14 @@ public class LandManager {
         return tempContainerCache;
     }
 
+    /**
+     * Calculates container worth for a specified entity.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param useGui whether a gui is used
+     *
+     * @return map of sender uuid to the calculated container worth
+     */
     public double calculateContainerWorthForIndividual(UUID uuid, boolean useGui) {
         ArrayList<Block> blocks = senderContainerListForIndividual.get(uuid);
         if (blocks == null) {
@@ -275,56 +304,133 @@ public class LandManager {
         senderContainerForGui.remove(uuid);
     }
 
+    /**
+     * Checks if land is included.
+     *
+     * @return true if included, false otherwise
+     */
     public boolean getIncludeLand() {
         return this.includeLand;
     }
 
+    /**
+     * Checks if spawner is included.
+     *
+     * @return true if included, false otherwise
+     */
     public boolean getIncludeSpawners() {
         return this.includeSpawners;
     }
 
+    /**
+     * Checks if container is included.
+     *
+     * @return true if included, false otherwise
+     */
     public boolean getIncludeContainers() {
         return this.includeContainers;
     }
 
+    /**
+     * Gets the blocks to show sender in GUI.
+     *
+     * @return hashmap of block name to its worth
+     */
     public HashMap<String, Integer> getSenderBlockForGui(UUID uuid) {
         return this.senderBlockForGui.get(uuid);
     }
 
+    /**
+     * Gets the spawners to show sender in GUI.
+     *
+     * @return hashmap of spawner name to its worth
+     */
     public HashMap<String, Integer> getSenderSpawnerForGui(UUID uuid) {
         return this.senderSpawnerForGui.get(uuid);
     }
 
+    /**
+     * Gets the container items to show sender in GUI.
+     *
+     * @return hashmap of container item name to its worth
+     */
     public HashMap<String, Integer> getSenderContainerForGui(UUID uuid) {
         return this.senderContainerForGui.get(uuid);
     }
 
-    public double getLand(UUID uuid, String name, ArrayList<BiFunction<UUID, Block, Double>> blockOperations) {
+    /**
+     * Get the worth of a land.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param name name of entity to get land worth for
+     * @param blockOperations operations to perform
+     *
+     * @return double representing its worth
+     */
+    public double getLand(UUID uuid, String name,
+            ArrayList<BiFunction<UUID, Block, Double>> blockOperations) {
         return landClaimPluginHandler.getLandWorth(uuid, name, blockOperations);
     }
 
+    /**
+     * Get the worth of a block.
+     *
+     * @param name name of block
+     *
+     * @return double representing its worth
+     */
     public double getBlockWorth(String name) {
         return this.landOperationsHelper.getBlockWorth(name);
     }
 
+    /**
+     * Get the worth of a spawner.
+     *
+     * @param name name of spawner
+     *
+     * @return double representing its worth
+     */
     public double getSpawnerWorth(String name) {
         return this.landOperationsHelper.getSpawnerWorth(name);
     }
 
+    /**
+     * Get the worth of a container item.
+     *
+     * @param name name of container item
+     *
+     * @return double representing its worth
+     */
     public double getContainerWorth(String name) {
         return this.landOperationsHelper.getContainerWorth(name);
     }
 
+    /**
+     * Setter for all block operations.
+     *
+     * @param blockOperationsForAll block operations to set for all entities
+     * @param blockOperationsForIndividual block operations to set for an individual entity.
+     */
     public void setAllOperations(ArrayList<BiFunction<UUID, Block, Double>> blockOperationsForAll,
             ArrayList<BiFunction<UUID, Block, Double>> blockOperationsForIndividual) {
         this.blockOperationsForAll = blockOperationsForAll;
         this.blockOperationsForIndividual = blockOperationsForIndividual;
     }
 
+    /**
+     * Operations to perform on all entities (during leaderboard update).
+     *
+     * @return list of operations to perform
+     */
     public ArrayList<BiFunction<UUID, Block, Double>> getBlockOperationsForAll() {
         return this.blockOperationsForAll;
     }
 
+    /**
+     * Operations to perform on a single entity (during individual stats checking).
+     *
+     * @return list of operations to perform
+     */
     public ArrayList<BiFunction<UUID, Block, Double>> getBlockOperationsForIndividual() {
         return this.blockOperationsForIndividual;
     }

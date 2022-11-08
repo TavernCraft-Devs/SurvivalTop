@@ -1,6 +1,10 @@
 package tk.taverncraft.survivaltop.land;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.UUID;
+import java.util.Set;
+import java.util.EnumSet;
 import java.util.function.BiFunction;
 
 import org.bukkit.Bukkit;
@@ -14,6 +18,9 @@ import org.bukkit.inventory.ItemStack;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.ui.InfoGui;
 
+/**
+ * Helper function for loading the logic of calculations.
+ */
 public class LandOperationsHelper {
     Main main;
     LandManager landManager;
@@ -21,13 +28,19 @@ public class LandOperationsHelper {
     private LinkedHashMap<String, Double> spawnerWorth = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> containerWorth = new LinkedHashMap<>();
     private final Set<Material> containerTypes = EnumSet.of(
-            Material.CHEST,
-            Material.DROPPER,
-            Material.HOPPER,
-            Material.DISPENSER,
-            Material.TRAPPED_CHEST
+        Material.CHEST,
+        Material.DROPPER,
+        Material.HOPPER,
+        Material.DISPENSER,
+        Material.TRAPPED_CHEST
     );
 
+    /**
+     * Constructor for LandOperationsHelper.
+     *
+     * @param main plugin class
+     * @param landManager the manager class for land
+     */
     public LandOperationsHelper(Main main, LandManager landManager) {
         this.main = main;
         this.landManager = landManager;
@@ -44,9 +57,12 @@ public class LandOperationsHelper {
         this.loadContainerWorth();
 
         // load worth values into info gui
-        new InfoGui(main, materialWorth, spawnerWorth, containerWorth);
+        new InfoGui(materialWorth, spawnerWorth, containerWorth);
     }
 
+    /**
+     * Initialize operations to be included.
+     */
     public void initializeOperations() {
         ArrayList<BiFunction<UUID, Block, Double>> blockOperationsForAll = new ArrayList<>();
         ArrayList<BiFunction<UUID, Block, Double>> blockOperationsForIndividual = new ArrayList<>();
@@ -73,7 +89,8 @@ public class LandOperationsHelper {
      */
     private void loadMaterialWorth() {
         materialWorth = new LinkedHashMap<>();
-        for (String key : main.getBlocksConfig().getConfigurationSection("").getKeys(false)) {
+        for (String key : main.getBlocksConfig().getConfigurationSection("")
+                .getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null || !material.isBlock() || !material.isSolid()) {
@@ -91,7 +108,8 @@ public class LandOperationsHelper {
      */
     private void loadSpawnerWorth() {
         spawnerWorth = new LinkedHashMap<>();
-        for (String key : main.getSpawnersConfig().getConfigurationSection("").getKeys(false)) {
+        for (String key : main.getSpawnersConfig().getConfigurationSection("")
+                .getKeys(false)) {
             try {
                 EntityType entityType = EntityType.fromName(key);
                 if (entityType == null) {
@@ -109,7 +127,8 @@ public class LandOperationsHelper {
      */
     private void loadContainerWorth() {
         containerWorth = new LinkedHashMap<>();
-        for (String key : main.getContainersConfig().getConfigurationSection("").getKeys(false)) {
+        for (String key : main.getContainersConfig().getConfigurationSection("")
+                .getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null) {
@@ -122,6 +141,13 @@ public class LandOperationsHelper {
         }
     }
 
+    /**
+     * Process the worth of spawners (for all players).
+     *
+     * @param blocks list of spawner blocks
+     *
+     * @return double value representing total worth of spawners
+     */
     public double processSpawnerWorthForAll(ArrayList<Block> blocks) {
         if (blocks == null) {
             return 0;
@@ -146,6 +172,13 @@ public class LandOperationsHelper {
         return totalSpawnerWorth;
     }
 
+    /**
+     * Process the worth of container items (for all players).
+     *
+     * @param blocks list of containers
+     *
+     * @return double value representing total worth of container items
+     */
     public double processContainerWorthForAll(ArrayList<Block> blocks) {
         if (blocks == null) {
             return 0;
@@ -175,7 +208,15 @@ public class LandOperationsHelper {
         return totalContainerWorth;
     }
 
-    public double processSpawnerWorthForIndividual(ArrayList<Block> blocks, UUID uuid, boolean useGui) {
+    /**
+     * Process the worth of spawners (for individuals which may need GUI).
+     *
+     * @param blocks list of spawner blocks
+     *
+     * @return double value representing total worth of spawners
+     */
+    public double processSpawnerWorthForIndividual(ArrayList<Block> blocks, UUID uuid,
+            boolean useGui) {
         if (blocks == null) {
             return 0;
         }
@@ -202,7 +243,15 @@ public class LandOperationsHelper {
         return totalSpawnerWorth;
     }
 
-    public double processContainerWorthForIndividual(ArrayList<Block> blocks, UUID uuid, boolean useGui) {
+    /**
+     * Process the worth of container items (for individuals who may need GUI).
+     *
+     * @param blocks list of containers
+     *
+     * @return double value representing total worth of container items
+     */
+    public double processContainerWorthForIndividual(ArrayList<Block> blocks, UUID uuid,
+            boolean useGui) {
         if (blocks == null) {
             return 0;
         }
@@ -234,6 +283,13 @@ public class LandOperationsHelper {
         return totalContainerWorth;
     }
 
+    /**
+     * Get the worth of a block.
+     *
+     * @param name name of block
+     *
+     * @return double representing its worth
+     */
     public double getBlockWorth(String name) {
         Double value = this.materialWorth.get(name);
         if (value == null) {
@@ -242,6 +298,13 @@ public class LandOperationsHelper {
         return value;
     }
 
+    /**
+     * Get the worth of a spawner.
+     *
+     * @param name name of spawner
+     *
+     * @return double representing its worth
+     */
     public double getSpawnerWorth(String name) {
         Double value = this.spawnerWorth.get(name);
         if (value == null) {
@@ -250,6 +313,13 @@ public class LandOperationsHelper {
         return value;
     }
 
+    /**
+     * Get the worth of a container item.
+     *
+     * @param name name of container item
+     *
+     * @return double representing its worth
+     */
     public double getContainerWorth(String name) {
         Double value = this.containerWorth.get(name);
         if (value == null) {
@@ -258,7 +328,7 @@ public class LandOperationsHelper {
         return value;
     }
 
-    BiFunction<UUID, Block, Double> calculateBlockForAll = (uuid, block) -> {
+    private BiFunction<UUID, Block, Double> calculateBlockForAll = (uuid, block) -> {
         Double worth = materialWorth.get(block.getType().toString());
         if (worth == null) {
             return 0.0;
@@ -266,7 +336,7 @@ public class LandOperationsHelper {
         return worth;
     };
 
-    BiFunction<UUID, Block, Double> calculateSpawnerForAll = (uuid, block) -> {
+    private BiFunction<UUID, Block, Double> calculateSpawnerForAll = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
             main.getLandManager().setSenderSpawnerForAll(uuid, block);
@@ -276,7 +346,7 @@ public class LandOperationsHelper {
 
 
 
-    BiFunction<UUID, Block, Double> calculateContainerForAll = (uuid, block) -> {
+    private BiFunction<UUID, Block, Double> calculateContainerForAll = (uuid, block) -> {
         Material material = block.getType();
         if (containerTypes.contains(material)) {
             main.getLandManager().setSenderContainerForAll(uuid, block);
@@ -284,7 +354,7 @@ public class LandOperationsHelper {
         return 0.0;
     };
 
-    BiFunction<UUID, Block, Double> calculateBlockForIndividual = (uuid, block) -> {
+    private BiFunction<UUID, Block, Double> calculateBlockForIndividual = (uuid, block) -> {
         Double worth = materialWorth.get(block.getType().toString());
         if (worth == null) {
             return 0.0;
@@ -296,7 +366,7 @@ public class LandOperationsHelper {
         return worth;
     };
 
-    BiFunction<UUID, Block, Double> calculateSpawnerForIndividual = (uuid, block) -> {
+    private BiFunction<UUID, Block, Double> calculateSpawnerForIndividual = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
             main.getLandManager().setSenderSpawnerForIndividual(uuid, block);
@@ -304,7 +374,7 @@ public class LandOperationsHelper {
         return 0.0;
     };
 
-    BiFunction<UUID, Block, Double> calculateContainerForIndividual = (uuid, block) -> {
+    private BiFunction<UUID, Block, Double> calculateContainerForIndividual = (uuid, block) -> {
         Material material = block.getType();
         if (containerTypes.contains(material)) {
             main.getLandManager().setSenderContainerForIndividual(uuid, block);

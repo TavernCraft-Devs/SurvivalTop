@@ -10,10 +10,14 @@ import tk.taverncraft.survivaltop.Main;
  * DependencyLoadEvent ensures plugin soft dependencies are loaded properly.
  */
 public class DependencyLoadEvent implements Listener {
-    Main main;
+    private Main main;
+
+    // todo: check if this class is still necessary
 
     /**
      * Constructor for DependencyLoadEvent.
+     *
+     * @param main plugin class
      */
     public DependencyLoadEvent(Main main) {
         this.main = main;

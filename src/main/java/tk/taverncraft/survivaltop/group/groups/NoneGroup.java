@@ -1,20 +1,16 @@
 package tk.taverncraft.survivaltop.group.groups;
 
-import org.bukkit.OfflinePlayer;
-import tk.taverncraft.survivaltop.Main;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class NoneGroup implements GroupHandler {
-    private Main main;
+import org.bukkit.OfflinePlayer;
 
-    /**
-     * Constructor for NoneGroup.
-     */
-    public NoneGroup(Main main) {
-        this.main = main;
-    }
+/**
+ * Empty group class that does nothing for cases where group is not required.
+ */
+public class NoneGroup implements GroupHandler {
+
+    public NoneGroup() {}
 
     public List<OfflinePlayer> getPlayers(String name) {
         return new ArrayList<>();

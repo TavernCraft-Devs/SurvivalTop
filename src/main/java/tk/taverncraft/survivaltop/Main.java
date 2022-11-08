@@ -4,7 +4,9 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,7 +25,11 @@ import tk.taverncraft.survivaltop.leaderboard.LeaderboardManager;
 import tk.taverncraft.survivaltop.stats.EntityStatsManager;
 import tk.taverncraft.survivaltop.stats.ServerStatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
-import tk.taverncraft.survivaltop.utils.*;
+import tk.taverncraft.survivaltop.utils.ConfigManager;
+import tk.taverncraft.survivaltop.utils.DependencyManager;
+import tk.taverncraft.survivaltop.utils.PapiManager;
+import tk.taverncraft.survivaltop.utils.PluginUpdateManager;
+import tk.taverncraft.survivaltop.utils.Metrics;
 
 /**
  * The plugin class.
@@ -58,7 +64,8 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
+        log.info(String.format("[%s] Disabled Version %s", getDescription().getName(),
+                getDescription().getVersion()));
     }
 
     @Override
@@ -94,7 +101,8 @@ public class Main extends JavaPlugin {
             this.landManager = new LandManager(this);
             this.groupManager = new GroupManager(this);
         } catch (NullPointerException e) {
-            Bukkit.getLogger().severe("[SurvivalTop] Is your config.yml updated/set up correctly?");
+            Bukkit.getLogger().severe(
+                    "[SurvivalTop] Is your config.yml updated/set up correctly?");
             getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -109,18 +117,24 @@ public class Main extends JavaPlugin {
         if (Bukkit.getVersion().contains("1.11") || Bukkit.getVersion().contains("1.12")) {
             Bukkit.getScheduler().runTaskLater(this, this::loadDependencies, 1);
         } else {
-            this.getServer().getPluginManager().registerEvents(new DependencyLoadEvent(this), this);
+            this.getServer().getPluginManager().registerEvents(
+                    new DependencyLoadEvent(this), this);
         }
 
         if (getConfig().getBoolean("update-on-start")) {
-            leaderboardManager.scheduleLeaderboardUpdate(getConfig().getInt("update-interval"), 3);
+            leaderboardManager.scheduleLeaderboardUpdate(getConfig().getInt(
+                    "update-interval"), 3);
         } else {
-            leaderboardManager.scheduleLeaderboardUpdate(getConfig().getInt("update-interval"), getConfig().getInt("update-interval"));
+            leaderboardManager.scheduleLeaderboardUpdate(getConfig().getInt(
+                    "update-interval"), getConfig().getInt("update-interval"));
         }
 
-        this.getServer().getPluginManager().registerEvents(new SignPlaceEvent(this), this);
-        this.getServer().getPluginManager().registerEvents(new SignBreakEvent(this), this);
-        this.getServer().getPluginManager().registerEvents(new ViewPageEvent(this), this);
+        this.getServer().getPluginManager().registerEvents(
+                new SignPlaceEvent(this), this);
+        this.getServer().getPluginManager().registerEvents(
+                new SignBreakEvent(this), this);
+        this.getServer().getPluginManager().registerEvents(
+                new ViewPageEvent(this), this);
     }
 
     /**
@@ -144,7 +158,8 @@ public class Main extends JavaPlugin {
      */
     private void checkPlaceholderAPI() {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            getLogger().info(String.format("[%s] - PlaceholderAPI found, integrated with plugin!", getDescription().getName()));
+            getLogger().info(String.format("[%s] - PlaceholderAPI found, integrated with plugin!",
+                    getDescription().getName()));
             new PapiManager(this).register();
         }
     }
@@ -153,7 +168,8 @@ public class Main extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return;
         }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        RegisteredServiceProvider<Economy> rsp =
+                getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return;
         }
@@ -161,7 +177,8 @@ public class Main extends JavaPlugin {
     }
 
     private void setupPermissions() {
-        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        RegisteredServiceProvider<Permission> rsp =
+                getServer().getServicesManager().getRegistration(Permission.class);
         perms = rsp.getProvider();
     }
 
@@ -178,6 +195,14 @@ public class Main extends JavaPlugin {
             return -64;
         } else {
             return 0;
+        }
+    }
+
+    public UUID getSenderUuid(CommandSender sender) {
+        if (sender instanceof Player) {
+            return ((Player) sender).getUniqueId();
+        } else {
+            return this.consoleUuid;
         }
     }
 
@@ -251,9 +276,5 @@ public class Main extends JavaPlugin {
 
     public StorageManager getStorageManager() {
         return this.storageManager;
-    }
-
-    public UUID getConsoleUuid() {
-        return consoleUuid;
     }
 }

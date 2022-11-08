@@ -1,31 +1,33 @@
 package tk.taverncraft.survivaltop.leaderboard;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.storage.SqlHelper;
 import tk.taverncraft.survivaltop.utils.MessageManager;
-import tk.taverncraft.survivaltop.utils.ValidationManager;
 
-import java.util.*;
-
+/**
+ * LeaderboardManager contains the main logic related to updating the leaderboard.
+ */
 public class LeaderboardManager {
-    Main main;
-    ValidationManager validationManager;
+    private Main main;
     private boolean isUpdating;
-    BukkitTask scheduledTask;
-    BukkitTask updateTask;
+    private BukkitTask leaderboardTask;
 
+    /**
+     * Constructor for LeaderboardManager.
+     *
+     * @param main plugin class
+     */
     public LeaderboardManager(Main main) {
         this.main = main;
-        this.validationManager = new ValidationManager(main);
-        initializeValues();
-    }
-
-    public void initializeValues() {
-        cancelAllTasks();
+        stopExistingTasks();
     }
 
     /**
@@ -35,29 +37,15 @@ public class LeaderboardManager {
      * @param delay the delay before first update
      */
     public void scheduleLeaderboardUpdate(int frequency, int delay) {
-        if (frequency == -1 && delay == 0) {
-            scheduledTask = new BukkitRunnable() {
+
+        // todo: clean up code logic here
+
+        // if frequency is -1, then no need to schedule repeating updates
+        if (frequency == -1) {
+            leaderboardTask = new BukkitRunnable() {
 
                 @Override
                 public void run() {
-                    if (isUpdating) {
-                        main.getLogger().info("Scheduled leaderboard update could not be " +
-                                "carried out because an existing update is in progress.");
-                        return;
-                    }
-                    isUpdating = true;
-                    initiateLeaderboardUpdate(Bukkit.getConsoleSender());
-                }
-
-            }.runTaskAsynchronously(main);
-            return;
-        }
-        long interval = frequency * 20L;
-        long delayTicks = delay * 20L;
-        scheduledTask = new BukkitRunnable() {
-
-            @Override
-            public void run() {
                 if (isUpdating) {
                     main.getLogger().info("Scheduled leaderboard update could not be " +
                             "carried out because an existing update is in progress.");
@@ -65,6 +53,24 @@ public class LeaderboardManager {
                 }
                 isUpdating = true;
                 initiateLeaderboardUpdate(Bukkit.getConsoleSender());
+                }
+
+            }.runTaskAsynchronously(main);
+            return;
+        }
+        long interval = frequency * 20L;
+        long delayTicks = delay * 20L;
+        leaderboardTask = new BukkitRunnable() {
+
+            @Override
+            public void run() {
+            if (isUpdating) {
+                main.getLogger().info("Scheduled leaderboard update could not be " +
+                        "carried out because an existing update is in progress.");
+                return;
+            }
+            isUpdating = true;
+            initiateLeaderboardUpdate(Bukkit.getConsoleSender());
             }
 
         }.runTaskTimerAsynchronously(main, delayTicks, interval);
@@ -75,7 +81,7 @@ public class LeaderboardManager {
      *
      * @param sender user executing the update
      */
-    public void manualUpdateLeaderboard(CommandSender sender) {
+    public void doManualLeaderboardUpdate(CommandSender sender) {
         new BukkitRunnable() {
 
             @Override
@@ -88,7 +94,7 @@ public class LeaderboardManager {
     }
 
     /**
-     * Updates the entire leaderboard. May take a while to run if player-base is large.
+     * Initiates the leaderboard update.
      *
      * @param sender user executing the update
      */
@@ -96,34 +102,46 @@ public class LeaderboardManager {
         main.getServerStatsManager().updateWealthStats(sender);
     }
 
-    public void completeLeaderboardUpdate(CommandSender sender, HashMap<UUID, Double> tempSortedCache) {
-        MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble("minimum" +
-            "-wealth", 0.0), main.groupIsEnabled(), this.main.getServerStatsManager().getGroupUuidToNameMap());
+    /**
+     * Callback function for updating leaderboard message and leaderboard signs.
+     *
+     * @param sender user executing the update
+     * @param tempSortedCache temporary cache for sorted player wealth to set the leaderboard
+     */
+    public void completeLeaderboardUpdate(CommandSender sender,
+            HashMap<UUID, Double> tempSortedCache) {
+        MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
+                "minimum-wealth", 0.0), main.groupIsEnabled(),
+                this.main.getServerStatsManager().getGroupUuidToNameMap());
         MessageManager.sendMessage(sender, "update-complete");
         Bukkit.getScheduler().runTask(main, () -> {
             try {
                 new SignHelper(main).updateSigns();
             } catch (NullPointerException e) {
+                main.getLogger().warning(e.getMessage());
             }
         });
         isUpdating = false;
     }
 
-    public void cancelAllTasks() {
-        if (scheduledTask != null) {
-            scheduledTask.cancel();
-            scheduledTask = null;
-        }
-
-        if (updateTask != null) {
-            updateTask.cancel();
-            updateTask = null;
+    /**
+     * Stops all existing leaderboard tasks.
+     */
+    public void stopExistingTasks() {
+        if (leaderboardTask != null) {
+            leaderboardTask.cancel();
+            leaderboardTask = null;
         }
 
         SqlHelper.query = "";
         this.isUpdating = false;
     }
 
+    /**
+     * Checks if there is an ongoing leaderboard task.
+     *
+     * @return true if the leaderboard update is in progress, false otherwise
+     */
     public boolean isUpdating() {
         return this.isUpdating;
     }

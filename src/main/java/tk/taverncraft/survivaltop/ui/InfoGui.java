@@ -8,10 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
-import tk.taverncraft.survivaltop.Main;
-
+/**
+ * InfoGui handles all logic related to showing land info in a GUI.
+ */
 public class InfoGui extends GuiHelper {
-    Main main;
 
     // list of worth values
     private static LinkedHashMap<String, Double> blockList;
@@ -26,66 +26,82 @@ public class InfoGui extends GuiHelper {
 
     private final int mainPageSize = 27;
 
-    public static boolean isReady;
-
     /**
-     * Helps create ui view.
-     * @param main plugin class
+     * Constructor for InfoGui.
+     *
+     * @param blockList list of blocks to show worth for
+     * @param spawnerList list of spawners to show worth for
+     * @param containerList list of container items to show worth for
      */
-    public InfoGui(Main main, LinkedHashMap<String, Double> blockList, LinkedHashMap<String, Double> spawnerList,
+    public InfoGui(LinkedHashMap<String, Double> blockList,
+            LinkedHashMap<String, Double> spawnerList,
             LinkedHashMap<String, Double> containerList) {
-        this.main = main;
         InfoGui.blockList = blockList;
         InfoGui.spawnerList = spawnerList;
         InfoGui.containerList = containerList;
         initializeAllPages();
     }
 
+    /**
+     * Initialize all values to default.
+     */
     public void initializeAllPages() {
-        isReady = false;
         setUpMainPage();
         blockViews = prepareViews(blockList, "Block Info");
         spawnerViews = prepareViews(spawnerList, "Spawner Info");
         containerViews = prepareViews(containerList, "Container Info");
-        isReady = true;
     }
 
+    /**
+     * Sets up the main page for land info.
+     */
     public void setUpMainPage() {
-        Inventory inv = Bukkit.createInventory(null, this.mainPageSize, "Land Calculation Info" + identifier);
+        Inventory inv = Bukkit.createInventory(null, this.mainPageSize,
+                "Land Calculation Info" + identifier);
         for (int i = 0; i < mainPageSize; i++) {
             inv.setItem(i, createGuiItem(background, " ", false));
         }
 
-        inv.setItem(12, createGuiItem(Material.STONE, "Block Info", false,"Click to learn more."));
-        inv.setItem(13, createGuiItem(Material.SPAWNER, "Spawner Info", false,"Click to learn " +
-            "more."));
-        inv.setItem(14, createGuiItem(Material.CHEST, "Container Info", false,"Click to learn " +
-            "more."));
+        inv.setItem(12, createGuiItem(Material.STONE, "Block Info",
+                false,"Click to learn more."));
+        inv.setItem(13, createGuiItem(Material.SPAWNER, "Spawner Info",
+                false,"Click to learn more."));
+        inv.setItem(14, createGuiItem(Material.CHEST, "Container Info",
+                false,"Click to learn more."));
 
         mainPage = inv;
     }
 
-    private ArrayList<Inventory> prepareViews(LinkedHashMap<String, Double> entityList, String viewType) {
+    /**
+     * Prepares the inventory views for block, spawner and container.
+     *
+     * @param materialList list of materials to show in gui
+     * @param viewType type of view (block, spawner or container)
+     *
+     * @return An array list representing pages of inventory for the view type
+     */
+    private ArrayList<Inventory> prepareViews(LinkedHashMap<String, Double> materialList,
+            String viewType) {
         ArrayList<Inventory> entityViews = new ArrayList<>();
         int pageNum = 1;
         Inventory entityView = initializeSubPageTemplate("", pageNum, viewType);
 
         // if no entity, return empty inventory
-        if (entityList == null ) {
+        if (materialList == null ) {
             entityViews.add(entityView);
             return entityViews;
         }
 
         int slot = 10;
-        for (Map.Entry<String, Double> map : entityList.entrySet()) {
+        for (Map.Entry<String, Double> map : materialList.entrySet()) {
             String name = map.getKey();
             double value = map.getValue();
             if (viewType.equals("Spawner Info")) {
                 entityView.setItem(slot, createGuiItem(Material.SPAWNER, name,
-                    false,"Item Worth: " + value));
+                        false,"Item Worth: " + value));
             } else {
-                entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name, false,
-                    "Item Worth: " + value));
+                entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
+                        false, "Item Worth: " + value));
             }
 
             slot++;
@@ -108,6 +124,12 @@ public class InfoGui extends GuiHelper {
         return entityViews;
     }
 
+    /**
+     * Gets the block info page.
+     *
+     * @param pageNum page number to show
+     * @return inventory showing block page of info
+     */
     public static Inventory getBlockInfoPage(int pageNum) {
         try {
             return blockViews.get(pageNum);
@@ -116,6 +138,12 @@ public class InfoGui extends GuiHelper {
         }
     }
 
+    /**
+     * Gets the spawner info page.
+     *
+     * @param pageNum page number to show
+     * @return inventory showing spawner page of info
+     */
     public static Inventory getSpawnerInfoPage(int pageNum) {
         try {
             return spawnerViews.get(pageNum);
@@ -124,6 +152,12 @@ public class InfoGui extends GuiHelper {
         }
     }
 
+    /**
+     * Gets the container info page.
+     *
+     * @param pageNum page number to show
+     * @return inventory showing container page of info
+     */
     public static Inventory getContainerInfoPage(int pageNum) {
         try {
             return containerViews.get(pageNum);

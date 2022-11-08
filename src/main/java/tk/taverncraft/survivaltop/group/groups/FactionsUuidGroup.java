@@ -1,17 +1,22 @@
 package tk.taverncraft.survivaltop.group.groups;
 
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import tk.taverncraft.survivaltop.Main;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+
+import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.Factions;
+
+import tk.taverncraft.survivaltop.Main;
+
+/**
+ * Handles the group logic for FactionsUUID.
+ */
 public class FactionsUuidGroup implements GroupHandler {
     private Main main;
     private List<String> filteredGroups = new ArrayList<String>() {
@@ -24,21 +29,20 @@ public class FactionsUuidGroup implements GroupHandler {
 
     /**
      * Constructor for FactionsUuidGroup.
+     *
+     * @param main plugin class
      */
     public FactionsUuidGroup(Main main) {
         this.main = main;
     }
 
-    public List<OfflinePlayer> getPlayers(String name) {
-        Faction faction = Factions.getInstance().getByTag(name);
-        List<OfflinePlayer> offlinePlayers = new ArrayList<>();
-        Set<FPlayer> fPlayers = faction.getFPlayers();
-        for (FPlayer fPlayer : fPlayers) {
-            offlinePlayers.add(fPlayer.getOfflinePlayer());
-        }
-        return offlinePlayers;
-    }
-
+    /**
+     * Checks if a group is exist.
+     *
+     * @param name name of group to check for
+     *
+     * @return true if group exist, false otherwise
+     */
     public boolean isValidGroup(String name) {
         if (name == null) {
             return false;
@@ -50,6 +54,28 @@ public class FactionsUuidGroup implements GroupHandler {
         return faction != null;
     }
 
+    /**
+     * Gets list of players from a group.
+     *
+     * @param name name of group to get players from
+     *
+     * @return list of players from given group
+     */
+    public List<OfflinePlayer> getPlayers(String name) {
+        Faction faction = Factions.getInstance().getByTag(name);
+        List<OfflinePlayer> offlinePlayers = new ArrayList<>();
+        Set<FPlayer> fPlayers = faction.getFPlayers();
+        for (FPlayer fPlayer : fPlayers) {
+            offlinePlayers.add(fPlayer.getOfflinePlayer());
+        }
+        return offlinePlayers;
+    }
+
+    /**
+     * Gets all groups.
+     *
+     * @return list of all groups
+     */
     public List<String> getGroups() {
         List<String> groups = new ArrayList<>();
         List<Faction> factions = Factions.getInstance().getAllFactions();
@@ -63,6 +89,13 @@ public class FactionsUuidGroup implements GroupHandler {
         return groups;
     }
 
+    /**
+     * Gets the group a player belongs to.
+     *
+     * @param playerName name of player to get group for
+     *
+     * @return group name of the player
+     */
     public String getGroupOfPlayer(String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         FPlayer fPlayer = FPlayers.getInstance().getByOfflinePlayer(player);
@@ -73,6 +106,29 @@ public class FactionsUuidGroup implements GroupHandler {
         return faction.getTag();
     }
 
+    /**
+     * Gets the leader of a group.
+     *
+     * @param name name of group to get leader for
+     *
+     * @return name of group leader
+     */
+    public String getGroupLeader(String name) {
+        Faction faction = Factions.getInstance().getByTag(name);
+        if (faction == null) {
+            return null;
+        }
+        return faction.getTag();
+    }
+
+    /**
+     * Checks if a group should be filtered. Unique to factions that has wilderness, safezone and
+     * warzone that needs to be filtered out.
+     *
+     * @param name name of group to check
+     *
+     * @return true if group needs to be filtered, false otherwise
+     */
     private boolean isFilteredGroup(String name) {
         for (String group : filteredGroups) {
             if (group.equalsIgnoreCase(name)) {
@@ -80,13 +136,5 @@ public class FactionsUuidGroup implements GroupHandler {
             }
         }
         return false;
-    }
-
-    public String getGroupLeader(String name) {
-        Faction faction = Factions.getInstance().getByTag(name);
-        if (faction == null) {
-            return null;
-        }
-        return faction.getTag();
     }
 }

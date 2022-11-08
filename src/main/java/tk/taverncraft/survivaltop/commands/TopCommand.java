@@ -7,19 +7,19 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**
- * TopCommand contains the execute method for when a user views the wealth leaderboard.
+ * TopCommand contains the execute method for when a user views the leaderboard.
  */
 public class TopCommand {
 
     private final String topPerm = "survtop.top";
-    Main main;
-    ValidationManager validationManager;
+    private ValidationManager validationManager;
 
     /**
      * Constructor for TopCommand.
+     *
+     * @param main plugin class
      */
     public TopCommand(Main main) {
-        this.main = main;
         this.validationManager = new ValidationManager(main);
     }
 
@@ -36,6 +36,7 @@ public class TopCommand {
             return true;
         }
 
+        // show first page if no page number provided
         try {
             int pageNum = Integer.parseInt(args[1]);
             MessageManager.showLeaderboard(sender, pageNum);

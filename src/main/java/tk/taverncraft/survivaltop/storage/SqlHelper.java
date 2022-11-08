@@ -1,29 +1,37 @@
 package tk.taverncraft.survivaltop.storage;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.DatabaseMetaData;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+
 import tk.taverncraft.survivaltop.Main;
 
 /**
  * SqlHelper is responsible for reading/writing from MySQL database.
  */
 public class SqlHelper implements StorageHelper {
-    Main main;
-    String tableName;
+    private Main main;
+    private String tableName;
     public static String query = "";
 
     /**
      * Constructor for SqlHelper.
+     *
+     * @param main plugin class
      */
     public SqlHelper(Main main) {
         this.main = main;
     }
 
     /**
-     * Updates the stats of an entity into a sql query for insertion into sql.
+     * Updates the stats of an entity into a sql query for a single insertion into database.
      *
      * @param uuid uuid of entity to update stats for
      * @param landWealth the amount of wealth calculated from land
@@ -41,11 +49,14 @@ public class SqlHelper implements StorageHelper {
                 entityName = player.getName();
             }
         }
-        SqlHelper.query += "('" + uuid + "', '" + entityName + "', '" + entityType + "', '" + landWealth + "', '" + balWealth + "'), ";
+        SqlHelper.query += "('" + uuid + "', '" + entityName + "', '" + entityType + "', '"
+                + landWealth + "', '" + balWealth + "'), ";
     }
 
     /**
      * Connects to MySQL database.
+     *
+     * @return returns a valid connection on success or null otherwise
      */
     public Connection connectToSql() {
         try {
@@ -53,7 +64,8 @@ public class SqlHelper implements StorageHelper {
             String dbName = main.getConfig().getString("database-name", "survtop");
             String tableName = main.getConfig().getString("table-name", "survtop");
             String port = main.getConfig().getString("port", "3306");
-            String url = "jdbc:mysql://" + main.getConfig().getString("host") + ":" + port + "/" + dbName + "?useSSL=false";
+            String url = "jdbc:mysql://" + main.getConfig().getString("host") + ":"
+                    + port + "/" + dbName + "?useSSL=false";
             String user = main.getConfig().getString("user", "survtop");
             String password = main.getConfig().getString("password");
 
@@ -78,7 +90,7 @@ public class SqlHelper implements StorageHelper {
             return conn;
 
         } catch (SQLException e){
-            main.getLogger().warning(e.getMessage());
+            Bukkit.getLogger().warning(e.getMessage());
             return null;
         }
     }
@@ -88,6 +100,8 @@ public class SqlHelper implements StorageHelper {
      *
      * @param dbName name of database
      * @param conn an open connection
+     *
+     * @return true if database exist, false otherwise
      */
     public boolean databaseExists(String dbName, Connection conn) throws SQLException {
         ResultSet rs;
@@ -105,7 +119,7 @@ public class SqlHelper implements StorageHelper {
             }
 
         } else {
-            main.getLogger().info("Unable to connect to database.");
+            Bukkit.getLogger().info("Unable to connect to database.");
         }
         return false;
     }
@@ -115,11 +129,14 @@ public class SqlHelper implements StorageHelper {
      *
      * @param tableName name of table
      * @param conn an open connection
+     *
+     * @return true if table exist, false otherwise
      */
     public boolean tableExists(String tableName, Connection conn) throws SQLException {
         boolean found = false;
         DatabaseMetaData databaseMetaData = conn.getMetaData();
-        ResultSet rs = databaseMetaData.getTables(null, null, tableName, null);
+        ResultSet rs = databaseMetaData.getTables(null, null,
+                tableName, null);
         while (rs.next()) {
             String name = rs.getString("TABLE_NAME");
             if (tableName.equals(name)) {
@@ -142,8 +159,10 @@ public class SqlHelper implements StorageHelper {
         Connection conn = this.connectToSql();
         if (conn != null) {
             try {
-                String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, LAND_WEALTH, BALANCE_WEALTH) VALUES ";
-                String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), BALANCE_WEALTH = VALUES(BALANCE_WEALTH)";
+                String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
+                        "LAND_WEALTH, BALANCE_WEALTH) VALUES ";
+                String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
+                        "BALANCE_WEALTH = VALUES(BALANCE_WEALTH)";
                 String finalQuery = header + query.substring(0, query.length() - 2) + footer;
                 PreparedStatement stmt = conn.prepareStatement(finalQuery);
                 stmt.executeUpdate();

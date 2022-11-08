@@ -12,11 +12,13 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class ReloadCommand {
 
     private final String reloadPerm = "survtop.reload";
-    Main main;
-    ValidationManager validationManager;
+    private Main main;
+    private ValidationManager validationManager;
 
     /**
      * Constructor for ReloadCommand.
+     *
+     * @param main plugin class
      */
     public ReloadCommand(Main main) {
         this.main = main;
@@ -24,7 +26,7 @@ public class ReloadCommand {
     }
 
     /**
-     * Reloads all files.
+     * Reloads all files and re-initializes values.
      *
      * @param sender user who sent the command
      *
@@ -51,6 +53,7 @@ public class ReloadCommand {
             main.getConfigManager().createSpawnersConfig();
             main.getConfigManager().createContainersConfig();
 
+            // check dependencies
             if (!main.getDependencyManager().hasDependenciesLoaded()) {
                 MessageManager.sendMessage(sender, "reload-fail");
                 return true;
@@ -63,7 +66,10 @@ public class ReloadCommand {
             main.getLandManager().initializeCalculationType();
             main.getLandManager().initializeLandOperations();
             main.getGroupManager().initializeLandType();
-            main.getLeaderboardManager().scheduleLeaderboardUpdate(main.getConfig().getInt("update-interval"), main.getConfig().getInt("update-interval"));
+            main.getLeaderboardManager().scheduleLeaderboardUpdate(
+                    main.getConfig().getInt("update-interval"),
+                    main.getConfig().getInt("update-interval")
+            );
 
             MessageManager.sendMessage(sender, "reload-success");
         } catch (Exception e) {

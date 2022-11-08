@@ -1,7 +1,6 @@
 package tk.taverncraft.survivaltop.events.leaderboard;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -15,15 +14,17 @@ import tk.taverncraft.survivaltop.leaderboard.SignHelper;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
 /**
- * SignBreakEvent checks for when a SurvivalTop sign is placed.
+ * SignBreakEvent checks for when a leaderboard sign is broken.
  */
 public class SignBreakEvent implements Listener {
 
     private final String signRemovePerm = "survtop.sign.remove";
-    Main main;
+    private Main main;
 
     /**
      * Constructor for SignBreakEvent.
+     *
+     * @param main plugin class
      */
     public SignBreakEvent(Main main) {
         this.main = main;
@@ -43,18 +44,15 @@ public class SignBreakEvent implements Listener {
         }
 
         Sign sign = (Sign) state;
-
         String line1 = sign.getLine(0);
         String line2 = sign.getLine(1);
         String unformattedLine2 = ChatColor.stripColor(line2);
-
         SignHelper signHelper = new SignHelper(main);
         if (!signHelper.isSurvTopSign(line1, line2)) {
             return;
         }
 
         Player player = e.getPlayer();
-
         if (!player.hasPermission(signRemovePerm)) {
             e.setCancelled(true);
             MessageManager.sendMessage(player, "no-survtop-sign-remove-permission");

@@ -1,27 +1,28 @@
 package tk.taverncraft.survivaltop.storage;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import tk.taverncraft.survivaltop.Main;
 
+/**
+ * StorageManager decides the storage helper to use.
+ */
 public class StorageManager {
-    Main main;
+    private Main main;
     private String storageType;
-    StorageHelper storageHelper;
+    private StorageHelper storageHelper;
 
+    /**
+     * Constructor for StorageManager.
+     *
+     * @param main plugin class
+     */
     public StorageManager(Main main) {
         this.main = main;
         initializeValues();
     }
 
+    /**
+     * Initializes all values to default and set storage type.
+     */
     public void initializeValues() {
         storageType = main.getConfig().getString("storage-type", "none");
         if (storageType.equalsIgnoreCase("yaml")) {
@@ -29,58 +30,25 @@ public class StorageManager {
         } else if (storageType.equalsIgnoreCase("mysql")) {
             storageHelper = new SqlHelper(main);
         } else {
-            storageHelper = new NoneHelper(main);
+            storageHelper = new NoneHelper();
         }
     }
 
+    /**
+     * Gets the storage helper.
+     *
+     * @return storage helper
+     */
     public StorageHelper getStorageHelper() {
         return this.storageHelper;
     }
 
+    /**
+     * Gets the storage type.
+     *
+     * @return storage type
+     */
     public String getStorageType() {
         return this.storageType;
-    }
-
-    /**
-     * Get entity data and create if not exist.
-     *
-     * @param uuid uuid of entity to get data for
-     */
-    public FileConfiguration getEntityData(UUID uuid) {
-        String entityFileName;
-        String entityName = "None";
-        String entityType = "player";
-        if (this.main.groupIsEnabled()) {
-            entityFileName = this.main.getServerStatsManager().getGroupUuidToNameMap().get(uuid);
-            entityName = entityFileName;
-            entityType = "group";
-        } else {
-            entityFileName = uuid.toString();
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            if (player != null) {
-                entityName = player.getName();
-            }
-        }
-        File entityFile = new File(main.getDataFolder() + "/entityData", entityFileName + ".yml");
-        FileConfiguration entityConfig = new YamlConfiguration();
-        if (!entityFile.exists()) {
-            entityFile.getParentFile().mkdirs();
-            entityConfig.set("entity-name", entityName);
-            entityConfig.set("entity-type", entityType);
-            entityConfig.set("land-wealth", 0);
-            entityConfig.set("bal-wealth", 0);
-            try {
-                entityConfig.save(entityFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            entityConfig.load(entityFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-        return entityConfig;
     }
 }

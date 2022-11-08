@@ -1,29 +1,57 @@
 package tk.taverncraft.survivaltop.group.groups;
 
-import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
-import com.palmergames.bukkit.towny.object.Nation;
-import com.palmergames.bukkit.towny.object.Resident;
-import com.palmergames.bukkit.towny.object.Town;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import tk.taverncraft.survivaltop.Main;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
+import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Town;
+
+import tk.taverncraft.survivaltop.Main;
+
+/**
+ * Handles the group logic for Towny Advanced (Towns).
+ */
 public class TownyAdvancedTownGroup implements GroupHandler {
     private Main main;
     private TownyAPI api;
 
     /**
      * Constructor for TownyAdvancedTownGroup.
+     *
+     * @param main plugin class
      */
     public TownyAdvancedTownGroup(Main main) {
         this.main = main;
         this.api = TownyAPI.getInstance();
     }
 
+    /**
+     * Checks if a group is exist.
+     *
+     * @param name name of group to check for
+     *
+     * @return true if group exist, false otherwise
+     */
+    public boolean isValidGroup(String name) {
+        if (name == null) {
+            return false;
+        }
+        Town town = api.getTown(name);
+        return town != null;
+    }
+
+    /**
+     * Gets list of players from a group.
+     *
+     * @param name name of group to get players from
+     *
+     * @return list of players from given group
+     */
     public List<OfflinePlayer> getPlayers(String name) {
         Town town = api.getTown(name);
         List<OfflinePlayer> players = new ArrayList<>();
@@ -34,14 +62,11 @@ public class TownyAdvancedTownGroup implements GroupHandler {
         return players;
     }
 
-    public boolean isValidGroup(String name) {
-        if (name == null) {
-            return false;
-        }
-        Town town = api.getTown(name);
-        return town != null;
-    }
-
+    /**
+     * Gets all groups.
+     *
+     * @return list of all groups
+     */
     public List<String> getGroups() {
         List<String> groups = new ArrayList<>();
         List<Town> towns = api.getTowns();
@@ -51,6 +76,13 @@ public class TownyAdvancedTownGroup implements GroupHandler {
         return groups;
     }
 
+    /**
+     * Gets the group a player belongs to.
+     *
+     * @param playerName name of player to get group for
+     *
+     * @return group name of the player
+     */
     public String getGroupOfPlayer(String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         Resident resident = api.getResident(player.getUniqueId());
@@ -65,6 +97,13 @@ public class TownyAdvancedTownGroup implements GroupHandler {
         }
     }
 
+    /**
+     * Gets the leader of a group.
+     *
+     * @param name name of group to get leader for
+     *
+     * @return name of group leader
+     */
     public String getGroupLeader(String name) {
         Town town = api.getTown(name);
         if (town == null) {

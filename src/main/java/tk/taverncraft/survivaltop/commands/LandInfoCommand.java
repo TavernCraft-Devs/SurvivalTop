@@ -2,27 +2,28 @@ package tk.taverncraft.survivaltop.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import org.bukkit.inventory.Inventory;
+
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.ui.InfoGui;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**
- * LandInfoCommand contains the execute method for when a user inputs command to view the value of blocks/spawners/containers.
+ * LandInfoCommand contains the execute method for when a user inputs command to view the value of
+ * blocks/spawners/containers.
  */
 public class LandInfoCommand {
 
     private final String landInfoPerm = "survtop.landinfo";
-    Main main;
-    ValidationManager validationManager;
+    private ValidationManager validationManager;
 
     /**
      * Constructor for LandInfoCommand.
+     *
+     * @param main plugin class
      */
     public LandInfoCommand(Main main) {
-        this.main = main;
         this.validationManager = new ValidationManager(main);
     }
 
@@ -38,6 +39,7 @@ public class LandInfoCommand {
             return true;
         }
 
+        // if sender is player, show info in a gui
         if (sender instanceof Player) {
             Inventory inv = InfoGui.mainPage;
             if (inv != null) {

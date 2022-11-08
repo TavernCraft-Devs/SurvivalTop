@@ -12,19 +12,19 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class HelpCommand {
 
     private final String helpPerm = "survtop.help";
-    Main main;
-    ValidationManager validationManager;
+    private ValidationManager validationManager;
 
     /**
      * Constructor for HelpCommand.
+     *
+     * @param main plugin class
      */
     public HelpCommand(Main main) {
-        this.main = main;
         this.validationManager = new ValidationManager(main);
     }
 
     /**
-     * Shows a list of commands to the user.
+     * Shows a list of helpful commands to the user.
      *
      * @param sender user who sent the command
      *

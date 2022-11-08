@@ -12,9 +12,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import tk.taverncraft.survivaltop.Main;
 
+/**
+ * ConfigManager handles the loading of all configuration files.
+ */
 public class ConfigManager {
     Main main;
 
+    /**
+     * Constructor for ConfigManager.
+     *
+     * @param main plugin class
+     */
     public ConfigManager(Main main) {
         this.main = main;
     }
@@ -91,6 +99,13 @@ public class ConfigManager {
         MessageManager.setMessages(lang);
     }
 
+    /**
+     * Gets the configuration file with given name.
+     *
+     * @param configName name of config file
+     *
+     * @return file configuration for config
+     */
     private FileConfiguration getConfig(String configName) {
         File configFile = new File(main.getDataFolder(), configName);
         if (!configFile.exists()) {

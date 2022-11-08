@@ -2,16 +2,27 @@ package tk.taverncraft.survivaltop.storage;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
-import tk.taverncraft.survivaltop.Main;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-public class YamlHelper implements StorageHelper {
-    Main main;
+import org.bukkit.configuration.file.YamlConfiguration;
+import tk.taverncraft.survivaltop.Main;
 
+/**
+ * YamlHelper is responsible for reading/writing from yml files.
+ */
+public class YamlHelper implements StorageHelper {
+    private Main main;
+
+    /**
+     * Constructor for YamlHelper.
+     *
+     * @param main plugin class
+     */
     public YamlHelper(Main main) {
         this.main = main;
     }
@@ -24,7 +35,6 @@ public class YamlHelper implements StorageHelper {
      * @param balWealth the amount of wealth calculated from balance
      */
     public void saveToStorage(UUID uuid, double landWealth, double balWealth) {
-        FileConfiguration entityConfig = this.main.getStorageManager().getEntityData(uuid);
         String entityFileName;
         String entityName = "None";
         String entityType = "player";
@@ -39,8 +49,18 @@ public class YamlHelper implements StorageHelper {
                 entityName = player.getName();
             }
         }
-        File entityFile = new File(this.main.getDataFolder() + "/entityData", entityFileName +
-            ".yml");
+        File entityFile = new File(this.main.getDataFolder() + "/entityData",
+                entityFileName + ".yml");
+        FileConfiguration entityConfig = new YamlConfiguration();
+        if (!entityFile.exists()) {
+            entityFile.getParentFile().mkdirs();
+        } else {
+            try {
+                entityConfig.load(entityFile);
+            } catch (IOException | InvalidConfigurationException e) {
+                e.printStackTrace();
+            }
+        }
         entityConfig.set("entity-name", entityName);
         entityConfig.set("entity-type", entityType);
         entityConfig.set("land-wealth", landWealth);
