@@ -29,7 +29,8 @@ Some of the key features provided by the plugin are as shown below:
 - Option to include blocks within land/claims in calculating wealth
 - Option to include spawners within land/claims in calculating wealth
 - Option to include items in containers (e.g chest, hoppers) within land/claims in calculating wealth
-- Option to assign any values to all block/spawner/container-item types for calculation of wealth
+- Option to include items in player inventories in calculating wealth
+- Option to assign any values to all block/spawner/container/inventory item types for calculation of wealth
 - Option to show leaderboard for individual players
 - Option to show leaderboard for groups
 - Option to set leaderboard signs + heads!
