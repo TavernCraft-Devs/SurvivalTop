@@ -158,22 +158,19 @@ public class SqlHelper implements StorageHelper {
         if (query.length() == 0) {
             return;
         }
-        Connection conn = this.connectToSql();
-        if (conn != null) {
-            try {
-                String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
-                        "LAND_WEALTH, BALANCE_WEALTH) VALUES ";
-                String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
-                        "BALANCE_WEALTH = VALUES(BALANCE_WEALTH)";
-                String finalQuery = header + query.substring(0, query.length() - 2) + footer;
-                PreparedStatement stmt = conn.prepareStatement(finalQuery);
+
+        String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
+            "LAND_WEALTH, BALANCE_WEALTH) VALUES ";
+        String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
+            "BALANCE_WEALTH = VALUES(BALANCE_WEALTH)";
+        String finalQuery = header + query.substring(0, query.length() - 2) + footer;
+        try (Connection conn = this.connectToSql(); PreparedStatement stmt =
+                conn.prepareStatement(finalQuery)) {
+            if (conn != null) {
                 stmt.executeUpdate();
-                main.getLogger().info("SQL operation completed.");
-                stmt.close();
-                conn.close();
-            } catch (SQLException e) {
-                main.getLogger().warning(e.getMessage());
             }
+        } catch (NullPointerException | SQLException e) {
+            Bukkit.getLogger().severe(e.getMessage());
         }
         query = "";
     }
