@@ -18,7 +18,12 @@ import tk.taverncraft.survivaltop.Main;
  */
 public class SqlHelper implements StorageHelper {
     private Main main;
+    private String dbName;
     private String tableName;
+    private String port;
+    private String url;
+    private String user;
+    private String password;
 
     // todo: improve this terrible implementation
     public static String query = "";
@@ -30,6 +35,20 @@ public class SqlHelper implements StorageHelper {
      */
     public SqlHelper(Main main) {
         this.main = main;
+        initializeConnectionInfo();
+    }
+
+    /**
+     * Initialize default values for connection.
+     */
+    private void initializeConnectionInfo() {
+        dbName = main.getConfig().getString("database-name", "survtop");
+        tableName = main.getConfig().getString("table-name", "survtop");
+        port = main.getConfig().getString("port", "3306");
+        url = "jdbc:mysql://" + main.getConfig().getString("host") + ":"
+            + port + "/" + dbName + "?useSSL=false";
+        user = main.getConfig().getString("user", "survtop");
+        password = main.getConfig().getString("password");
     }
 
     /**
@@ -63,14 +82,6 @@ public class SqlHelper implements StorageHelper {
     public Connection connectToSql() {
         try {
             Connection conn;
-            String dbName = main.getConfig().getString("database-name", "survtop");
-            String tableName = main.getConfig().getString("table-name", "survtop");
-            String port = main.getConfig().getString("port", "3306");
-            String url = "jdbc:mysql://" + main.getConfig().getString("host") + ":"
-                    + port + "/" + dbName + "?useSSL=false";
-            String user = main.getConfig().getString("user", "survtop");
-            String password = main.getConfig().getString("password");
-
             conn = DriverManager.getConnection(url, user, password);
 
             if (!databaseExists(dbName, conn)) {
@@ -115,13 +126,12 @@ public class SqlHelper implements StorageHelper {
                 String catalogs = rs.getString(1);
 
                 if (dbName.equals(catalogs)) {
-                    main.getLogger().info("The database " + dbName + " has been found.");
                     return true;
                 }
             }
 
         } else {
-            Bukkit.getLogger().info("Unable to connect to database.");
+            Bukkit.getLogger().severe("Unable to connect to database.");
         }
         return false;
     }
@@ -146,7 +156,6 @@ public class SqlHelper implements StorageHelper {
                 break;
             }
         }
-        this.tableName = tableName;
 
         return found;
     }
