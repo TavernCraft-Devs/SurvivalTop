@@ -39,9 +39,9 @@ public class StatsCommand {
      */
     public boolean execute(CommandSender sender, String[] args) {
         if (args.length == 2) {
-            getStatsForSelf(sender);
-        } else {
             getStatsForOthers(sender, args);
+        } else {
+            getStatsForSelf(sender);
         }
         return true;
     }
