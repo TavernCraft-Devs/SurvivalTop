@@ -19,6 +19,8 @@ import tk.taverncraft.survivaltop.Main;
 public class SqlHelper implements StorageHelper {
     private Main main;
     private String tableName;
+
+    // todo: improve this terrible implementation
     public static String query = "";
 
     /**

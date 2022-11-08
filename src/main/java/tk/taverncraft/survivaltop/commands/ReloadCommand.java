@@ -47,11 +47,8 @@ public class ReloadCommand {
             main.getEntityStatsManager().stopEntityStatsCalculations();
 
             // reload files
-            main.getConfigManager().createConfig();
-            main.getConfigManager().createMessageFile();
-            main.getConfigManager().createBlocksConfig();
-            main.getConfigManager().createSpawnersConfig();
-            main.getConfigManager().createContainersConfig();
+            main.createConfigs();
+            main.setOptions();
 
             // check dependencies
             if (!main.getDependencyManager().checkAllDependencies()) {

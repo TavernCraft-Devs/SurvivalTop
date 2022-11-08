@@ -88,9 +88,7 @@ public class Main extends JavaPlugin {
 
         // config setup
         createConfigs();
-        this.includeBalance = this.getConfig().getBoolean("include-bal", false);
-        this.includeLand = this.getConfig().getBoolean("include-land", false);
-        this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
+        setOptions();
 
         //this.createScheduleConfig();
         this.getCommand("survivaltop").setTabCompleter(new CommandTabCompleter());
@@ -139,13 +137,19 @@ public class Main extends JavaPlugin {
                 new ViewPageEvent(this), this);
     }
 
-    private void createConfigs() {
+    public void createConfigs() {
         configManager.createConfig();
         configManager.createMessageFile();
         configManager.createBlocksConfig();
         configManager.createSpawnersConfig();
         configManager.createContainersConfig();
         configManager.createSignsConfig();
+    }
+
+    public void setOptions() {
+        this.includeBalance = this.getConfig().getBoolean("include-bal", false);
+        this.includeLand = this.getConfig().getBoolean("include-land", false);
+        this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
     }
 
     /**

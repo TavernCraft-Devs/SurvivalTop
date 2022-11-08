@@ -76,7 +76,7 @@ minimum-wealth: 0
 #####################################################################################
 
 # if true, will include blocks in land for calculating wealth (requires a land claim plugin)
-include-land: true
+include-land: false
 
 # options supported are listed below, defaults to GriefPrevention if not specified and include-land is true:
 # - GriefPrevention
