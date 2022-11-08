@@ -16,7 +16,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.ui.InfoGui;
 
 /**
  * Helper function for loading the logic of calculations.
@@ -24,7 +23,7 @@ import tk.taverncraft.survivaltop.ui.InfoGui;
 public class LandOperationsHelper {
     Main main;
     LandManager landManager;
-    private LinkedHashMap<String, Double> materialWorth = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> blockWorth = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> spawnerWorth = new LinkedHashMap<>();
     private LinkedHashMap<String, Double> containerWorth = new LinkedHashMap<>();
     private final Set<Material> containerTypes = EnumSet.of(
@@ -49,15 +48,12 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Initializes values of blocks/spawners.
+     * Initializes values of blocks/spawners/containers.
      */
     public void initializeWorth() {
-        this.loadMaterialWorth();
+        this.loadBlockWorth();
         this.loadSpawnerWorth();
         this.loadContainerWorth();
-
-        // load worth values into info gui
-        new InfoGui(materialWorth, spawnerWorth, containerWorth);
     }
 
     /**
@@ -87,8 +83,8 @@ public class LandOperationsHelper {
     /**
      * Resets and loads all block values.
      */
-    private void loadMaterialWorth() {
-        materialWorth = new LinkedHashMap<>();
+    private void loadBlockWorth() {
+        blockWorth = new LinkedHashMap<>();
         for (String key : main.getBlocksConfig().getConfigurationSection("")
                 .getKeys(false)) {
             try {
@@ -96,7 +92,7 @@ public class LandOperationsHelper {
                 if (material == null || !material.isBlock() || !material.isSolid()) {
                     continue;
                 }
-                materialWorth.put(key.toUpperCase(), main.getBlocksConfig().getDouble(key));
+                blockWorth.put(key.toUpperCase(), main.getBlocksConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getConsoleSender().sendMessage(e.getMessage());
             }
@@ -284,6 +280,15 @@ public class LandOperationsHelper {
     }
 
     /**
+     * Gets the map of worth for all blocks.
+     *
+     * @return map of block name to value
+     */
+    public LinkedHashMap<String, Double> getBlockWorth() {
+        return this.blockWorth;
+    }
+
+    /**
      * Get the worth of a block.
      *
      * @param name name of block
@@ -291,11 +296,20 @@ public class LandOperationsHelper {
      * @return double representing its worth
      */
     public double getBlockWorth(String name) {
-        Double value = this.materialWorth.get(name);
+        Double value = this.blockWorth.get(name);
         if (value == null) {
             return 0;
         }
         return value;
+    }
+
+    /**
+     * Gets the map of worth for all spawners.
+     *
+     * @return map of spawner name to value
+     */
+    public LinkedHashMap<String, Double> getSpawnerWorth() {
+        return this.spawnerWorth;
     }
 
     /**
@@ -314,6 +328,15 @@ public class LandOperationsHelper {
     }
 
     /**
+     * Gets the map of worth for all container items.
+     *
+     * @return map of contaimer item ame to value
+     */
+    public LinkedHashMap<String, Double> getContainerWorth() {
+        return this.containerWorth;
+    }
+
+    /**
      * Get the worth of a container item.
      *
      * @param name name of container item
@@ -329,7 +352,7 @@ public class LandOperationsHelper {
     }
 
     private BiFunction<UUID, Block, Double> calculateBlockForAll = (uuid, block) -> {
-        Double worth = materialWorth.get(block.getType().toString());
+        Double worth = blockWorth.get(block.getType().toString());
         if (worth == null) {
             return 0.0;
         }
@@ -355,7 +378,7 @@ public class LandOperationsHelper {
     };
 
     private BiFunction<UUID, Block, Double> calculateBlockForIndividual = (uuid, block) -> {
-        Double worth = materialWorth.get(block.getType().toString());
+        Double worth = blockWorth.get(block.getType().toString());
         if (worth == null) {
             return 0.0;
         }

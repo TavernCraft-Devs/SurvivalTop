@@ -17,6 +17,7 @@ import tk.taverncraft.survivaltop.events.leaderboard.SignBreakEvent;
 import tk.taverncraft.survivaltop.events.leaderboard.SignPlaceEvent;
 import tk.taverncraft.survivaltop.events.stats.ViewPageEvent;
 import tk.taverncraft.survivaltop.group.GroupManager;
+import tk.taverncraft.survivaltop.inventory.InventoryManager;
 import tk.taverncraft.survivaltop.land.LandManager;
 import tk.taverncraft.survivaltop.commands.CommandParser;
 import tk.taverncraft.survivaltop.commands.CommandTabCompleter;
@@ -25,9 +26,9 @@ import tk.taverncraft.survivaltop.leaderboard.LeaderboardManager;
 import tk.taverncraft.survivaltop.stats.EntityStatsManager;
 import tk.taverncraft.survivaltop.stats.ServerStatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
+import tk.taverncraft.survivaltop.ui.InfoGui;
 import tk.taverncraft.survivaltop.utils.ConfigManager;
 import tk.taverncraft.survivaltop.utils.DependencyManager;
-import tk.taverncraft.survivaltop.utils.MessageManager;
 import tk.taverncraft.survivaltop.utils.PapiManager;
 import tk.taverncraft.survivaltop.utils.PluginUpdateManager;
 import tk.taverncraft.survivaltop.utils.Metrics;
@@ -48,12 +49,14 @@ public class Main extends JavaPlugin {
     private FileConfiguration blocksConfig;
     private FileConfiguration spawnersConfig;
     private FileConfiguration containersConfig;
+    private FileConfiguration inventoriesConfig;
     private FileConfiguration signsConfig;
 
     // managers
     private ConfigManager configManager;
     private DependencyManager dependencyManager;
     private LandManager landManager;
+    private InventoryManager inventoryManager;
     private GroupManager groupManager;
     private EntityStatsManager entityStatsManager;
     private ServerStatsManager serverStatsManager;
@@ -63,6 +66,7 @@ public class Main extends JavaPlugin {
     // options
     private boolean includeBalance;
     private boolean includeLand;
+    private boolean includeInventory;
     private boolean groupEnabled;
 
     // console uuid
@@ -101,6 +105,10 @@ public class Main extends JavaPlugin {
             this.serverStatsManager = new ServerStatsManager(this);
             this.leaderboardManager = new LeaderboardManager(this);
             this.landManager = new LandManager(this);
+            this.inventoryManager = new InventoryManager(this);
+            // todo: revisit how gui is done, that whole module is messy and needs to be rewritten
+            // load worth values into info gui
+            new InfoGui(this);
             this.groupManager = new GroupManager(this);
         } catch (NullPointerException e) {
             Bukkit.getLogger().severe(
@@ -143,12 +151,14 @@ public class Main extends JavaPlugin {
         configManager.createBlocksConfig();
         configManager.createSpawnersConfig();
         configManager.createContainersConfig();
+        configManager.createInventoriesConfig();
         configManager.createSignsConfig();
     }
 
     public void setOptions() {
         this.includeBalance = this.getConfig().getBoolean("include-bal", false);
         this.includeLand = this.getConfig().getBoolean("include-land", false);
+        this.includeInventory = this.getConfig().getBoolean("include-inventory", false);
         this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
     }
 
@@ -242,6 +252,10 @@ public class Main extends JavaPlugin {
         return includeLand;
     }
 
+    public boolean inventoryIsIncluded() {
+        return includeInventory;
+    }
+
     public boolean groupIsEnabled() {
         return groupEnabled;
     }
@@ -278,6 +292,14 @@ public class Main extends JavaPlugin {
         this.containersConfig = containersConfig;
     }
 
+    public FileConfiguration getInventoriesConfig() {
+        return this.inventoriesConfig;
+    }
+
+    public void setInventoriesConfig(FileConfiguration inventoriesConfig) {
+        this.inventoriesConfig = inventoriesConfig;
+    }
+
     public FileConfiguration getSignsConfig() {
         return this.signsConfig;
     }
@@ -290,7 +312,9 @@ public class Main extends JavaPlugin {
         this.config = config;
     }
 
-    public ConfigManager getConfigManager() { return configManager; }
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
 
     public DependencyManager getDependencyManager() {
         return this.dependencyManager;
@@ -300,15 +324,25 @@ public class Main extends JavaPlugin {
         return landManager;
     }
 
-    public GroupManager getGroupManager() { return this.groupManager; }
+    public InventoryManager getInventoryManager() {
+        return this.inventoryManager;
+    }
 
-    public EntityStatsManager getEntityStatsManager() { return this.entityStatsManager; }
+    public GroupManager getGroupManager() {
+        return this.groupManager;
+    }
+
+    public EntityStatsManager getEntityStatsManager() {
+        return this.entityStatsManager;
+    }
 
     public ServerStatsManager getServerStatsManager() {
         return this.serverStatsManager;
     }
 
-    public LeaderboardManager getLeaderboardManager() { return this.leaderboardManager; }
+    public LeaderboardManager getLeaderboardManager() {
+        return this.leaderboardManager;
+    }
 
     public StorageManager getStorageManager() {
         return this.storageManager;

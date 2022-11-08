@@ -60,6 +60,14 @@ public class ConfigManager {
     }
 
     /**
+     * Creates inventories config file.
+     */
+    public void createInventoriesConfig() {
+        FileConfiguration config = getConfig("inventories.yml");
+        main.setInventoriesConfig(config);
+    }
+
+    /**
      * Creates signs config file.
      */
     public void createSignsConfig() {

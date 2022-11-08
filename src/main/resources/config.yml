@@ -105,6 +105,15 @@ include-containers: false
 
 #####################################################################################
 #                                                                                   #
+#                     Inventory Integration (ignore section if not using)           #
+#                                                                                   #
+#####################################################################################
+
+# if true, will include player inventory in calculating wealth (currently only works for online players)
+include-inventory: false
+
+#####################################################################################
+#                                                                                   #
 #                 Vault Integration (ignore section if not using)                   #
 #                                                                                   #
 #####################################################################################

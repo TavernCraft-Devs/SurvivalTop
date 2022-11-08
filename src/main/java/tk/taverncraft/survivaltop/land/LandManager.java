@@ -373,6 +373,15 @@ public class LandManager {
     }
 
     /**
+     * Gets the map of worth for all blocks.
+     *
+     * @return map of block name to value
+     */
+    public LinkedHashMap<String, Double> getBlockWorth() {
+        return this.landOperationsHelper.getBlockWorth();
+    }
+
+    /**
      * Get the worth of a block.
      *
      * @param name name of block
@@ -384,6 +393,15 @@ public class LandManager {
     }
 
     /**
+     * Gets the map of worth for all spawners.
+     *
+     * @return map of spawner name to value
+     */
+    public LinkedHashMap<String, Double> getSpawnerWorth() {
+        return this.landOperationsHelper.getSpawnerWorth();
+    }
+
+    /**
      * Get the worth of a spawner.
      *
      * @param name name of spawner
@@ -392,6 +410,15 @@ public class LandManager {
      */
     public double getSpawnerWorth(String name) {
         return this.landOperationsHelper.getSpawnerWorth(name);
+    }
+
+    /**
+     * Gets the map of worth for all container items.
+     *
+     * @return map of container item name to value
+     */
+    public LinkedHashMap<String, Double> getContainerWorth() {
+        return this.landOperationsHelper.getContainerWorth();
     }
 
     /**

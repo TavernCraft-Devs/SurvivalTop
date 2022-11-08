@@ -70,6 +70,7 @@ public class EntityStatsManager {
     private void calculateEntityStats(CommandSender sender, String name) {
         double landWealth = 0;
         double balWealth = 0;
+        double invWealth = 0;
         if (main.landIsIncluded()) {
             landWealth = getEntityLandWealth(sender, name);
         }
@@ -77,8 +78,14 @@ public class EntityStatsManager {
         if (main.balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
+
+        if (main.inventoryIsIncluded()) {
+            invWealth = getEntityInvWealth(sender, name);
+        }
+
         final double tempLandWealth = landWealth;
         final double tempBalWealth = balWealth;
+        final double tempInvWealth = invWealth;
         boolean useGui = main.getConfig().getBoolean("use-gui-stats", true);
         new BukkitRunnable() {
             @Override
@@ -93,10 +100,10 @@ public class EntityStatsManager {
             // handle gui or non-gui results
             if (useGui && isPlayer) {
                 prepareSenderStatsGui(sender, name, tempBalWealth, tempLandWealth, spawnerValue,
-                    containerValue);
+                        containerValue, tempInvWealth);
             } else {
                 postEntityStatsProcessing(sender, name, null, tempBalWealth, tempLandWealth,
-                    spawnerValue, containerValue);
+                        spawnerValue, containerValue, tempInvWealth);
             }
             }
         }.runTask(main);
@@ -137,8 +144,9 @@ public class EntityStatsManager {
             double blockValue = values[1];
             double spawnerValue = values[2];
             double containerValue = values[3];
+            double inventoryValue = values[4];
             double landValue = blockValue + spawnerValue + containerValue;
-            double totalValue = balValue + landValue;
+            double totalValue = balValue + landValue + inventoryValue;
 
             String strTotalWealth = String.format("%.02f", totalValue);
             String strBalWealth = String.format("%.02f", balValue);
@@ -146,16 +154,19 @@ public class EntityStatsManager {
             String strBlockWealth = String.format("%.02f", blockValue);
             String strSpawnerWealth = String.format("%.02f", spawnerValue);
             String strContainerWealth = String.format("%.02f", containerValue);
+            String strInvWealth = String.format("%.02f", inventoryValue);
 
             MessageManager.sendMessage(sender, "entity-stats",
                     new String[]{"%entity%", "%landwealth%", "%balwealth%", "%totalwealth%",
-                            "%blockwealth%", "%spawnerwealth%", "%containerwealth%"},
+                            "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
+                            "%inventorywealth%"},
                     new String[]{name, new BigDecimal(strLandWealth).toPlainString(),
                             new BigDecimal(strBalWealth).toPlainString(),
-                    new BigDecimal(strTotalWealth).toPlainString(),
+                            new BigDecimal(strTotalWealth).toPlainString(),
                             new BigDecimal(strBlockWealth).toPlainString(),
-                    new BigDecimal(strSpawnerWealth).toPlainString(),
-                            new BigDecimal(strContainerWealth).toPlainString()});
+                            new BigDecimal(strSpawnerWealth).toPlainString(),
+                            new BigDecimal(strContainerWealth).toPlainString(),
+                            new BigDecimal(strInvWealth).toPlainString()});
         } else {
             TextComponent message = new TextComponent("Click here to view stats!");
             message.setColor(ChatColor.GOLD);
@@ -166,6 +177,7 @@ public class EntityStatsManager {
 
         UUID uuid = this.main.getSenderUuid(sender);
         this.main.getLandManager().resetSenderLists(uuid);
+        this.main.getInventoryManager().resetSenderLists(uuid);
         isCalculatingStats.remove(uuid);
         statsInitialTask.remove(uuid);
     }
@@ -182,6 +194,19 @@ public class EntityStatsManager {
         UUID uuid = this.main.getSenderUuid(sender);
         return this.main.getLandManager().getLand(uuid, name,
                 this.main.getLandManager().getBlockOperationsForIndividual());
+    }
+
+    /**
+     * Gets the inventory wealth of an entity.
+     *
+     * @param sender sender who checked for stats
+     * @param name name of entity to get inventory wealth for
+     *
+     * @return double value representing entity inventory wealth
+     */
+    private double getEntityInvWealth(CommandSender sender, String name) {
+        UUID uuid = this.main.getSenderUuid(sender);
+        return this.main.getInventoryManager().getEntityInventoryWorth(uuid, name);
     }
 
     /**
@@ -306,6 +331,18 @@ public class EntityStatsManager {
      */
     public Inventory getContainerStatsPage(UUID uuid, int pageNum) {
         return senderGui.get(uuid).getContainerStatsPage(pageNum);
+    }
+
+    /**
+     * Retrieves player inventory gui stats inventory page.
+     *
+     * @param uuid uuid of sender
+     * @param pageNum page number to show
+     *
+     * @return inventory page containing inventory info for given page
+     */
+    public Inventory getInventoryStatsPage(UUID uuid, int pageNum) {
+        return senderGui.get(uuid).getInventoryStatsPage(pageNum);
     }
 }
 

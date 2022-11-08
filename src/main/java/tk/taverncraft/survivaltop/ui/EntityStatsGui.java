@@ -22,6 +22,7 @@ public class EntityStatsGui extends GuiHelper {
     private ArrayList<Inventory> blockViews;
     private ArrayList<Inventory> spawnerViews;
     private ArrayList<Inventory> containerViews;
+    private ArrayList<Inventory> inventoryViews;
 
     private final int mainPageSize = 27;
 
@@ -43,9 +44,12 @@ public class EntityStatsGui extends GuiHelper {
         HashMap<String, Integer> spawnerList = main.getLandManager().getSenderSpawnerForGui(uuid);
         HashMap<String, Integer> containerList =
                 main.getLandManager().getSenderContainerForGui(uuid);
+        HashMap<String, Integer> inventoryList =
+                main.getInventoryManager().getSenderInventoryForGui(uuid);
         blockViews = prepareViews(blockList, name, "Block Stats");
         spawnerViews = prepareViews(spawnerList, name, "Spawner Stats");
         containerViews = prepareViews(containerList, name, "Container Stats");
+        inventoryViews = prepareViews(inventoryList, name, "Inventory Stats");
     }
 
     /**
@@ -64,8 +68,9 @@ public class EntityStatsGui extends GuiHelper {
         double blockValue = values[1];
         double spawnerValue = values[2];
         double containerValue = values[3];
+        double inventoryValue = values[4];
         double landValue = blockValue + spawnerValue + containerValue;
-        double totalValue = balValue + landValue;
+        double totalValue = balValue + landValue + inventoryValue;
 
         // formatting to 2dp
         balValue = new BigDecimal(balValue).setScale(2,
@@ -86,12 +91,12 @@ public class EntityStatsGui extends GuiHelper {
         if (main.getLandManager().getIncludeLand()) {
             inv.setItem(12, createGuiItem(Material.GOLDEN_SHOVEL, "Total Land Wealth",
                     true, "Land Wealth: " + landValue));
-            inv.setItem(13, createGuiItem(Material.STONE, "Blocks Wealth",
+            inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
                 true, "Block Wealth: " + blockValue, "Click to learn more."));
         } else {
             inv.setItem(12, createGuiItem(Material.GOLDEN_SHOVEL, "Total Land Wealth",
                     false, "Disabled"));
-            inv.setItem(13, createGuiItem(Material.STONE, "Blocks Wealth",
+            inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
                     false, "Disabled"));
         }
         if (main.getLandManager().getIncludeSpawners() && main.getLandManager().getIncludeLand()) {
@@ -110,8 +115,14 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(15, createGuiItem(Material.CHEST, "Container Wealth",
                     false, "Disabled"));
         }
-        inv.setItem(16, createGuiItem(Material.PLAYER_HEAD, "Inventory Wealth",
-                false, "Coming soon."));
+        if (main.inventoryIsIncluded()) {
+            inv.setItem(16, createGuiItem(Material.PLAYER_HEAD, "Inventory Wealth",
+                true, "Inventory Wealth: " + inventoryValue,
+                "Click to learn more."));
+        } else {
+            inv.setItem(16, createGuiItem(Material.PLAYER_HEAD, "Inventory Wealth",
+                false, "Disabled"));
+        }
 
         mainPage = inv;
     }
@@ -168,6 +179,20 @@ public class EntityStatsGui extends GuiHelper {
     }
 
     /**
+     * Gets the inventory stats page.
+     *
+     * @param pageNum page number to show
+     * @return inventory showing inventory page of stats
+     */
+    public Inventory getInventoryStatsPage(int pageNum) {
+        try {
+            return inventoryViews.get(pageNum);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    /**
      * Prepares the inventory views for block, spawner and container.
      *
      * @param materialList list of materials to show in gui
@@ -203,8 +228,13 @@ public class EntityStatsGui extends GuiHelper {
                 entityView.setItem(slot, createGuiItem(Material.SPAWNER, name,
                         false, "Quantity: " + quantity,
                         "Item Worth: " + value, "Total Value: " + value * quantity));
-            } else {
+            } else if (viewType.equals("Container Stats")) {
                 value = main.getLandManager().getContainerWorth(name);
+                entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
+                    false, "Quantity: " + quantity,
+                    "Item Worth: " + value, "Total Value: " + value * quantity));
+            } else {
+                value = main.getInventoryManager().getInventoryItemWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
                         false, "Quantity: " + quantity,
                         "Item Worth: " + value, "Total Value: " + value * quantity));

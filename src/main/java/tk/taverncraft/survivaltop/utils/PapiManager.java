@@ -35,7 +35,7 @@ public class PapiManager extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "2.0.2";
+        return "2.1.0";
     }
 
     @Override
@@ -72,6 +72,9 @@ public class PapiManager extends PlaceholderExpansion {
                 String entityName;
                 if (args.length == 2) {
                     entityName = player.getName();
+                    if (this.main.groupIsEnabled()) {
+                        entityName = this.main.getGroupManager().getGroupOfPlayer(entityName);
+                    }
                 } else {
                     entityName = args[2];
                 }
@@ -87,6 +90,9 @@ public class PapiManager extends PlaceholderExpansion {
                 String entityName;
                 if (args.length == 3) {
                     entityName = player.getName();
+                    if (this.main.groupIsEnabled()) {
+                        entityName = this.main.getGroupManager().getGroupOfPlayer(entityName);
+                    }
                 } else {
                     entityName = args[3];
                 }
@@ -102,6 +108,9 @@ public class PapiManager extends PlaceholderExpansion {
                 String entityName;
                 if (args.length == 3) {
                     entityName = player.getName();
+                    if (this.main.groupIsEnabled()) {
+                        entityName = this.main.getGroupManager().getGroupOfPlayer(entityName);
+                    }
                 } else {
                     entityName = args[3];
                 }
@@ -117,6 +126,9 @@ public class PapiManager extends PlaceholderExpansion {
                 String entityName;
                 if (args.length == 3) {
                     entityName = player.getName();
+                    if (this.main.groupIsEnabled()) {
+                        entityName = this.main.getGroupManager().getGroupOfPlayer(entityName);
+                    }
                 } else {
                     entityName = args[3];
                 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import tk.taverncraft.survivaltop.Main;
 
 /**
  * InfoGui handles all logic related to showing land info in a GUI.
@@ -17,28 +18,27 @@ public class InfoGui extends GuiHelper {
     private static LinkedHashMap<String, Double> blockList;
     private static LinkedHashMap<String, Double> spawnerList;
     private static LinkedHashMap<String, Double> containerList;
+    private static LinkedHashMap<String, Double> inventoryList;
 
     // list of inventories
     public static Inventory mainPage;
     public static ArrayList<Inventory> blockViews;
     public static ArrayList<Inventory> spawnerViews;
     public static ArrayList<Inventory> containerViews;
+    public static ArrayList<Inventory> inventoryViews;
 
     private final int mainPageSize = 27;
 
     /**
      * Constructor for InfoGui.
      *
-     * @param blockList list of blocks to show worth for
-     * @param spawnerList list of spawners to show worth for
-     * @param containerList list of container items to show worth for
+     * @param main plugin class
      */
-    public InfoGui(LinkedHashMap<String, Double> blockList,
-            LinkedHashMap<String, Double> spawnerList,
-            LinkedHashMap<String, Double> containerList) {
-        InfoGui.blockList = blockList;
-        InfoGui.spawnerList = spawnerList;
-        InfoGui.containerList = containerList;
+    public InfoGui(Main main) {
+        InfoGui.blockList = main.getLandManager().getBlockWorth();
+        InfoGui.spawnerList = main.getLandManager().getSpawnerWorth();
+        InfoGui.containerList = main.getLandManager().getContainerWorth();
+        InfoGui.inventoryList = main.getInventoryManager().getInventoryItemWorth();
         initializeAllPages();
     }
 
@@ -50,6 +50,7 @@ public class InfoGui extends GuiHelper {
         blockViews = prepareViews(blockList, "Block Info");
         spawnerViews = prepareViews(spawnerList, "Spawner Info");
         containerViews = prepareViews(containerList, "Container Info");
+        inventoryViews = prepareViews(inventoryList, "Inventory Info");
     }
 
     /**
@@ -57,17 +58,21 @@ public class InfoGui extends GuiHelper {
      */
     public void setUpMainPage() {
         Inventory inv = Bukkit.createInventory(null, this.mainPageSize,
-                "Land Calculation Info" + identifier);
+                "Wealth Calculation Info" + identifier);
         for (int i = 0; i < mainPageSize; i++) {
             inv.setItem(i, createGuiItem(background, " ", false));
         }
 
-        inv.setItem(12, createGuiItem(Material.STONE, "Block Info",
+        inv.setItem(11, createGuiItem(Material.EMERALD, "Balance Info",
+            false,"Taken directly from your balance!"));
+        inv.setItem(12, createGuiItem(Material.GRASS_BLOCK, "Block Info",
                 false,"Click to learn more."));
         inv.setItem(13, createGuiItem(Material.SPAWNER, "Spawner Info",
                 false,"Click to learn more."));
         inv.setItem(14, createGuiItem(Material.CHEST, "Container Info",
                 false,"Click to learn more."));
+        inv.setItem(15, createGuiItem(Material.PLAYER_HEAD, "Inventory Info",
+            false,"Click to learn more."));
 
         mainPage = inv;
     }
@@ -161,6 +166,20 @@ public class InfoGui extends GuiHelper {
     public static Inventory getContainerInfoPage(int pageNum) {
         try {
             return containerViews.get(pageNum);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the inventory info page.
+     *
+     * @param pageNum page number to show
+     * @return inventory showing inventory page of info
+     */
+    public static Inventory getInventoryInfoPage(int pageNum) {
+        try {
+            return inventoryViews.get(pageNum);
         } catch (IndexOutOfBoundsException e) {
             return null;
         }

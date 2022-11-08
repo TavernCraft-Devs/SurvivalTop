@@ -49,7 +49,7 @@ public class ViewPageEvent implements Listener {
             statsMainPageClickHandler(slot, e);
             return;
         }
-        if (title.startsWith("Land Calculation Info")) {
+        if (title.startsWith("Wealth Calculation Info")) {
             infoMainPageClickHandler(slot, e);
             return;
         }
@@ -58,9 +58,10 @@ public class ViewPageEvent implements Listener {
         boolean isBlockStatsPage = title.contains("Block Stats");
         boolean isSpawnerStatsPage = title.contains("Spawner Stats");
         boolean isContainerStatsPage = title.contains("Container Stats");
-        if (isBlockStatsPage || isSpawnerStatsPage || isContainerStatsPage) {
+        boolean isInventoryStatsPage = title.contains("Inventory Stats");
+        if (isBlockStatsPage || isSpawnerStatsPage || isContainerStatsPage || isInventoryStatsPage) {
             statsSubPageClickHandler(slot, e, isBlockStatsPage, isSpawnerStatsPage,
-                    isContainerStatsPage);
+                    isContainerStatsPage, isInventoryStatsPage);
             return;
         }
 
@@ -68,9 +69,10 @@ public class ViewPageEvent implements Listener {
         boolean isBlockInfoPage = title.contains("Block Info");
         boolean isSpawnerInfoPage = title.contains("Spawner Info");
         boolean isContainerInfoPage = title.contains("Container Info");
-        if (isBlockInfoPage || isSpawnerInfoPage || isContainerInfoPage) {
+        boolean isInventoryInfoPage = title.contains("Inventory Info");
+        if (isBlockInfoPage || isSpawnerInfoPage || isContainerInfoPage || isInventoryInfoPage) {
             infoSubPageClickHandler(slot, e, isBlockInfoPage, isSpawnerInfoPage,
-                    isContainerInfoPage);
+                    isContainerInfoPage, isInventoryInfoPage);
         }
     }
 
@@ -108,6 +110,9 @@ public class ViewPageEvent implements Listener {
         } else if (slot == 15) {
             inv = main.getEntityStatsManager().getContainerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
+        } else if (slot == 16) {
+            inv = main.getEntityStatsManager().getInventoryStatsPage(
+                e.getWhoClicked().getUniqueId(), 0);
         }
         if (inv == null) {
             return;
@@ -123,9 +128,10 @@ public class ViewPageEvent implements Listener {
      * @param isBlockPage boolean indicating if current page is for blocks
      * @param isSpawnerPage boolean indicating if current page is for spawners
      * @param isContainerPage boolean indicating if current page is for containers
+     * @param isInventoryPage boolean indicating if current page is for inventories
      */
     private void statsSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
-                boolean isSpawnerPage, boolean isContainerPage) {
+                boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
         if (slot == 47 || slot == 51) {
             int pageToGo = getPage(e);
             if (pageToGo == -1) {
@@ -142,6 +148,9 @@ public class ViewPageEvent implements Listener {
             } else if (isContainerPage) {
                 inv = main.getEntityStatsManager().getContainerStatsPage(
                         e.getWhoClicked().getUniqueId(), pageToGo);
+            } else if (isInventoryPage) {
+                inv = main.getEntityStatsManager().getInventoryStatsPage(
+                    e.getWhoClicked().getUniqueId(), pageToGo);
             }
             if (inv == null) {
                 return;
@@ -168,6 +177,8 @@ public class ViewPageEvent implements Listener {
             inv = InfoGui.getSpawnerInfoPage(0);
         } else if (slot == 14) {
             inv = InfoGui.getContainerInfoPage(0);
+        } else if (slot == 15) {
+            inv = InfoGui.getInventoryInfoPage(0);
         }
         if (inv == null) {
             return;
@@ -183,9 +194,10 @@ public class ViewPageEvent implements Listener {
      * @param isBlockPage boolean indicating if current page is for blocks
      * @param isSpawnerPage boolean indicating if current page is for spawners
      * @param isContainerPage boolean indicating if current page is for containers
+     * @param isInventoryPage boolean indicating if current page is for inventories
      */
     private void infoSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
-            boolean isSpawnerPage, boolean isContainerPage) {
+            boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
         if (slot == 47 || slot == 51) {
             int pageToGo = getPage(e);
             if (pageToGo == -1) {
@@ -198,6 +210,8 @@ public class ViewPageEvent implements Listener {
                 inv = InfoGui.getSpawnerInfoPage(pageToGo);
             } else if (isContainerPage) {
                inv = InfoGui.getContainerInfoPage(pageToGo);
+            } else if (isInventoryPage) {
+                inv = InfoGui.getInventoryInfoPage(pageToGo);
             }
             if (inv == null) {
                 return;
