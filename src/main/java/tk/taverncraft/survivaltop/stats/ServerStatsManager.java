@@ -21,6 +21,7 @@ public class ServerStatsManager {
     // cache values used for leaderboard/papi
     private ConcurrentHashMap<UUID, Double> entityTotalWealthCache;
     private ConcurrentHashMap<UUID, Double> entityLandWealthCache;
+    private ConcurrentHashMap<UUID, Double> entityInvWealthCache;
     private ConcurrentHashMap<UUID, Double> entityBalWealthCache;
     private HashMap<UUID, Integer> entityPositionCache;
     private ArrayList<UUID> entityTotalWealthKeys;
@@ -46,6 +47,7 @@ public class ServerStatsManager {
     public void initializeValues() throws NullPointerException {
         entityTotalWealthCache = new ConcurrentHashMap<>();
         entityLandWealthCache = new ConcurrentHashMap<>();
+        entityInvWealthCache = new ConcurrentHashMap<>();
         entityBalWealthCache = new ConcurrentHashMap<>();
         entityPositionCache = new HashMap<>();
         entityTotalWealthKeys = new ArrayList<>();
@@ -66,12 +68,13 @@ public class ServerStatsManager {
         try {
             boolean includeLandInWealth = main.landIsIncluded();
             boolean includeBalInWealth = main.balIsIncluded();
+            boolean includeInvInWealth = main.inventoryIsIncluded();
             main.getLandManager().resetSenderLists();
             MessageManager.sendMessage(sender, "update-started");
             if (this.main.groupIsEnabled()) {
-                updateForGroups(includeLandInWealth, includeBalInWealth);
+                updateForGroups(includeLandInWealth, includeBalInWealth, includeInvInWealth);
             } else {
-                updateForPlayers(includeLandInWealth, includeBalInWealth);
+                updateForPlayers(includeLandInWealth, includeBalInWealth, includeInvInWealth);
             }
             new BukkitRunnable() {
                 @Override
@@ -94,11 +97,14 @@ public class ServerStatsManager {
      *
      * @param includeLandInWealth whether to include land in calculations
      * @param includeBalInWealth whether to include balance in calculations
+     * @param includeInvInWealth whether to include inventory in calculations
      */
-    private void updateForPlayers(boolean includeLandInWealth, boolean includeBalInWealth) {
+    private void updateForPlayers(boolean includeLandInWealth, boolean includeBalInWealth,
+            boolean includeInvInWealth) {
         Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
             double entityLandWorth = 0;
             double entityBalWorth = 0;
+            double entityInvWorth = 0;
             try {
                 if (includeLandInWealth) {
                     entityLandWorth = main.getLandManager().getLand(offlinePlayer.getUniqueId(),
@@ -108,16 +114,22 @@ public class ServerStatsManager {
                 if (includeBalInWealth) {
                     entityBalWorth = Main.getEconomy().getBalance(offlinePlayer);
                 }
+
+                if (includeInvInWealth) {
+                    entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
+                            offlinePlayer.getUniqueId(), offlinePlayer.getName());
+                }
             } catch (Exception | NoClassDefFoundError e) {
                 // vault might throw an error here related to null user, remove when resolved
             }
             UUID uuid = offlinePlayer.getUniqueId();
             entityLandWealthCache.put(uuid, entityLandWorth);
+            entityInvWealthCache.put(uuid, entityInvWorth);
             entityBalWealthCache.put(uuid, entityBalWorth);
 
-            entityTotalWealthCache.put(uuid, entityLandWorth + entityBalWorth);
+            entityTotalWealthCache.put(uuid, entityLandWorth + entityBalWorth + entityInvWorth);
             main.getStorageManager().getStorageHelper().saveToStorage(uuid, entityLandWorth,
-                    entityBalWorth);
+                    entityBalWorth, entityInvWorth);
         });
     }
 
@@ -126,12 +138,15 @@ public class ServerStatsManager {
      *
      * @param includeLandInWealth whether to include land in calculations
      * @param includeBalInWealth whether to include balance in calculations
+     * @param includeInvInWealth whether to include inventory in calculations
      */
-    private void updateForGroups(boolean includeLandInWealth, boolean includeBalInWealth) {
+    private void updateForGroups(boolean includeLandInWealth, boolean includeBalInWealth,
+            boolean includeInvInWealth) {
         // reset cache on each update since unlike players, group uuids are temporary
         for (Map.Entry<UUID, String> set : groupUuidToNameMap.entrySet()) {
             this.entityTotalWealthCache.remove(set.getKey());
             this.entityBalWealthCache.remove(set.getKey());
+            this.entityInvWealthCache.remove(set.getKey());
             this.entityLandWealthCache.remove(set.getKey());
         }
         this.groupUuidToNameMap = new HashMap<>();
@@ -144,6 +159,7 @@ public class ServerStatsManager {
             groupNameToUuidMap.put(group, tempUuid);
             double entityLandWorth = 0;
             double entityBalWorth = 0;
+            double entityInvWorth = 0;
             try {
                 if (includeLandInWealth) {
                     entityLandWorth = main.getLandManager().getLand(tempUuid,
@@ -163,15 +179,20 @@ public class ServerStatsManager {
                         entityBalWorth = 0;
                     }
                 }
+                if (includeInvInWealth) {
+                    entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
+                            tempUuid, group);
+                }
             } catch (Exception | NoClassDefFoundError e) {
                 // vault might throw an error here related to null user, remove when resolved
             }
             entityLandWealthCache.put(tempUuid, entityLandWorth);
+            entityInvWealthCache.put(tempUuid, entityInvWorth);
             entityBalWealthCache.put(tempUuid, entityBalWorth);
 
-            entityTotalWealthCache.put(tempUuid, entityLandWorth + entityBalWorth);
+            entityTotalWealthCache.put(tempUuid, entityLandWorth + entityBalWorth + entityInvWorth);
             main.getStorageManager().getStorageHelper().saveToStorage(tempUuid, entityLandWorth,
-                    entityBalWorth);
+                    entityBalWorth, entityInvWorth);
         }
     }
 
@@ -193,10 +214,12 @@ public class ServerStatsManager {
                 double value = map.getValue();
                 double newValue = value + entityLandWealthCache.get(uuid);
                 double balValue = entityBalWealthCache.get(uuid);
-                double totalValue = newValue + balValue;
+                double invValue = entityInvWealthCache.get(uuid);
+                double totalValue = newValue + balValue + invValue;
                 entityLandWealthCache.put(uuid, newValue);
                 entityTotalWealthCache.put(uuid, totalValue);
-                main.getStorageManager().getStorageHelper().saveToStorage(uuid, newValue, balValue);
+                main.getStorageManager().getStorageHelper().saveToStorage(uuid, newValue,
+                        balValue, invValue);
             }
 
             for (Map.Entry<UUID, Double> map : tempContainerCache.entrySet()) {
@@ -204,10 +227,12 @@ public class ServerStatsManager {
                 double value = map.getValue();
                 double newValue = value + entityLandWealthCache.get(uuid);
                 double balValue = entityBalWealthCache.get(uuid);
-                double totalValue = newValue + balValue;
+                double invValue = entityInvWealthCache.get(uuid);
+                double totalValue = newValue + balValue + invValue;
                 entityLandWealthCache.put(uuid, newValue);
                 entityTotalWealthCache.put(uuid, totalValue);
-                main.getStorageManager().getStorageHelper().saveToStorage(uuid, newValue, balValue);
+                main.getStorageManager().getStorageHelper().saveToStorage(uuid, newValue,
+                        balValue, invValue);
             }
 
             if (main.getStorageManager().getStorageType().equalsIgnoreCase("mysql")) {
@@ -371,6 +396,23 @@ public class ServerStatsManager {
         } else {
             OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
             return String.format("%.02f", entityBalWealthCache.get(player.getUniqueId()));
+        }
+    }
+
+    /**
+     * Gets the inventory wealth of an entity with given name.
+     *
+     * @param entityName name of entity to get inventory wealth for
+     *
+     * @return inventory wealth of given entity
+     */
+    public String getEntityInvWealth(String entityName) {
+        if (this.main.groupIsEnabled()) {
+            UUID uuid = this.groupNameToUuidMap.get(entityName);
+            return String.format("%.02f", entityInvWealthCache.get(uuid));
+        } else {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
+            return String.format("%.02f", entityInvWealthCache.get(player.getUniqueId()));
         }
     }
 

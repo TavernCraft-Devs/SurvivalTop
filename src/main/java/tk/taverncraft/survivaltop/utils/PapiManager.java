@@ -35,7 +35,7 @@ public class PapiManager extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "2.1.0";
+        return "2.1.1";
     }
 
     @Override
@@ -133,6 +133,24 @@ public class PapiManager extends PlaceholderExpansion {
                     entityName = args[3];
                 }
                 return main.getServerStatsManager().getEntityBalWealth(entityName);
+            } catch (NullPointerException | IndexOutOfBoundsException e) {
+                return "0";
+            }
+        }
+
+        if (params.startsWith("entity_inv_wealth")) {
+            String[] args = params.split("_", 4);
+            try {
+                String entityName;
+                if (args.length == 3) {
+                    entityName = player.getName();
+                    if (this.main.groupIsEnabled()) {
+                        entityName = this.main.getGroupManager().getGroupOfPlayer(entityName);
+                    }
+                } else {
+                    entityName = args[3];
+                }
+                return main.getServerStatsManager().getEntityInvWealth(entityName);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }

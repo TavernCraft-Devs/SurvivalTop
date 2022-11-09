@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.group.groups;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -19,7 +20,7 @@ import tk.taverncraft.survivaltop.Main;
  */
 public class FactionsUuidGroup implements GroupHandler {
     private Main main;
-    private List<String> filteredGroups = new ArrayList<String>() {
+    private List<String> filteredGroups = new ArrayList<>() {
         {
             add("§2wilderness");
             add("§6safezone");
@@ -66,7 +67,10 @@ public class FactionsUuidGroup implements GroupHandler {
         List<OfflinePlayer> offlinePlayers = new ArrayList<>();
         Set<FPlayer> fPlayers = faction.getFPlayers();
         for (FPlayer fPlayer : fPlayers) {
-            offlinePlayers.add(fPlayer.getOfflinePlayer());
+            OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(fPlayer.getId()));
+            if (player != null) {
+                offlinePlayers.add(player);
+            }
         }
         return offlinePlayers;
     }

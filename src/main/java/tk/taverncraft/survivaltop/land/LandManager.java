@@ -74,6 +74,8 @@ public class LandManager {
             landClaimPluginHandler = new FactionsUuidHandler(main);
         } else if (landType.equalsIgnoreCase("townyadvanced")) {
             landClaimPluginHandler = new TownyAdvancedHandler(main);
+        } else if (landType.equalsIgnoreCase("saberfactions")) {
+            landClaimPluginHandler = new FactionsUuidHandler(main);
         } else {
             landClaimPluginHandler = new GriefPreventionHandler(main);
         }

@@ -50,6 +50,8 @@ public class GroupManager {
             groupHandler = new TownyAdvancedTownGroup(main);
         } else if (groupType.equalsIgnoreCase("townyadvancednation")) {
             groupHandler = new TownyAdvancedNationGroup(main);
+        } else if (groupType.equalsIgnoreCase("saberfactions")) {
+            groupHandler = new FactionsUuidGroup(main);
         } else {
             groupHandler = new NoneGroup();
         }

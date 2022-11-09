@@ -13,7 +13,8 @@ public interface StorageHelper {
      *
      * @param uuid uuid of entity
      * @param landWealth land wealth of entity
-     * @param balWealth bal wealth of entity
+     * @param balWealth balance wealth of entity
+     * @param invWealth inventory wealth of entity
      */
-    void saveToStorage(UUID uuid, double landWealth, double balWealth);
+    void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth);
 }

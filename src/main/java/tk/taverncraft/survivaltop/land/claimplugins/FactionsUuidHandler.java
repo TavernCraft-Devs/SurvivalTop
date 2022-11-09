@@ -118,8 +118,9 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
      * @return List of claims of group
      */
     private Set<FLocation> getClaimsByGroup(String name) {
-        if (this.main.getConfig().getString("group-type").equalsIgnoreCase(
-                "factionsuuid")) {
+        String groupType = this.main.getConfig().getString(
+                "group-type", "factionsuuid").toLowerCase();
+        if (groupType.equals("factionsuuid") || groupType.equals("saberfactions")) {
             Faction faction = Factions.getInstance().getByTag(name);
             return faction.getAllClaims();
         }

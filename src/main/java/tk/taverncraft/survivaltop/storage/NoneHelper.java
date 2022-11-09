@@ -8,5 +8,5 @@ import java.util.UUID;
 public class NoneHelper implements StorageHelper {
 
     public NoneHelper() {}
-    public void saveToStorage(UUID uuid, double landWealth, double balWealth) {}
+    public void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth) {}
 }

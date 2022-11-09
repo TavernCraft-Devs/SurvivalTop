@@ -33,8 +33,9 @@ public class YamlHelper implements StorageHelper {
      * @param uuid uuid of entity to update stats for
      * @param landWealth the amount of wealth calculated from land
      * @param balWealth the amount of wealth calculated from balance
+     * @param invWealth the amount of wealth calculated from inventory
      */
-    public void saveToStorage(UUID uuid, double landWealth, double balWealth) {
+    public void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth) {
         String entityFileName;
         String entityName = "None";
         String entityType = "player";
@@ -65,6 +66,7 @@ public class YamlHelper implements StorageHelper {
         entityConfig.set("entity-type", entityType);
         entityConfig.set("land-wealth", landWealth);
         entityConfig.set("bal-wealth", balWealth);
+        entityConfig.set("inv-wealth", invWealth);
 
         try {
             entityConfig.save(entityFile);

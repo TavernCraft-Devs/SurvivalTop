@@ -57,8 +57,9 @@ public class SqlHelper implements StorageHelper {
      * @param uuid uuid of entity to update stats for
      * @param landWealth the amount of wealth calculated from land
      * @param balWealth the amount of wealth calculated from balance
+     * @param invWealth the amount of wealth calculated from inventory
      */
-    public void saveToStorage(UUID uuid, double landWealth, double balWealth) {
+    public void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth) {
         String entityName = null;
         String entityType = "player";
         if (this.main.groupIsEnabled()) {
@@ -71,7 +72,7 @@ public class SqlHelper implements StorageHelper {
             }
         }
         SqlHelper.query += "('" + uuid + "', '" + entityName + "', '" + entityType + "', '"
-                + landWealth + "', '" + balWealth + "'), ";
+                + landWealth + "', '" + balWealth + "', '" + invWealth + "'), ";
     }
 
     /**
@@ -95,6 +96,7 @@ public class SqlHelper implements StorageHelper {
                         + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
                         + "LAND_WEALTH DECIMAL (18, 2), "
                         + "BALANCE_WEALTH DECIMAL (18, 2), "
+                        + "INVENTORY_WEALTH DECIMAL (18, 2), "
                         + "PRIMARY KEY (UUID))";
                 PreparedStatement stmt = conn.prepareStatement(query);
                 stmt.executeUpdate();
@@ -169,13 +171,18 @@ public class SqlHelper implements StorageHelper {
         }
 
         String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
-            "LAND_WEALTH, BALANCE_WEALTH) VALUES ";
+            "LAND_WEALTH, BALANCE_WEALTH, INVENTORY_WEALTH) VALUES ";
         String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
-            "BALANCE_WEALTH = VALUES(BALANCE_WEALTH)";
+            "BALANCE_WEALTH = VALUES(BALANCE_WEALTH), INVENTORY_WEALTH = VALUES(INVENTORY_WEALTH)";
         String finalQuery = header + query.substring(0, query.length() - 2) + footer;
-        try (Connection conn = this.connectToSql(); PreparedStatement stmt =
-                conn.prepareStatement(finalQuery)) {
+        try (Connection conn = this.connectToSql(); PreparedStatement delStmt =
+                conn.prepareStatement("DELETE FROM " + tableName);
+                PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
             if (conn != null) {
+                // necessary to delete table for group since temp uuid results in multiple entries
+                if (this.main.groupIsEnabled()) {
+                    delStmt.execute();
+                }
                 stmt.executeUpdate();
             }
         } catch (NullPointerException | SQLException e) {

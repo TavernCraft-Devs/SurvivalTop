@@ -27,6 +27,7 @@ public class DependencyManager {
         put("townyadvancednation", "Towny");
         put("mcmmoparty", "mcMMO");
         put("parties", "Parties");
+        put("saberfactions", "Factions");
     }};
 
     /**
