@@ -64,6 +64,7 @@ leaderboard-footer: |
 # %blockwealth%
 # %spawnerwealth%
 # %containerwealth%
+# %inventorywealth%
 entity-stats: |
   &b----- &6%entity%'s Wealth &b-----
   &aTotal Wealth: &b%totalwealth%
@@ -72,3 +73,4 @@ entity-stats: |
   &aBlock Wealth: &b%blockwealth%
   &aSpawner Wealth: &b%spawnerwealth%
   &aContainer Wealth: &b%containerwealth%
+  &aInventory Wealth: &b%inventorywealth%
