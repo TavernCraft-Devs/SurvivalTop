@@ -84,16 +84,17 @@
             <id>glaremasters repo</id>
             <url>https://repo.glaremasters.me/repository/towny/</url>
         </repository>
+        <repository>
+            <id>mcmmo-repo</id>
+            <url>https://nexus.neetgames.com/repository/maven-public</url>
+        </repository>
+        <repository>
+            <id>redprotect-repo</id>
+            <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.19.2-R0.1-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -136,34 +137,20 @@
             <artifactId>residence</artifactId>
             <version>5.0.0.3</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/Residence5.1.0.0.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/Residence5.1.0.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.songoda.ultimateclaims</groupId>
             <artifactId>ultimateclaims</artifactId>
             <version>1.8.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/UltimateClaims-1.10.0.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.griefdefender</groupId>
-            <artifactId>api</artifactId>
-            <version>2.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/griefdefenderapi-2.0.0.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/UltimateClaims-1.10.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>kingdoms</artifactId>
             <version>1.13.9</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>br.net.fabiozumbi12.RedProtect.Bukkit</groupId>
-            <artifactId>redprotect</artifactId>
-            <version>7.7.2</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/RedProtect-7.7.3-b410-Universal.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.massivecraft</groupId>
@@ -176,14 +163,13 @@
             <artifactId>crashclaim</artifactId>
             <version>1.0.36</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/CrashClaim.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/CrashClaim.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.gmail.nossr50.api</groupId>
-            <artifactId>mcmmo</artifactId>
+            <groupId>com.gmail.nossr50.mcMMO</groupId>
+            <artifactId>mcMMO</artifactId>
             <version>2.1.217</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/mcMMO.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.alessiodp.parties</groupId>
@@ -196,6 +182,25 @@
             <artifactId>towny</artifactId>
             <version>0.98.3.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>br.net.fabiozumbi12.RedProtect</groupId>
+            <artifactId>RedProtect-Spigot</artifactId>
+            <version>7.7.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>br.net.fabiozumbi12.RedProtect</groupId>
+            <artifactId>RedProtect-Core</artifactId>
+            <version>7.7.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.griefdefender</groupId>
+            <artifactId>api</artifactId>
+            <version>2.0.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/griefdefenderapi-2.0.0.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

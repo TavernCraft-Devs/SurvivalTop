@@ -1,6 +1,15 @@
 package tk.taverncraft.survivaltop.stats;
 
-import java.util.*;
+import java.util.UUID;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
@@ -23,7 +32,7 @@ public class ServerStatsManager {
     private ConcurrentHashMap<UUID, Double> entityLandWealthCache;
     private ConcurrentHashMap<UUID, Double> entityInvWealthCache;
     private ConcurrentHashMap<UUID, Double> entityBalWealthCache;
-    private HashMap<UUID, Integer> entityPositionCache;
+    private ConcurrentHashMap<UUID, Integer> entityPositionCache;
     private ArrayList<UUID> entityTotalWealthKeys;
     private ArrayList<Double> entityTotalWealthValues;
 
@@ -49,7 +58,7 @@ public class ServerStatsManager {
         entityLandWealthCache = new ConcurrentHashMap<>();
         entityInvWealthCache = new ConcurrentHashMap<>();
         entityBalWealthCache = new ConcurrentHashMap<>();
-        entityPositionCache = new HashMap<>();
+        entityPositionCache = new ConcurrentHashMap<>();
         entityTotalWealthKeys = new ArrayList<>();
         entityTotalWealthValues = new ArrayList<>();
         groupUuidToNameMap = new HashMap<>();
@@ -274,7 +283,7 @@ public class ServerStatsManager {
      */
     private void sortWealthCacheKeyValue(HashMap<UUID, Double> tempSortedCache) {
         Set<UUID> keySet = tempSortedCache.keySet();
-        this.entityPositionCache = new HashMap<>();
+        this.entityPositionCache = new ConcurrentHashMap<>();
         int i = 0;
         for (Map.Entry<UUID, Double> set : tempSortedCache.entrySet()) {
             this.entityPositionCache.put(set.getKey(), i);
