@@ -1,9 +1,9 @@
 ---
 name: Bug report
 about: Report bug(s) encountered with the plugin!
-title: ''
-labels: ''
-assignees: ''
+title: "[Bug]"
+labels: bug
+assignees: tjtanjin
 
 ---
 
@@ -14,8 +14,8 @@ SurvivalTop version:
 **Bug Description**
 Describe as clear as possible what the bug is. The more detailed information you give, the better we can help resolve it. If possible, include the steps that can be taken to reproduce the bug as well.
 
-**Screenshots/Videos**
-If applicable, add screenshots/videos to help explain your problem.
+**Media**
+If applicable, add screenshots, videos or any media that may help explain your problem.
 
 **Configuration File**
 It is highly preferred for you to share your configuration file so we can better know what are the possible options that may have resulted in the bug. Remember to remove sensitive details like database login credentials if you do so!

@@ -1,20 +1,20 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+about: Suggest a feature or enhancement for the plugin!
+title: "[Feature]"
+labels: enhancement
+assignees: tjtanjin
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Feature Description**
+Describe in detail the feature that you have in mind. You are also strongly encouraged to describe use case scenarios that can show the benefits of your idea. Note that while we are open to suggestions, extremely niche suggestions may be hard to adopt and ideas that are able to benefit the larger population are much more preferable.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Alternatives Explored**
+Describe any alternative solutions or workarounds that you may have considered.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Media**
+If applicable, add screenshots, videos or even drawings/diagrams that may help better explain your idea.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Additional Information**
+Include any additional information that may be relevant to your proposed feature.
