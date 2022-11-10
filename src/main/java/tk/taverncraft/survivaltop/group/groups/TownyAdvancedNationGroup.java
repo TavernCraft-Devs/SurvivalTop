@@ -15,22 +15,16 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
  * Handles the group logic for Towny Advanced (Nations).
  */
 public class TownyAdvancedNationGroup implements GroupHandler {
-    private Main main;
     private TownyAPI api;
 
     /**
      * Constructor for TownyAdvancedNationGroup.
-     *
-     * @param main plugin class
      */
-    public TownyAdvancedNationGroup(Main main) {
-        this.main = main;
+    public TownyAdvancedNationGroup() {
         this.api = TownyAPI.getInstance();
     }
 

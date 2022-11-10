@@ -13,13 +13,10 @@ import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
  * Handles the group logic for FactionsUUID.
  */
 public class FactionsUuidGroup implements GroupHandler {
-    private Main main;
     private List<String> filteredGroups = new ArrayList<>() {
         {
             add("§2wilderness");
@@ -30,12 +27,8 @@ public class FactionsUuidGroup implements GroupHandler {
 
     /**
      * Constructor for FactionsUuidGroup.
-     *
-     * @param main plugin class
      */
-    public FactionsUuidGroup(Main main) {
-        this.main = main;
-    }
+    public FactionsUuidGroup() {}
 
     /**
      * Checks if a group is exist.

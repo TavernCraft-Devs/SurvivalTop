@@ -11,22 +11,15 @@ import org.kingdoms.constants.group.Kingdom;
 import org.kingdoms.constants.player.KingdomPlayer;
 import org.kingdoms.main.Kingdoms;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
  * Handles the group logic for KingdomsX.
  */
 public class KingdomsXGroup implements GroupHandler {
-    private Main main;
 
     /**
      * Constructor for KingdomsXGroup.
-     *
-     * @param main plugin class
      */
-    public KingdomsXGroup(Main main) {
-        this.main = main;
-    }
+    public KingdomsXGroup() {}
 
     /**
      * Checks if a group is exist.

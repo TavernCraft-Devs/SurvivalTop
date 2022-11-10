@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
+import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -20,6 +21,7 @@ import tk.taverncraft.survivaltop.Main;
 public class SpawnerOperations {
     private Main main;
     private LinkedHashMap<String, Double> spawnerWorth;
+    private RoseStackerAPI rApi;
 
     // populated from main thread and processed on async thread later
     private HashMap<UUID, ArrayList<Block>> preprocessedSpawnersForLeaderboard = new HashMap<>();
@@ -34,6 +36,9 @@ public class SpawnerOperations {
     public SpawnerOperations(Main main, LinkedHashMap<String, Double> spawnerWorth) {
         this.main = main;
         this.spawnerWorth = spawnerWorth;
+        if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
+            rApi = RoseStackerAPI.getInstance();
+        }
     }
 
     public void doLeaderboardCleanup() {
@@ -50,6 +55,9 @@ public class SpawnerOperations {
      * @return spawner operation for leaderboard
      */
     public BiFunction<UUID, Block, Double> getLeaderboardOperation() {
+        if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
+            return preprocessRoseStackerForLeaderboard;
+        }
         return preprocessSpawnerForLeaderboard;
     }
 
@@ -59,6 +67,9 @@ public class SpawnerOperations {
      * @return spawner operation for stats.
      */
     public BiFunction<UUID, Block, Double> getStatsOperation() {
+        if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
+            return preprocessRoseStackerForStats;
+        }
         return preprocessSpawnerForStats;
     }
 
@@ -154,6 +165,46 @@ public class SpawnerOperations {
         if (material.equals(Material.SPAWNER)) {
             preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedSpawnersForStats.get(uuid).add(block);
+        }
+        return 0.0;
+    };
+
+    /**
+     * Variation of preprocessSpawnerForLeaderboard for RoseStacker support.
+     */
+    private BiFunction<UUID, Block, Double> preprocessRoseStackerForLeaderboard = (uuid, block) -> {
+        Material material = block.getType();
+        if (material.equals(Material.SPAWNER)) {
+            if (rApi.isSpawnerStacked(block)) {
+                int stackSize = rApi.getStackedSpawner(block).getStackSize();
+                for (int i = 0; i < stackSize; i++) {
+                    preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
+                    preprocessedSpawnersForLeaderboard.get(uuid).add(block);
+                }
+            } else {
+                preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
+                preprocessedSpawnersForLeaderboard.get(uuid).add(block);
+            }
+        }
+        return 0.0;
+    };
+
+    /**
+     * Variation of preprocessSpawnerForStats for RoseStacker support.
+     */
+    private BiFunction<UUID, Block, Double> preprocessRoseStackerForStats = (uuid, block) -> {
+        Material material = block.getType();
+        if (material.equals(Material.SPAWNER)) {
+            if (rApi.isSpawnerStacked(block)) {
+                int stackSize = rApi.getStackedSpawner(block).getStackSize();
+                for (int i = 0; i < stackSize; i++) {
+                    preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
+                    preprocessedSpawnersForStats.get(uuid).add(block);
+                }
+            } else {
+                preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
+                preprocessedSpawnersForStats.get(uuid).add(block);
+            }
         }
         return 0.0;
     };

@@ -13,22 +13,15 @@ import com.gmail.nossr50.api.PartyAPI;
 import com.gmail.nossr50.datatypes.party.Party;
 import com.gmail.nossr50.party.PartyManager;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
  * Handles the group logic for mcMMO Party.
  */
 public class McmmoPartyGroup implements GroupHandler {
-    private Main main;
 
     /**
      * Constructor for McmmoPartyGroup.
-     *
-     * @param main plugin class
      */
-    public McmmoPartyGroup(Main main) {
-        this.main = main;
-    }
+    public McmmoPartyGroup() {}
 
     /**
      * Checks if a group is exist.

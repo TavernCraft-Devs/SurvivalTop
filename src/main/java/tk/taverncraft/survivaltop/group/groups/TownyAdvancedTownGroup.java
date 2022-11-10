@@ -11,22 +11,16 @@ import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
  * Handles the group logic for Towny Advanced (Towns).
  */
 public class TownyAdvancedTownGroup implements GroupHandler {
-    private Main main;
     private TownyAPI api;
 
     /**
      * Constructor for TownyAdvancedTownGroup.
-     *
-     * @param main plugin class
      */
-    public TownyAdvancedTownGroup(Main main) {
-        this.main = main;
+    public TownyAdvancedTownGroup() {
         this.api = TownyAPI.getInstance();
     }
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 
+import org.bukkit.plugin.Plugin;
 import tk.taverncraft.survivaltop.Main;
 
 /**
@@ -37,6 +38,18 @@ public class DependencyManager {
      */
     public DependencyManager(Main main) {
         this.main = main;
+    }
+
+    /**
+     * Checks if a specific dependency plugin is loaded.
+     *
+     * @param dependency plugin that is being depended on
+     *
+     * @return true if plugin is present and enabled, false otherwise
+     */
+    public boolean hasDependencyLoaded(String dependency) {
+        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin(dependency);
+        return plugin != null && plugin.isEnabled();
     }
 
     /**

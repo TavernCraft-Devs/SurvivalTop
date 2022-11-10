@@ -42,22 +42,22 @@ public class GroupManager {
         switch (groupType) {
         case "factionsuuid":
         case "saberfactions":
-            groupHandler = new FactionsUuidGroup(main);
+            groupHandler = new FactionsUuidGroup();
             return;
         case "kingdomsx":
-            groupHandler = new KingdomsXGroup(main);
+            groupHandler = new KingdomsXGroup();
             return;
         case "mcmmoparty":
-            groupHandler = new McmmoPartyGroup(main);
+            groupHandler = new McmmoPartyGroup();
             return;
         case "parties":
-            groupHandler = new PartiesGroup(main);
+            groupHandler = new PartiesGroup();
             return;
         case "townyadvancedtown":
-            groupHandler = new TownyAdvancedTownGroup(main);
+            groupHandler = new TownyAdvancedTownGroup();
             return;
         case "townyadvancednation":
-            groupHandler = new TownyAdvancedNationGroup(main);
+            groupHandler = new TownyAdvancedNationGroup();
         }
     }
 

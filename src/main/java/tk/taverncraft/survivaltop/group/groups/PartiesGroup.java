@@ -12,22 +12,16 @@ import com.alessiodp.parties.api.Parties;
 import com.alessiodp.parties.api.interfaces.PartiesAPI;
 import com.alessiodp.parties.api.interfaces.Party;
 
-import tk.taverncraft.survivaltop.Main;
-
 /**
  * Handles the group logic for Parties.
  */
 public class PartiesGroup implements GroupHandler {
-    private Main main;
     PartiesAPI api;
 
     /**
      * Constructor for PartiesGroup.
-     *
-     * @param main plugin class
      */
-    public PartiesGroup(Main main) {
-        this.main = main;
+    public PartiesGroup() {
         this.api = Parties.getApi();
     }
 
