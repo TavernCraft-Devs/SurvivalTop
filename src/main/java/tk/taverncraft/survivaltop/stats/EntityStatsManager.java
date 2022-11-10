@@ -9,7 +9,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -73,37 +72,46 @@ public class EntityStatsManager {
         if (main.landIsIncluded()) {
             landWealth = getEntityLandWealth(sender, name);
         }
-
         if (main.balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
-
         if (main.inventoryIsIncluded()) {
             invWealth = getEntityInvWealth(sender, name);
         }
-
-        final double tempLandWealth = landWealth;
-        final double tempBalWealth = balWealth;
-        final double tempInvWealth = invWealth;
         boolean useGui = main.getConfig().getBoolean("use-gui-stats", true);
+        processSpawnersAndContainers(sender, name, useGui, balWealth, landWealth, invWealth);
+    }
+
+    /**
+     * Processes spawners and containers on the main thread (required).
+     *
+     * @param sender user who is getting stats
+     * @param name name of entity whose stats is being retrieved
+     * @param useGui whether gui is used
+     * @param balWealth bal wealth of the entity
+     * @param landWealth land wealth of the entity
+     * @param invWealth inv wealth of the entity
+     */
+    private void processSpawnersAndContainers(CommandSender sender, String name, boolean useGui,
+            double balWealth, double landWealth, double invWealth) {
         new BukkitRunnable() {
             @Override
             public void run() {
-            boolean isPlayer = sender instanceof Player;
-            UUID uuid = main.getSenderUuid(sender);
-            double spawnerValue = main.getLandManager().calculateSpawnerWorthForIndividual(
+                boolean isPlayer = sender instanceof Player;
+                UUID uuid = main.getSenderUuid(sender);
+                double spawnerValue = main.getLandManager().calculateSpawnerWorthForIndividual(
                     uuid, useGui);
-            double containerValue = main.getLandManager().calculateContainerWorthForIndividual(
+                double containerValue = main.getLandManager().calculateContainerWorthForIndividual(
                     uuid, useGui);
 
-            // handle gui or non-gui results
-            if (useGui && isPlayer) {
-                prepareSenderStatsGui(sender, name, tempBalWealth, tempLandWealth, spawnerValue,
-                        containerValue, tempInvWealth);
-            } else {
-                postEntityStatsProcessing(sender, name, null, tempBalWealth, tempLandWealth,
-                        spawnerValue, containerValue, tempInvWealth);
-            }
+                // handle gui or non-gui results
+                if (useGui && isPlayer) {
+                    processStatsGui(sender, name, balWealth, landWealth, spawnerValue,
+                        containerValue, invWealth);
+                    return;
+                }
+                executePostCalculationActions(sender, name, balWealth, landWealth,
+                    spawnerValue, containerValue, invWealth);
             }
         }.runTask(main);
     }
@@ -115,65 +123,81 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      * @param values wealth values of the entity
      */
-    private void prepareSenderStatsGui(CommandSender sender, String name, double... values) {
+    private void processStatsGui(CommandSender sender, String name, double... values) {
         UUID uuid = this.main.getSenderUuid(sender);
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 EntityStatsGui gui = new EntityStatsGui(main, uuid, name, values);
                 senderGui.put(uuid, gui);
-                postEntityStatsProcessing(sender, name, gui, values);
+                executePostCalculationActions(sender);
             }
         }.runTaskAsynchronously(main);
         this.statsUiTask.put(uuid, task);
     }
 
     /**
-     * Cleans up after an entity's stats has been retrieved. Also updates spawner values if
-     * applicable.
+     * Cleans up after an entity's stats has been retrieved. Also updates spawner/container
+     * values if applicable and sends message for user to access the gui.
      *
-     * @param sender sender who checked for stats
-     * @param name name of entity to get stats for
-     * @param gui gui to show stats in
+     * @param sender user who requested for stats
      */
-    private void postEntityStatsProcessing(CommandSender sender, String name, EntityStatsGui gui,
-            double... values) {
-        if (gui == null) {
-            double balValue = values[0];
-            double blockValue = values[1];
-            double spawnerValue = values[2];
-            double containerValue = values[3];
-            double inventoryValue = values[4];
-            double landValue = blockValue + spawnerValue + containerValue;
-            double totalValue = balValue + landValue + inventoryValue;
+    private void executePostCalculationActions(CommandSender sender) {
+        TextComponent message = new TextComponent("Click here to view stats!");
+        message.setColor(ChatColor.GOLD);
+        message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/st openstatsinv"));
+        sender.spigot().sendMessage(message);
+        doCleanUp(sender);
+    }
 
-            String strTotalWealth = String.format("%.02f", totalValue);
-            String strBalWealth = String.format("%.02f", balValue);
-            String strLandWealth = String.format("%.02f", landValue);
-            String strBlockWealth = String.format("%.02f", blockValue);
-            String strSpawnerWealth = String.format("%.02f", spawnerValue);
-            String strContainerWealth = String.format("%.02f", containerValue);
-            String strInvWealth = String.format("%.02f", inventoryValue);
+    /**
+     * Cleans up after an entity's stats has been retrieved. Also updates spawner/container
+     * values if applicable and sends stats in chat.
+     *
+     * @param sender user who requested for stats
+     * @param name name of entity to get stats for
+     * @param values balance values breakdown
+     */
+    private void executePostCalculationActions(CommandSender sender, String name, double... values) {
+        double balValue = values[0];
+        double blockValue = values[1];
+        double spawnerValue = values[2];
+        double containerValue = values[3];
+        double inventoryValue = values[4];
+        double landValue = blockValue + spawnerValue + containerValue;
+        double totalValue = balValue + landValue + inventoryValue;
 
-            MessageManager.sendMessage(sender, "entity-stats",
-                    new String[]{"%entity%", "%landwealth%", "%balwealth%", "%totalwealth%",
-                            "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
-                            "%inventorywealth%"},
-                    new String[]{name, new BigDecimal(strLandWealth).toPlainString(),
-                            new BigDecimal(strBalWealth).toPlainString(),
-                            new BigDecimal(strTotalWealth).toPlainString(),
-                            new BigDecimal(strBlockWealth).toPlainString(),
-                            new BigDecimal(strSpawnerWealth).toPlainString(),
-                            new BigDecimal(strContainerWealth).toPlainString(),
-                            new BigDecimal(strInvWealth).toPlainString()});
-        } else {
-            TextComponent message = new TextComponent("Click here to view stats!");
-            message.setColor(ChatColor.GOLD);
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                    "/st openstatsinv"));
-            sender.spigot().sendMessage(message);
-        }
+        String strTotalWealth = String.format("%.02f", totalValue);
+        String strBalWealth = String.format("%.02f", balValue);
+        String strLandWealth = String.format("%.02f", landValue);
+        String strBlockWealth = String.format("%.02f", blockValue);
+        String strSpawnerWealth = String.format("%.02f", spawnerValue);
+        String strContainerWealth = String.format("%.02f", containerValue);
+        String strInvWealth = String.format("%.02f", inventoryValue);
 
+        String[] placeholders = new String[]{"%entity%", "%landwealth%", "%balwealth%",
+                "%totalwealth%", "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
+                "%inventorywealth%"};
+
+        String[] wealthValues = new String[]{name, new BigDecimal(strLandWealth).toPlainString(),
+            new BigDecimal(strBalWealth).toPlainString(),
+            new BigDecimal(strTotalWealth).toPlainString(),
+            new BigDecimal(strBlockWealth).toPlainString(),
+            new BigDecimal(strSpawnerWealth).toPlainString(),
+            new BigDecimal(strContainerWealth).toPlainString(),
+            new BigDecimal(strInvWealth).toPlainString()};
+
+        MessageManager.sendMessage(sender, "entity-stats", placeholders, wealthValues);
+        doCleanUp(sender);
+    }
+
+    /**
+     * Cleans up trackers and lists used in calculating stats.
+     *
+     * @param sender user who requested for stats
+     */
+    private void doCleanUp(CommandSender sender) {
         UUID uuid = this.main.getSenderUuid(sender);
         this.main.getLandManager().resetSenderLists(uuid);
         this.main.getInventoryManager().resetSenderLists(uuid);

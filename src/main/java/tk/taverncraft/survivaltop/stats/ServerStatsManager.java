@@ -132,18 +132,17 @@ public class ServerStatsManager {
         double entityBalWorth = 0;
         double entityInvWorth = 0;
         if (main.landIsIncluded()) {
-            entityBlockWorth = main.getLandManager().getLand(uuid,
-                name, main.getLandManager().getBlockOperationsForAll());
+            entityBlockWorth = main.getLandManager().getLand(uuid, name,
+                    main.getLandManager().getBlockOperationsForAll());
         }
         if (main.balIsIncluded()) {
             entityBalWorth = main.getBalanceManager().getBalanceForEntity(name);
         }
         if (main.inventoryIsIncluded()) {
-            entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
-                uuid, name);
+            entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(uuid, name);
         }
         EntityCache eCache = new EntityCache(uuid, entityBalWorth, entityBlockWorth,
-            entityInvWorth, 0, 0);
+                entityInvWorth, 0, 0);
         uuidToEntityCacheMap.put(uuid, eCache);
     }
 
