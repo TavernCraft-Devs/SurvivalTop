@@ -12,6 +12,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.ChatPaginator;
+import tk.taverncraft.survivaltop.stats.EntityCache;
 
 import static org.bukkit.util.ChatPaginator.*;
 
@@ -111,7 +112,7 @@ public class MessageManager {
      * @param useGroup whether group is enabled
      * @param groupUuidToNameMap map of temporary uuid to name for groups
      */
-    public static void setUpLeaderboard(HashMap<UUID, Double> leaderboard, double minimumWealth,
+    public static void setUpLeaderboard(HashMap<UUID, EntityCache> leaderboard, double minimumWealth,
             boolean useGroup, HashMap<UUID, String> groupUuidToNameMap) {
         int positionsPerPage = 10;
 
@@ -121,7 +122,7 @@ public class MessageManager {
         StringBuilder message = new StringBuilder(header);
         int position = 1;
         int currentPage = 1;
-        for (HashMap.Entry<UUID, Double> entry : leaderboard.entrySet()) {
+        for (HashMap.Entry<UUID, EntityCache> entry : leaderboard.entrySet()) {
             UUID uuid = entry.getKey();
             String name;
 
@@ -136,7 +137,7 @@ public class MessageManager {
                 continue;
             }
 
-            double wealth = entry.getValue();
+            double wealth = entry.getValue().getTotalWealth();
             if (wealth < minimumWealth) {
                 continue;
             }

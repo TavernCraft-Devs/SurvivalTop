@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,13 +26,9 @@ public class ServerStatsManager {
     private Main main;
 
     // cache values used for leaderboard/papi
-    private ConcurrentHashMap<UUID, Double> entityTotalWealthCache;
-    private ConcurrentHashMap<UUID, Double> entityLandWealthCache;
-    private ConcurrentHashMap<UUID, Double> entityInvWealthCache;
-    private ConcurrentHashMap<UUID, Double> entityBalWealthCache;
     private ConcurrentHashMap<UUID, Integer> entityPositionCache;
-    private ArrayList<UUID> entityTotalWealthKeys;
-    private ArrayList<Double> entityTotalWealthValues;
+    private ConcurrentHashMap<UUID, EntityCache> uuidToEntityCacheMap;
+    private ArrayList<EntityCache> entityCacheList;
 
     // temp hashmaps with pseudo uuids used only when entity is set to group
     private HashMap<UUID, String> groupUuidToNameMap;
@@ -54,13 +48,9 @@ public class ServerStatsManager {
      * Initializes all values to default.
      */
     public void initializeValues() throws NullPointerException {
-        entityTotalWealthCache = new ConcurrentHashMap<>();
-        entityLandWealthCache = new ConcurrentHashMap<>();
-        entityInvWealthCache = new ConcurrentHashMap<>();
-        entityBalWealthCache = new ConcurrentHashMap<>();
         entityPositionCache = new ConcurrentHashMap<>();
-        entityTotalWealthKeys = new ArrayList<>();
-        entityTotalWealthValues = new ArrayList<>();
+        uuidToEntityCacheMap = new ConcurrentHashMap<>();
+        entityCacheList = new ArrayList<>();
         groupUuidToNameMap = new HashMap<>();
         groupNameToUuidMap = new HashMap<>();
     }
@@ -71,30 +61,15 @@ public class ServerStatsManager {
      * @param sender user executing the update
      */
     public void updateWealthStats(CommandSender sender) {
-
-        // todo: clean up code logic
-
         try {
-            boolean includeLandInWealth = main.landIsIncluded();
-            boolean includeBalInWealth = main.balIsIncluded();
-            boolean includeInvInWealth = main.inventoryIsIncluded();
             main.getLandManager().resetSenderLists();
             MessageManager.sendMessage(sender, "update-started");
             if (this.main.groupIsEnabled()) {
-                updateForGroups(includeLandInWealth, includeBalInWealth, includeInvInWealth);
+                updateForGroups();
             } else {
-                updateForPlayers(includeLandInWealth, includeBalInWealth, includeInvInWealth);
+                updateForPlayers();
             }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                HashMap<UUID, Double> tempSpawnerCache =
-                        main.getLandManager().calculateSpawnerWorthForAll();
-                HashMap<UUID, Double> tempContainerCache =
-                        main.getLandManager().calculateContainerWorthForAll();
-                postUpdateProcessing(tempSpawnerCache, tempContainerCache, sender);
-                }
-            }.runTask(main);
+            processSpawnersAndContainers(sender);
         } catch (Exception e) {
             Bukkit.getLogger().info(e.getMessage());
             this.main.getLeaderboardManager().stopExistingTasks();
@@ -102,62 +77,56 @@ public class ServerStatsManager {
     }
 
     /**
-     * Performs update by individual players.
+     * Processes spawners and containers on main thread before doing post updates on async thread
+     * again.
      *
-     * @param includeLandInWealth whether to include land in calculations
-     * @param includeBalInWealth whether to include balance in calculations
-     * @param includeInvInWealth whether to include inventory in calculations
+     * @param sender user executing the update
      */
-    private void updateForPlayers(boolean includeLandInWealth, boolean includeBalInWealth,
-            boolean includeInvInWealth) {
+    private void processSpawnersAndContainers(CommandSender sender) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                HashMap<UUID, Double> tempSpawnerCache =
+                    main.getLandManager().calculateSpawnerWorthForAll();
+                HashMap<UUID, Double> tempContainerCache =
+                    main.getLandManager().calculateContainerWorthForAll();
+                postUpdateProcessing(tempSpawnerCache, tempContainerCache, sender);
+            }
+        }.runTask(main);
+    }
+
+    /**
+     * Performs update by individual players.
+     */
+    private void updateForPlayers() {
         Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-            double entityLandWorth = 0;
+            double entityBlockWorth = 0;
             double entityBalWorth = 0;
             double entityInvWorth = 0;
-            try {
-                if (includeLandInWealth) {
-                    entityLandWorth = main.getLandManager().getLand(offlinePlayer.getUniqueId(),
-                        offlinePlayer.getName(),
-                        main.getLandManager().getBlockOperationsForAll());
-                }
-                if (includeBalInWealth) {
-                    entityBalWorth = Main.getEconomy().getBalance(offlinePlayer);
-                }
-
-                if (includeInvInWealth) {
-                    entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
-                            offlinePlayer.getUniqueId(), offlinePlayer.getName());
-                }
-            } catch (Exception | NoClassDefFoundError e) {
-                // vault might throw an error here related to null user, remove when resolved
+            if (main.landIsIncluded()) {
+                entityBlockWorth = main.getLandManager().getLand(offlinePlayer.getUniqueId(),
+                        offlinePlayer.getName(), main.getLandManager().getBlockOperationsForAll());
+            }
+            if (main.balIsIncluded()) {
+                entityBalWorth = main.getBalanceManager().getBalanceByPlayer(offlinePlayer);
+            }
+            if (main.inventoryIsIncluded()) {
+                entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
+                        offlinePlayer.getUniqueId(), offlinePlayer.getName());
             }
             UUID uuid = offlinePlayer.getUniqueId();
-            entityLandWealthCache.put(uuid, entityLandWorth);
-            entityInvWealthCache.put(uuid, entityInvWorth);
-            entityBalWealthCache.put(uuid, entityBalWorth);
-
-            entityTotalWealthCache.put(uuid, entityLandWorth + entityBalWorth + entityInvWorth);
-            main.getStorageManager().getStorageHelper().saveToStorage(uuid, entityLandWorth,
-                    entityBalWorth, entityInvWorth);
+            EntityCache eCache = new EntityCache(uuid, entityBalWorth, entityBlockWorth,
+                    entityInvWorth, 0, 0);
+            uuidToEntityCacheMap.put(uuid, eCache);
         });
     }
 
     /**
      * Performs update by groups.
-     *
-     * @param includeLandInWealth whether to include land in calculations
-     * @param includeBalInWealth whether to include balance in calculations
-     * @param includeInvInWealth whether to include inventory in calculations
      */
-    private void updateForGroups(boolean includeLandInWealth, boolean includeBalInWealth,
-            boolean includeInvInWealth) {
+    private void updateForGroups() {
         // reset cache on each update since unlike players, group uuids are temporary
-        for (Map.Entry<UUID, String> set : groupUuidToNameMap.entrySet()) {
-            this.entityTotalWealthCache.remove(set.getKey());
-            this.entityBalWealthCache.remove(set.getKey());
-            this.entityInvWealthCache.remove(set.getKey());
-            this.entityLandWealthCache.remove(set.getKey());
-        }
+        this.uuidToEntityCacheMap = new ConcurrentHashMap<>();
         this.groupUuidToNameMap = new HashMap<>();
         this.groupNameToUuidMap = new HashMap<>();
 
@@ -166,42 +135,23 @@ public class ServerStatsManager {
             UUID tempUuid = UUID.randomUUID();
             groupUuidToNameMap.put(tempUuid, group);
             groupNameToUuidMap.put(group, tempUuid);
-            double entityLandWorth = 0;
+            double entityBlockWorth = 0;
             double entityBalWorth = 0;
             double entityInvWorth = 0;
-            try {
-                if (includeLandInWealth) {
-                    entityLandWorth = main.getLandManager().getLand(tempUuid,
-                        group,
-                        main.getLandManager().getBlockOperationsForAll());
-                }
-                if (includeBalInWealth) {
-                    try {
-                        double totalBalance = 0;
-                        List<OfflinePlayer> offlinePlayers =
-                                this.main.getGroupManager().getPlayers(group);
-                        for (OfflinePlayer offlinePlayer : offlinePlayers) {
-                            totalBalance += Main.getEconomy().getBalance(offlinePlayer);
-                        }
-                        entityBalWorth = totalBalance;
-                    } catch (NoClassDefFoundError | NullPointerException e) {
-                        entityBalWorth = 0;
-                    }
-                }
-                if (includeInvInWealth) {
-                    entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
-                            tempUuid, group);
-                }
-            } catch (Exception | NoClassDefFoundError e) {
-                // vault might throw an error here related to null user, remove when resolved
+            if (main.landIsIncluded()) {
+                entityBlockWorth = main.getLandManager().getLand(tempUuid,
+                        group, main.getLandManager().getBlockOperationsForAll());
             }
-            entityLandWealthCache.put(tempUuid, entityLandWorth);
-            entityInvWealthCache.put(tempUuid, entityInvWorth);
-            entityBalWealthCache.put(tempUuid, entityBalWorth);
-
-            entityTotalWealthCache.put(tempUuid, entityLandWorth + entityBalWorth + entityInvWorth);
-            main.getStorageManager().getStorageHelper().saveToStorage(tempUuid, entityLandWorth,
-                    entityBalWorth, entityInvWorth);
+            if (main.balIsIncluded()) {
+                entityBalWorth = main.getBalanceManager().getBalanceByGroup(group);
+            }
+            if (main.inventoryIsIncluded()) {
+                entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
+                        tempUuid, group);
+            }
+            EntityCache eCache = new EntityCache(tempUuid, entityBalWorth, entityBlockWorth,
+                entityInvWorth, 0, 0);
+            uuidToEntityCacheMap.put(tempUuid, eCache);
         }
     }
 
@@ -221,37 +171,24 @@ public class ServerStatsManager {
             for (Map.Entry<UUID, Double> map : tempSpawnerCache.entrySet()) {
                 UUID uuid = map.getKey();
                 double value = map.getValue();
-                double newValue = value + entityLandWealthCache.get(uuid);
-                double balValue = entityBalWealthCache.get(uuid);
-                double invValue = entityInvWealthCache.get(uuid);
-                double totalValue = newValue + balValue + invValue;
-                entityLandWealthCache.put(uuid, newValue);
-                entityTotalWealthCache.put(uuid, totalValue);
-                main.getStorageManager().getStorageHelper().saveToStorage(uuid, newValue,
-                        balValue, invValue);
+                EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+                EntityCache updatedCache = eCache.setSpawnerWealth(value);
+                uuidToEntityCacheMap.put(uuid, updatedCache);
             }
 
             for (Map.Entry<UUID, Double> map : tempContainerCache.entrySet()) {
                 UUID uuid = map.getKey();
                 double value = map.getValue();
-                double newValue = value + entityLandWealthCache.get(uuid);
-                double balValue = entityBalWealthCache.get(uuid);
-                double invValue = entityInvWealthCache.get(uuid);
-                double totalValue = newValue + balValue + invValue;
-                entityLandWealthCache.put(uuid, newValue);
-                entityTotalWealthCache.put(uuid, totalValue);
-                main.getStorageManager().getStorageHelper().saveToStorage(uuid, newValue,
-                        balValue, invValue);
+                EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+                EntityCache updatedCache = eCache.setContainerWealth(value);
+                uuidToEntityCacheMap.put(uuid, updatedCache);
             }
 
-            if (main.getStorageManager().getStorageType().equalsIgnoreCase("mysql")) {
-                new SqlHelper(main).insertIntoDatabase();
-            }
-
-            HashMap<UUID, Double> tempSortedCache = sortTotalWealthCache(entityTotalWealthCache);
+            HashMap<UUID, EntityCache> tempSortedCache = sortTotalWealthCache(uuidToEntityCacheMap);
             sortWealthCacheKeyValue(tempSortedCache);
             main.getLandManager().resetSenderLists();
             main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
+            main.getStorageManager().saveToStorage(entityCacheList);
             }
         }.runTaskLaterAsynchronously(main, 0);
     }
@@ -263,35 +200,34 @@ public class ServerStatsManager {
      *
      * @return sorted total wealth hashmap
      */
-    private HashMap<UUID, Double> sortTotalWealthCache(ConcurrentHashMap<UUID, Double> hm) {
-        List<Map.Entry<UUID, Double> > list =
+    private HashMap<UUID, EntityCache> sortTotalWealthCache(ConcurrentHashMap<UUID,
+            EntityCache> hm) {
+        List<Map.Entry<UUID, EntityCache> > list =
                 new LinkedList<>(hm.entrySet());
 
-        list.sort((o1, o2) -> (o2.getValue()).compareTo(o1.getValue()));
+        list.sort((o1, o2) -> (o2.getValue().getTotalWealth())
+                .compareTo(o1.getValue().getTotalWealth()));
 
-        HashMap<UUID, Double> temp = new LinkedHashMap<>();
-        for (Map.Entry<UUID, Double> aa : list) {
+        HashMap<UUID, EntityCache> temp = new LinkedHashMap<>();
+        for (Map.Entry<UUID, EntityCache> aa : list) {
             temp.put(aa.getKey(), aa.getValue());
         }
         return temp;
     }
 
     /**
-     * Set cache for easy PAPI access.
+     * Set entity position and entity cache list for easy PAPI access.
      *
      * @param tempSortedCache hashmap to use to generate cache for
      */
-    private void sortWealthCacheKeyValue(HashMap<UUID, Double> tempSortedCache) {
-        Set<UUID> keySet = tempSortedCache.keySet();
+    private void sortWealthCacheKeyValue(HashMap<UUID, EntityCache> tempSortedCache) {
         this.entityPositionCache = new ConcurrentHashMap<>();
         int i = 0;
-        for (Map.Entry<UUID, Double> set : tempSortedCache.entrySet()) {
-            this.entityPositionCache.put(set.getKey(), i);
+        for (UUID uuid : tempSortedCache.keySet()) {
+            this.entityPositionCache.put(uuid, i);
             i++;
         }
-        this.entityTotalWealthKeys = new ArrayList<>(keySet);
-        Collection<Double> values = tempSortedCache.values();
-        this.entityTotalWealthValues = new ArrayList<>(values);
+        this.entityCacheList = new ArrayList<>(tempSortedCache.values());
     }
 
     /**
@@ -302,7 +238,8 @@ public class ServerStatsManager {
      * @return name of entity at specified position
      */
     public String getEntityNameAtPosition(int index) {
-        UUID uuid = this.entityTotalWealthKeys.get(index);
+        EntityCache eCache = this.entityCacheList.get(index);
+        UUID uuid = eCache.getUuid();
 
         if (uuid == null) {
             return "None";
@@ -324,7 +261,9 @@ public class ServerStatsManager {
      * @return wealth of entity at specified position
      */
     public String getEntityWealthAtPosition(int index) {
-        Double value = this.entityTotalWealthValues.get(index);
+        EntityCache eCache = this.entityCacheList.get(index);
+        Double value = eCache.getTotalWealth();
+
         if (value != null) {
             return String.format("%.02f", value);
         } else {
@@ -335,19 +274,11 @@ public class ServerStatsManager {
     /**
      * Gets the position of an entity with given name.
      *
-     * @param entityName name of entity to get position for
+     * @param uuid uuid of entity to get position for
      *
      * @return position of given entity
      */
-    public String getPositionOfEntity(String entityName) {
-        UUID uuid;
-        if (this.main.groupIsEnabled()) {
-            uuid = this.groupNameToUuidMap.get(entityName);
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
-            uuid = player.getUniqueId();
-        }
-
+    public String getPositionOfEntity(UUID uuid) {
         Integer position = this.entityPositionCache.get(uuid);
         if (position != null) {
             position = position + 1; // index 0
@@ -358,71 +289,87 @@ public class ServerStatsManager {
     }
 
     /**
-     * Gets the total wealth of an entity with given name.
+     * Gets the balance wealth of an entity with given name.
      *
-     * @param entityName name of entity to get total wealth for
+     * @param uuid uuid of entity to get balance wealth for
      *
-     * @return total wealth of given entity
+     * @return balance wealth of given entity
      */
-    public String getEntityTotalWealth(String entityName) {
-        if (this.main.groupIsEnabled()) {
-            UUID uuid = this.groupNameToUuidMap.get(entityName);
-            return String.format("%.02f", entityTotalWealthCache.get(uuid));
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
-            return String.format("%.02f", entityTotalWealthCache.get(player.getUniqueId()));
-        }
+    public String getEntityBalWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getBalWealth());
     }
 
     /**
      * Gets the land wealth of an entity with given name.
      *
-     * @param entityName name of entity to get land wealth for
+     * @param uuid uuid of entity to get land wealth for
      *
      * @return land wealth of given entity
      */
-    public String getEntityLandWealth(String entityName) {
-        if (this.main.groupIsEnabled()) {
-            UUID uuid = this.groupNameToUuidMap.get(entityName);
-            return String.format("%.02f", entityLandWealthCache.get(uuid));
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
-            return String.format("%.02f", entityLandWealthCache.get(player.getUniqueId()));
-        }
+    public String getEntityLandWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getLandWealth());
     }
 
     /**
-     * Gets the balance wealth of an entity with given name.
+     * Gets the block wealth of an entity with given name.
      *
-     * @param entityName name of entity to get balance wealth for
+     * @param uuid uuid of entity to get block wealth for
      *
-     * @return balance wealth of given entity
+     * @return block wealth of given entity
      */
-    public String getEntityBalWealth(String entityName) {
-        if (this.main.groupIsEnabled()) {
-            UUID uuid = this.groupNameToUuidMap.get(entityName);
-            return String.format("%.02f", entityBalWealthCache.get(uuid));
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
-            return String.format("%.02f", entityBalWealthCache.get(player.getUniqueId()));
-        }
+    public String getEntityBlockWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getBlockWealth());
+    }
+
+    /**
+     * Gets the spawner wealth of an entity with given name.
+     *
+     * @param uuid uuid of entity to get spawner wealth for
+     *
+     * @return spawner wealth of given entity
+     */
+    public String getEntitySpawnerWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getSpawnerWealth());
+    }
+
+    /**
+     * Gets the container wealth of an entity with given name.
+     *
+     * @param uuid uuid of entity to get container wealth for
+     *
+     * @return container wealth of given entity
+     */
+    public String getEntityContainerWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getContainerWealth());
     }
 
     /**
      * Gets the inventory wealth of an entity with given name.
      *
-     * @param entityName name of entity to get inventory wealth for
+     * @param uuid uuid of entity to get inventory wealth for
      *
      * @return inventory wealth of given entity
      */
-    public String getEntityInvWealth(String entityName) {
-        if (this.main.groupIsEnabled()) {
-            UUID uuid = this.groupNameToUuidMap.get(entityName);
-            return String.format("%.02f", entityInvWealthCache.get(uuid));
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(entityName);
-            return String.format("%.02f", entityInvWealthCache.get(player.getUniqueId()));
-        }
+    public String getEntityInvWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getInventoryWealth());
+    }
+
+    /**
+     * Gets the total wealth of an entity with given name.
+     *
+     * @param uuid uuid of entity to get total wealth for
+     *
+     * @return total wealth of given entity
+     */
+    public String getEntityTotalWealth(UUID uuid) {
+        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        return String.format("%.02f", eCache.getTotalWealth());
     }
 
     /**
@@ -432,6 +379,15 @@ public class ServerStatsManager {
      */
     public HashMap<UUID, String> getGroupUuidToNameMap() {
         return this.groupUuidToNameMap;
+    }
+
+    /**
+     * Returns a map of name to temporary uuid for groups.
+     *
+     * @return map of group names to temporary uuid
+     */
+    public HashMap<String, UUID> getGroupNameToUuidMap() {
+        return this.groupNameToUuidMap;
     }
 }
 

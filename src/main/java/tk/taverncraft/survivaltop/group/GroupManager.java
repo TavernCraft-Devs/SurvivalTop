@@ -1,5 +1,6 @@
 package tk.taverncraft.survivaltop.group;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.OfflinePlayer;
@@ -9,7 +10,6 @@ import tk.taverncraft.survivaltop.group.groups.FactionsUuidGroup;
 import tk.taverncraft.survivaltop.group.groups.GroupHandler;
 import tk.taverncraft.survivaltop.group.groups.KingdomsXGroup;
 import tk.taverncraft.survivaltop.group.groups.McmmoPartyGroup;
-import tk.taverncraft.survivaltop.group.groups.NoneGroup;
 import tk.taverncraft.survivaltop.group.groups.PartiesGroup;
 import tk.taverncraft.survivaltop.group.groups.TownyAdvancedNationGroup;
 import tk.taverncraft.survivaltop.group.groups.TownyAdvancedTownGroup;
@@ -37,23 +37,27 @@ public class GroupManager {
      * Initializes values for land type depending on which land plugin is used.
      */
     public void initializeLandType() throws NullPointerException {
-        String groupType = main.getConfig().getString("group-type", "factionsuuid");
-        if (groupType.equalsIgnoreCase("factionsuuid")) {
+        String groupType = main.getConfig().getString("group-type", "factionsuuid")
+                .toLowerCase();
+        switch (groupType) {
+        case "factionsuuid":
+        case "saberfactions":
             groupHandler = new FactionsUuidGroup(main);
-        } else if (groupType.equalsIgnoreCase("kingdomsx")) {
+            return;
+        case "kingdomsx":
             groupHandler = new KingdomsXGroup(main);
-        } else if (groupType.equalsIgnoreCase("mcmmoparty")) {
+            return;
+        case "mcmmoparty":
             groupHandler = new McmmoPartyGroup(main);
-        } else if (groupType.equalsIgnoreCase("parties")) {
+            return;
+        case "parties":
             groupHandler = new PartiesGroup(main);
-        } else if (groupType.equalsIgnoreCase("townyadvancedtown")) {
+            return;
+        case "townyadvancedtown":
             groupHandler = new TownyAdvancedTownGroup(main);
-        } else if (groupType.equalsIgnoreCase("townyadvancednation")) {
+            return;
+        case "townyadvancednation":
             groupHandler = new TownyAdvancedNationGroup(main);
-        } else if (groupType.equalsIgnoreCase("saberfactions")) {
-            groupHandler = new FactionsUuidGroup(main);
-        } else {
-            groupHandler = new NoneGroup();
         }
     }
 
@@ -65,6 +69,9 @@ public class GroupManager {
      * @return true if group exist, false otherwise
      */
     public boolean isValidGroup(String name) {
+        if (this.groupHandler == null) {
+            return false;
+        }
         return this.groupHandler.isValidGroup(name);
     }
 
@@ -76,6 +83,9 @@ public class GroupManager {
      * @return list of players from given group
      */
     public List<OfflinePlayer> getPlayers(String name) {
+        if (this.groupHandler == null) {
+            return new ArrayList<>();
+        }
         return this.groupHandler.getPlayers(name);
     }
 
@@ -85,6 +95,9 @@ public class GroupManager {
      * @return list of all groups
      */
     public List<String> getGroups() {
+        if (this.groupHandler == null) {
+            return new ArrayList<>();
+        }
         return this.groupHandler.getGroups();
     }
 
@@ -96,6 +109,9 @@ public class GroupManager {
      * @return group name of the player
      */
     public String getGroupOfPlayer(String playerName) {
+        if (this.groupHandler == null) {
+            return null;
+        }
         return this.groupHandler.getGroupOfPlayer(playerName);
     }
 
@@ -107,6 +123,9 @@ public class GroupManager {
      * @return name of group leader
      */
     public String getGroupLeader(String name) {
+        if (this.groupHandler == null) {
+            return null;
+        }
         return this.groupHandler.getGroupLeader(name);
     }
 }

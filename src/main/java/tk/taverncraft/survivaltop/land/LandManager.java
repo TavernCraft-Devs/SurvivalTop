@@ -57,26 +57,36 @@ public class LandManager {
      * Initializes values for land type depending on which land plugin is used.
      */
     public void initializeLandType() throws NullPointerException {
-        String landType = main.getConfig().getString("land-type", "griefprevention");
-        if (landType.equalsIgnoreCase("residence")) {
+        String landType = main.getConfig().getString(
+                "land-type", "griefprevention").toLowerCase();
+
+        switch (landType) {
+        case "residence":
             landClaimPluginHandler = new ResidenceHandler(main);
-        } else if (landType.equalsIgnoreCase("ultimateclaims")) {
+            return;
+        case "ultimateclaims":
             landClaimPluginHandler = new UltimateClaimsHandler(main);
-        } else if (landType.equalsIgnoreCase("griefdefender")) {
+            return;
+        case "griefdefender":
             landClaimPluginHandler = new GriefDefenderHandler(main);
-        } else if (landType.equalsIgnoreCase("kingdomsx")) {
+            return;
+        case "kingdomsx":
             landClaimPluginHandler = new KingdomsXHandler(main);
-        } else if (landType.equalsIgnoreCase("redprotect")) {
+            return;
+        case "redprotect":
             landClaimPluginHandler = new RedProtectHandler(main);
-        } else if (landType.equalsIgnoreCase("crashclaim")) {
+            return;
+        case "crashclaim":
             landClaimPluginHandler = new CrashClaimHandler(main);
-        } else if (landType.equalsIgnoreCase("factionsuuid")) {
+            return;
+        case "factionsuuid":
+        case "saberfactions":
             landClaimPluginHandler = new FactionsUuidHandler(main);
-        } else if (landType.equalsIgnoreCase("townyadvanced")) {
+            return;
+        case "townyadvanced":
             landClaimPluginHandler = new TownyAdvancedHandler(main);
-        } else if (landType.equalsIgnoreCase("saberfactions")) {
-            landClaimPluginHandler = new FactionsUuidHandler(main);
-        } else {
+            return;
+        default:
             landClaimPluginHandler = new GriefPreventionHandler(main);
         }
     }

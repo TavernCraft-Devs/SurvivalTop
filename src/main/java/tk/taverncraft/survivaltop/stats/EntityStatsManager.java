@@ -2,7 +2,6 @@ package tk.taverncraft.survivaltop.stats;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 import net.md_5.bungee.api.ChatColor;
@@ -219,25 +218,10 @@ public class EntityStatsManager {
     private double getEntityBalWealth(String name) {
         // handle if group is enabled
         if (this.main.groupIsEnabled()) {
-            try {
-                double totalBalance = 0;
-                List<OfflinePlayer> offlinePlayers = this.main.getGroupManager().getPlayers(name);
-                for (OfflinePlayer offlinePlayer : offlinePlayers) {
-                    totalBalance += Main.getEconomy().getBalance(offlinePlayer);
-                }
-                return totalBalance;
-            } catch (NoClassDefFoundError | NullPointerException e) {
-                return 0;
-            }
+            return main.getBalanceManager().getBalanceByGroup(name);
         }
-
-        // handle for an individual player
-        try {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(name);
-            return Main.getEconomy().getBalance(player);
-        } catch (NoClassDefFoundError | NullPointerException e) {
-            return 0;
-        }
+        OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+        return main.getBalanceManager().getBalanceByPlayer(player);
     }
 
     /**

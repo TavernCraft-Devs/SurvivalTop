@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
+import tk.taverncraft.survivaltop.balance.BalanceManager;
 import tk.taverncraft.survivaltop.events.leaderboard.SignBreakEvent;
 import tk.taverncraft.survivaltop.events.leaderboard.SignPlaceEvent;
 import tk.taverncraft.survivaltop.events.stats.ViewPageEvent;
@@ -55,6 +56,7 @@ public class Main extends JavaPlugin {
     // managers
     private ConfigManager configManager;
     private DependencyManager dependencyManager;
+    private BalanceManager balanceManager;
     private LandManager landManager;
     private InventoryManager inventoryManager;
     private GroupManager groupManager;
@@ -104,6 +106,7 @@ public class Main extends JavaPlugin {
             this.entityStatsManager = new EntityStatsManager(this);
             this.serverStatsManager = new ServerStatsManager(this);
             this.leaderboardManager = new LeaderboardManager(this);
+            this.balanceManager = new BalanceManager(this);
             this.landManager = new LandManager(this);
             this.inventoryManager = new InventoryManager(this);
             // todo: revisit how gui is done, that whole module is messy and needs to be rewritten
@@ -318,6 +321,10 @@ public class Main extends JavaPlugin {
 
     public DependencyManager getDependencyManager() {
         return this.dependencyManager;
+    }
+
+    public BalanceManager getBalanceManager() {
+        return this.balanceManager;
     }
 
     public LandManager getLandManager() {

@@ -49,7 +49,7 @@ public class InventoryManager {
     private void loadInventoryWorth() {
         inventoryWorth = new LinkedHashMap<>();
         for (String key : main.getInventoriesConfig().getConfigurationSection("")
-            .getKeys(false)) {
+                .getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null) {
@@ -57,7 +57,7 @@ public class InventoryManager {
                 }
                 inventoryWorth.put(key.toUpperCase(), main.getInventoriesConfig().getDouble(key));
             } catch (Exception e) {
-                Bukkit.getConsoleSender().sendMessage(e.getMessage());
+                Bukkit.getLogger().info(e.getMessage());
             }
         }
     }
@@ -108,31 +108,45 @@ public class InventoryManager {
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      * @param name name of player to get inventory worth for
-     * @return
+     *
+     * @return double representing total worth
      */
     private double getByPlayer(UUID uuid, String name) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
         if (offlinePlayer.isOnline()) {
             Player player = offlinePlayer.getPlayer();
             Inventory inventory = player.getInventory();
-            double totalInventoryWorth = 0;
-            for (ItemStack itemStack : inventory) {
-                if (itemStack == null) {
-                    continue;
-                }
-                String itemName = itemStack.getType().toString().toUpperCase();
-                Double worth = inventoryWorth.get(itemName);
-                if (worth == null) {
-                    worth = (double) 0;
-                } else if (true) {
-                    setSenderInventoryForGui(uuid, itemName, itemStack.getAmount());
-                }
-                totalInventoryWorth += worth * itemStack.getAmount();
-            }
+            double totalInventoryWorth = calculateInventoryItemValues(uuid, inventory);
             return totalInventoryWorth;
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Goes through every item in inventory to get total values.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param inventory inventory of player to get worth for
+     *
+     * @return double representing total worth
+     */
+    private double calculateInventoryItemValues(UUID uuid, Inventory inventory) {
+        double totalInventoryWorth = 0;
+        for (ItemStack itemStack : inventory) {
+            if (itemStack == null) {
+                continue;
+            }
+            String itemName = itemStack.getType().toString().toUpperCase();
+            Double worth = inventoryWorth.get(itemName);
+            if (worth == null) {
+                worth = (double) 0;
+            } else if (true) {
+                setSenderInventoryForGui(uuid, itemName, itemStack.getAmount());
+            }
+            totalInventoryWorth += worth * itemStack.getAmount();
+        }
+        return totalInventoryWorth;
     }
 
     /**

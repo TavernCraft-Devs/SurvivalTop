@@ -1,16 +1,18 @@
 package tk.taverncraft.survivaltop.storage;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.stats.EntityCache;
 
 /**
  * YamlHelper is responsible for reading/writing from yml files.
@@ -28,14 +30,23 @@ public class YamlHelper implements StorageHelper {
     }
 
     /**
-     * Updates the stats of an entity into file.
+     * Saves information to yaml file.
      *
-     * @param uuid uuid of entity to update stats for
-     * @param landWealth the amount of wealth calculated from land
-     * @param balWealth the amount of wealth calculated from balance
-     * @param invWealth the amount of wealth calculated from inventory
+     * @param entityCacheList list of entities to store
      */
-    public void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth) {
+    public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
+        for (EntityCache eCache : entityCacheList) {
+            saveToFile(eCache);
+        }
+    }
+
+    /**
+     * Saves individual entities to file.
+     *
+     * @param eCache entity to save
+     */
+    private void saveToFile(EntityCache eCache) {
+        UUID uuid = eCache.getUuid();
         String entityFileName;
         String entityName = "None";
         String entityType = "player";
@@ -51,7 +62,7 @@ public class YamlHelper implements StorageHelper {
             }
         }
         File entityFile = new File(this.main.getDataFolder() + "/entityData",
-                entityFileName + ".yml");
+            entityFileName + ".yml");
         FileConfiguration entityConfig = new YamlConfiguration();
         if (!entityFile.exists()) {
             entityFile.getParentFile().mkdirs();
@@ -64,9 +75,13 @@ public class YamlHelper implements StorageHelper {
         }
         entityConfig.set("entity-name", entityName);
         entityConfig.set("entity-type", entityType);
-        entityConfig.set("land-wealth", landWealth);
-        entityConfig.set("bal-wealth", balWealth);
-        entityConfig.set("inv-wealth", invWealth);
+        entityConfig.set("bal-wealth", eCache.getBalWealth());
+        entityConfig.set("land-wealth", eCache.getLandWealth());
+        entityConfig.set("block-wealth", eCache.getBlockWealth());
+        entityConfig.set("spawner-wealth", eCache.getSpawnerWealth());
+        entityConfig.set("container-wealth", eCache.getContainerWealth());
+        entityConfig.set("inv-wealth", eCache.getInventoryWealth());
+        entityConfig.set("total-wealth", eCache.getTotalWealth());
 
         try {
             entityConfig.save(entityFile);

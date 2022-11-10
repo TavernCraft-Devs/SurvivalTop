@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.stats.EntityCache;
 import tk.taverncraft.survivaltop.storage.SqlHelper;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
@@ -109,7 +110,7 @@ public class LeaderboardManager {
      * @param tempSortedCache temporary cache for sorted player wealth to set the leaderboard
      */
     public void completeLeaderboardUpdate(CommandSender sender,
-            HashMap<UUID, Double> tempSortedCache) {
+            HashMap<UUID, EntityCache> tempSortedCache) {
         MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
                 "minimum-wealth", 0.0), main.groupIsEnabled(),
                 this.main.getServerStatsManager().getGroupUuidToNameMap());
@@ -132,8 +133,6 @@ public class LeaderboardManager {
             leaderboardTask.cancel();
             leaderboardTask = null;
         }
-
-        SqlHelper.query = "";
         this.isUpdating = false;
     }
 

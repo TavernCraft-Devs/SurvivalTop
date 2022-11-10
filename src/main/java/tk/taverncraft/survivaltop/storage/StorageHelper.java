@@ -1,6 +1,8 @@
 package tk.taverncraft.survivaltop.storage;
 
-import java.util.UUID;
+import java.util.ArrayList;
+
+import tk.taverncraft.survivaltop.stats.EntityCache;
 
 /**
  * Interface to determine what type of storage to use. Used to shift work to compile
@@ -11,10 +13,7 @@ public interface StorageHelper {
     /**
      * Saves information to storage.
      *
-     * @param uuid uuid of entity
-     * @param landWealth land wealth of entity
-     * @param balWealth balance wealth of entity
-     * @param invWealth inventory wealth of entity
+     * @param entityCacheList list of entities to store
      */
-    void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth);
+    void saveToStorage(ArrayList<EntityCache> entityCacheList);
 }

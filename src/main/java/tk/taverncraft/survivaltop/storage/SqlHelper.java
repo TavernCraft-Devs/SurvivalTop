@@ -6,12 +6,14 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.stats.EntityCache;
 
 /**
  * SqlHelper is responsible for reading/writing from MySQL database.
@@ -24,9 +26,6 @@ public class SqlHelper implements StorageHelper {
     private String url;
     private String user;
     private String password;
-
-    // todo: improve this terrible implementation
-    public static String query = "";
 
     /**
      * Constructor for SqlHelper.
@@ -52,27 +51,37 @@ public class SqlHelper implements StorageHelper {
     }
 
     /**
-     * Updates the stats of an entity into a sql query for a single insertion into database.
+     * Saves information to mysql database.
      *
-     * @param uuid uuid of entity to update stats for
-     * @param landWealth the amount of wealth calculated from land
-     * @param balWealth the amount of wealth calculated from balance
-     * @param invWealth the amount of wealth calculated from inventory
+     * @param entityCacheList list of entities to store
      */
-    public void saveToStorage(UUID uuid, double landWealth, double balWealth, double invWealth) {
-        String entityName = null;
-        String entityType = "player";
-        if (this.main.groupIsEnabled()) {
-            entityName = this.main.getServerStatsManager().getGroupUuidToNameMap().get(uuid);
-            entityType = "group";
-        } else {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            if (player != null) {
-                entityName = player.getName();
-            }
+    public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
+        String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
+            "LAND_WEALTH, BALANCE_WEALTH, INVENTORY_WEALTH) VALUES ";
+        String body = "";
+        for (EntityCache eCache : entityCacheList) {
+            body += getEntityQuery(eCache);
         }
-        SqlHelper.query += "('" + uuid + "', '" + entityName + "', '" + entityType + "', '"
-                + landWealth + "', '" + balWealth + "', '" + invWealth + "'), ";
+
+        if (body.length() == 0) {
+            return;
+        }
+        String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
+            "BALANCE_WEALTH = VALUES(BALANCE_WEALTH), INVENTORY_WEALTH = VALUES(INVENTORY_WEALTH)";
+        String finalQuery = header + body.substring(0, body.length() - 2) + footer;
+        try (Connection conn = this.connectToSql(); PreparedStatement delStmt =
+            conn.prepareStatement("DELETE FROM " + tableName);
+             PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
+            if (conn != null) {
+                // necessary to delete table for group since temp uuid results in multiple entries
+                if (this.main.groupIsEnabled()) {
+                    delStmt.execute();
+                }
+                stmt.executeUpdate();
+            }
+        } catch (NullPointerException | SQLException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+        }
     }
 
     /**
@@ -158,36 +167,31 @@ public class SqlHelper implements StorageHelper {
                 break;
             }
         }
-
         return found;
     }
 
     /**
-     * Inserts user values into database.
+     * Appends individual entities to sql query.
+     *
+     * @param eCache entity to append
      */
-    public void insertIntoDatabase() {
-        if (query.length() == 0) {
-            return;
-        }
-
-        String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
-            "LAND_WEALTH, BALANCE_WEALTH, INVENTORY_WEALTH) VALUES ";
-        String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
-            "BALANCE_WEALTH = VALUES(BALANCE_WEALTH), INVENTORY_WEALTH = VALUES(INVENTORY_WEALTH)";
-        String finalQuery = header + query.substring(0, query.length() - 2) + footer;
-        try (Connection conn = this.connectToSql(); PreparedStatement delStmt =
-                conn.prepareStatement("DELETE FROM " + tableName);
-                PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
-            if (conn != null) {
-                // necessary to delete table for group since temp uuid results in multiple entries
-                if (this.main.groupIsEnabled()) {
-                    delStmt.execute();
-                }
-                stmt.executeUpdate();
+    public String getEntityQuery(EntityCache eCache) {
+        UUID uuid = eCache.getUuid();
+        String entityName = "None";
+        String entityType = "player";
+        if (this.main.groupIsEnabled()) {
+            entityName = this.main.getServerStatsManager().getGroupUuidToNameMap().get(uuid);
+            entityType = "group";
+        } else {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            if (player != null) {
+                entityName = player.getName();
             }
-        } catch (NullPointerException | SQLException e) {
-            Bukkit.getLogger().severe(e.getMessage());
         }
-        query = "";
+        return "('" + uuid + "', '" + entityName + "', '" + entityType + "', '"
+            + eCache.getBalWealth() + "', '" + eCache.getLandWealth() + "', '"
+            + eCache.getBlockWealth() + "', '" + eCache.getSpawnerWealth() + "', '"
+            + eCache.getContainerWealth() + "', '" + eCache.getInventoryWealth() + "', '"
+            + eCache.getTotalWealth() + "'), ";
     }
 }
