@@ -57,7 +57,8 @@ public class SqlHelper implements StorageHelper {
      */
     public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
         String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
-            "LAND_WEALTH, BALANCE_WEALTH, INVENTORY_WEALTH) VALUES ";
+                "BALANCE_WEALTH, LAND_WEALTH, BLOCK_WEALTH, SPAWNER_WEALTH, CONTAINER_WEALTH, " +
+                "INVENTORY_WEALTH, TOTAL_WEALTH) VALUES ";
         String body = "";
         for (EntityCache eCache : entityCacheList) {
             body += getEntityQuery(eCache);
@@ -66,8 +67,11 @@ public class SqlHelper implements StorageHelper {
         if (body.length() == 0) {
             return;
         }
-        String footer = " ON DUPLICATE KEY UPDATE LAND_WEALTH = VALUES(LAND_WEALTH), " +
-            "BALANCE_WEALTH = VALUES(BALANCE_WEALTH), INVENTORY_WEALTH = VALUES(INVENTORY_WEALTH)";
+        String footer = " ON DUPLICATE KEY UPDATE BALANCE_WEALTH = VALUES(BALANCE_WEALTH), " +
+            "LAND_WEALTH = VALUES(LAND_WEALTH), BLOCK_WEALTH = VALUES(BLOCK_WEALTH), " +
+            "SPAWNER_WEALTH = VALUES(SPAWNER_WEALTH), " +
+            "CONTAINER_WEALTH = VALUES(CONTAINER_WEALTH), " +
+            "INVENTORY_WEALTH = VALUES(INVENTORY_WEALTH), TOTAL_WEALTH = VALUES(TOTAL_WEALTH)";
         String finalQuery = header + body.substring(0, body.length() - 2) + footer;
         try (Connection conn = this.connectToSql(); PreparedStatement delStmt =
             conn.prepareStatement("DELETE FROM " + tableName);
@@ -103,9 +107,13 @@ public class SqlHelper implements StorageHelper {
                         + "UUID VARCHAR (36) NOT NULL, "
                         + "ENTITY_NAME VARCHAR (36) NOT NULL, "
                         + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
-                        + "LAND_WEALTH DECIMAL (18, 2), "
                         + "BALANCE_WEALTH DECIMAL (18, 2), "
+                        + "LAND_WEALTH DECIMAL (18, 2), "
+                        + "BLOCK_WEALTH DECIMAL (18, 2), "
+                        + "SPAWNER_WEALTH DECIMAL (18, 2), "
+                        + "CONTAINER_WEALTH DECIMAL (18, 2), "
                         + "INVENTORY_WEALTH DECIMAL (18, 2), "
+                        + "TOTAL_WEALTH DECIMAL (18, 2), "
                         + "PRIMARY KEY (UUID))";
                 PreparedStatement stmt = conn.prepareStatement(query);
                 stmt.executeUpdate();

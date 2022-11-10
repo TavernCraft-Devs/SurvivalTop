@@ -16,7 +16,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.storage.SqlHelper;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
 /**
@@ -90,7 +89,7 @@ public class ServerStatsManager {
                     main.getLandManager().calculateSpawnerWorthForAll();
                 HashMap<UUID, Double> tempContainerCache =
                     main.getLandManager().calculateContainerWorthForAll();
-                postUpdateProcessing(tempSpawnerCache, tempContainerCache, sender);
+                executePostUpdateActions(tempSpawnerCache, tempContainerCache, sender);
             }
         }.runTask(main);
     }
@@ -100,24 +99,7 @@ public class ServerStatsManager {
      */
     private void updateForPlayers() {
         Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-            double entityBlockWorth = 0;
-            double entityBalWorth = 0;
-            double entityInvWorth = 0;
-            if (main.landIsIncluded()) {
-                entityBlockWorth = main.getLandManager().getLand(offlinePlayer.getUniqueId(),
-                        offlinePlayer.getName(), main.getLandManager().getBlockOperationsForAll());
-            }
-            if (main.balIsIncluded()) {
-                entityBalWorth = main.getBalanceManager().getBalanceByPlayer(offlinePlayer);
-            }
-            if (main.inventoryIsIncluded()) {
-                entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
-                        offlinePlayer.getUniqueId(), offlinePlayer.getName());
-            }
-            UUID uuid = offlinePlayer.getUniqueId();
-            EntityCache eCache = new EntityCache(uuid, entityBalWorth, entityBlockWorth,
-                    entityInvWorth, 0, 0);
-            uuidToEntityCacheMap.put(uuid, eCache);
+            calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName());
         });
     }
 
@@ -135,62 +117,89 @@ public class ServerStatsManager {
             UUID tempUuid = UUID.randomUUID();
             groupUuidToNameMap.put(tempUuid, group);
             groupNameToUuidMap.put(group, tempUuid);
-            double entityBlockWorth = 0;
-            double entityBalWorth = 0;
-            double entityInvWorth = 0;
-            if (main.landIsIncluded()) {
-                entityBlockWorth = main.getLandManager().getLand(tempUuid,
-                        group, main.getLandManager().getBlockOperationsForAll());
-            }
-            if (main.balIsIncluded()) {
-                entityBalWorth = main.getBalanceManager().getBalanceByGroup(group);
-            }
-            if (main.inventoryIsIncluded()) {
-                entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
-                        tempUuid, group);
-            }
-            EntityCache eCache = new EntityCache(tempUuid, entityBalWorth, entityBlockWorth,
-                entityInvWorth, 0, 0);
-            uuidToEntityCacheMap.put(tempUuid, eCache);
+            calculateAndCacheEntities(tempUuid, group);
         }
     }
 
     /**
+     * Calculates the worth for each entity and caches them.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param name name of entity to calculate for
+     */
+    private void calculateAndCacheEntities(UUID uuid, String name) {
+        double entityBlockWorth = 0;
+        double entityBalWorth = 0;
+        double entityInvWorth = 0;
+        if (main.landIsIncluded()) {
+            entityBlockWorth = main.getLandManager().getLand(uuid,
+                name, main.getLandManager().getBlockOperationsForAll());
+        }
+        if (main.balIsIncluded()) {
+            entityBalWorth = main.getBalanceManager().getBalanceForEntity(name);
+        }
+        if (main.inventoryIsIncluded()) {
+            entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(
+                uuid, name);
+        }
+        EntityCache eCache = new EntityCache(uuid, entityBalWorth, entityBlockWorth,
+            entityInvWorth, 0, 0);
+        uuidToEntityCacheMap.put(uuid, eCache);
+    }
+
+    /**
      * Cleans up after values of entities are retrieved and updates the relevant caches. Also
-     * updates spawner values if applicable.
+     * updates spawner/container values if applicable.
      *
      * @param tempSpawnerCache map from uuid to spawner value
      * @param tempContainerCache map from uuid to container value
      * @param sender sender who initiated the leaderboard update
      */
-    private void postUpdateProcessing(HashMap<UUID, Double> tempSpawnerCache, HashMap<UUID,
+    private void executePostUpdateActions(HashMap<UUID, Double> tempSpawnerCache, HashMap<UUID,
         Double> tempContainerCache, CommandSender sender) {
         new BukkitRunnable() {
             @Override
             public void run() {
-            for (Map.Entry<UUID, Double> map : tempSpawnerCache.entrySet()) {
-                UUID uuid = map.getKey();
-                double value = map.getValue();
-                EntityCache eCache = uuidToEntityCacheMap.get(uuid);
-                EntityCache updatedCache = eCache.setSpawnerWealth(value);
-                uuidToEntityCacheMap.put(uuid, updatedCache);
-            }
-
-            for (Map.Entry<UUID, Double> map : tempContainerCache.entrySet()) {
-                UUID uuid = map.getKey();
-                double value = map.getValue();
-                EntityCache eCache = uuidToEntityCacheMap.get(uuid);
-                EntityCache updatedCache = eCache.setContainerWealth(value);
-                uuidToEntityCacheMap.put(uuid, updatedCache);
-            }
-
-            HashMap<UUID, EntityCache> tempSortedCache = sortTotalWealthCache(uuidToEntityCacheMap);
-            sortWealthCacheKeyValue(tempSortedCache);
-            main.getLandManager().resetSenderLists();
-            main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
-            main.getStorageManager().saveToStorage(entityCacheList);
+                executePostUpdateSpawners(tempSpawnerCache);
+                executePostUpdateContainers(tempContainerCache);
+                HashMap<UUID, EntityCache> tempSortedCache =
+                        sortTotalWealthCache(uuidToEntityCacheMap);
+                sortWealthCacheKeyValue(tempSortedCache);
+                main.getLandManager().resetSenderLists();
+                main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
+                main.getStorageManager().saveToStorage(entityCacheList);
             }
         }.runTaskLaterAsynchronously(main, 0);
+    }
+
+    /**
+     * Updates the values of spawners after they are processed on the main thread.
+     *
+     * @param tempSpawnerCache spawner cache to update from
+     */
+    private void executePostUpdateSpawners(HashMap<UUID, Double> tempSpawnerCache) {
+        for (Map.Entry<UUID, Double> map : tempSpawnerCache.entrySet()) {
+            UUID uuid = map.getKey();
+            double value = map.getValue();
+            EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+            EntityCache updatedCache = eCache.setSpawnerWealth(value);
+            uuidToEntityCacheMap.put(uuid, updatedCache);
+        }
+    }
+
+    /**
+     * Updates the values of containers after they are processed on the main thread.
+     *
+     * @param tempContainerCache container cache to update from
+     */
+    private void executePostUpdateContainers(HashMap<UUID, Double> tempContainerCache) {
+        for (Map.Entry<UUID, Double> map : tempContainerCache.entrySet()) {
+            UUID uuid = map.getKey();
+            double value = map.getValue();
+            EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+            EntityCache updatedCache = eCache.setContainerWealth(value);
+            uuidToEntityCacheMap.put(uuid, updatedCache);
+        }
     }
 
     /**

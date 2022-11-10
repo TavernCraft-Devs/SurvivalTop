@@ -216,12 +216,7 @@ public class EntityStatsManager {
      * @return double value representing entity balance wealth
      */
     private double getEntityBalWealth(String name) {
-        // handle if group is enabled
-        if (this.main.groupIsEnabled()) {
-            return main.getBalanceManager().getBalanceByGroup(name);
-        }
-        OfflinePlayer player = Bukkit.getOfflinePlayer(name);
-        return main.getBalanceManager().getBalanceByPlayer(player);
+        return main.getBalanceManager().getBalanceForEntity(name);
     }
 
     /**
