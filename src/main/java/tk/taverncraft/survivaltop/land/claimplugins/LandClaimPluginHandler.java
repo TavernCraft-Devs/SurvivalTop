@@ -1,10 +1,6 @@
 package tk.taverncraft.survivaltop.land.claimplugins;
 
-import java.util.ArrayList;
 import java.util.UUID;
-import java.util.function.BiFunction;
-
-import org.bukkit.block.Block;
 
 /**
  * Interface to get land worth from different land claim plugins.
@@ -14,12 +10,11 @@ public interface LandClaimPluginHandler {
     /**
      * Get the worth of a land.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
-     * @param blockOperations operations to perform
+     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      *
      * @return double representing its worth
      */
-    double getLandWorth(UUID uuid, String name,
-            ArrayList<BiFunction<UUID, Block, Double>> blockOperations);
+    double getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate);
 }

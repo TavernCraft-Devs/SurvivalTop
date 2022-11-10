@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.ui.LeaderboardGui;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
 /**
@@ -32,6 +33,9 @@ public class ServerStatsManager {
     // temp hashmaps with pseudo uuids used only when entity is set to group
     private HashMap<UUID, String> groupUuidToNameMap;
     private HashMap<String, UUID> groupNameToUuidMap;
+
+    // leaderboard gui, for upcoming update
+    private HashMap<UUID, LeaderboardGui> leaderboardGui = new HashMap<>();
 
     /**
      * Constructor for ServerStatsManager.
@@ -61,7 +65,7 @@ public class ServerStatsManager {
      */
     public void updateWealthStats(CommandSender sender) {
         try {
-            main.getLandManager().resetSenderLists();
+            main.getLandManager().doCleanup();
             MessageManager.sendMessage(sender, "update-started");
             if (this.main.groupIsEnabled()) {
                 updateForGroups();
@@ -86,9 +90,9 @@ public class ServerStatsManager {
             @Override
             public void run() {
                 HashMap<UUID, Double> tempSpawnerCache =
-                    main.getLandManager().calculateSpawnerWorthForAll();
+                    main.getLandManager().calculateSpawnerWorthForLeaderboard();
                 HashMap<UUID, Double> tempContainerCache =
-                    main.getLandManager().calculateContainerWorthForAll();
+                    main.getLandManager().calculateContainerWorthForLeaderboard();
                 executePostUpdateActions(tempSpawnerCache, tempContainerCache, sender);
             }
         }.runTask(main);
@@ -124,7 +128,7 @@ public class ServerStatsManager {
     /**
      * Calculates the worth for each entity and caches them.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to calculate for
      */
     private void calculateAndCacheEntities(UUID uuid, String name) {
@@ -132,14 +136,13 @@ public class ServerStatsManager {
         double entityBalWorth = 0;
         double entityInvWorth = 0;
         if (main.landIsIncluded()) {
-            entityBlockWorth = main.getLandManager().getLand(uuid, name,
-                    main.getLandManager().getBlockOperationsForAll());
+            entityBlockWorth = main.getLandManager().getLandWorthForEntity(uuid, name, true);
         }
         if (main.balIsIncluded()) {
             entityBalWorth = main.getBalanceManager().getBalanceForEntity(name);
         }
         if (main.inventoryIsIncluded()) {
-            entityInvWorth = main.getInventoryManager().getEntityInventoryWorth(uuid, name);
+            entityInvWorth = main.getInventoryManager().getInventoryWorthForEntity(uuid, name, true);
         }
         EntityCache eCache = new EntityCache(uuid, entityBalWorth, entityBlockWorth,
                 entityInvWorth, 0, 0);
@@ -164,7 +167,7 @@ public class ServerStatsManager {
                 HashMap<UUID, EntityCache> tempSortedCache =
                         sortTotalWealthCache(uuidToEntityCacheMap);
                 sortWealthCacheKeyValue(tempSortedCache);
-                main.getLandManager().resetSenderLists();
+                main.getLandManager().doCleanup();
                 main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
                 main.getStorageManager().saveToStorage(entityCacheList);
             }

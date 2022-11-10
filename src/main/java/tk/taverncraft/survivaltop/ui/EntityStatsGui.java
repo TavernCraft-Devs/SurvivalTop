@@ -40,12 +40,13 @@ public class EntityStatsGui extends GuiHelper {
         // set up inventories
         name = name + " ";
         setUpMainPage(name);
-        HashMap<String, Integer> blockList = main.getLandManager().getSenderBlockForGui(uuid);
-        HashMap<String, Integer> spawnerList = main.getLandManager().getSenderSpawnerForGui(uuid);
+        HashMap<String, Integer> blockList = main.getEntityStatsManager().getBlocksForGuiStats(uuid);
+        HashMap<String, Integer> spawnerList =
+                main.getEntityStatsManager().getSpawnersForGuiStats(uuid);
         HashMap<String, Integer> containerList =
-                main.getLandManager().getSenderContainerForGui(uuid);
+                main.getEntityStatsManager().getContainersForGuiStats(uuid);
         HashMap<String, Integer> inventoryList =
-                main.getInventoryManager().getSenderInventoryForGui(uuid);
+                main.getEntityStatsManager().getInventoriesForGuiStats(uuid);
         blockViews = prepareViews(blockList, name, "Block Stats");
         spawnerViews = prepareViews(spawnerList, name, "Spawner Stats");
         containerViews = prepareViews(containerList, name, "Container Stats");
@@ -88,7 +89,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(11, createGuiItem(Material.EMERALD, "Total Balance Wealth",
                     false, "Disabled"));
         }
-        if (main.getLandManager().getIncludeLand()) {
+        if (main.landIsIncluded()) {
             inv.setItem(12, createGuiItem(Material.GOLDEN_SHOVEL, "Total Land Wealth",
                     true, "Land Wealth: " + landValue));
             inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
@@ -99,7 +100,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
                     false, "Disabled"));
         }
-        if (main.getLandManager().getIncludeSpawners() && main.getLandManager().getIncludeLand()) {
+        if (main.getLandManager().getIncludeSpawners() && main.landIsIncluded()) {
             inv.setItem(14, createGuiItem(Material.SPAWNER, "Spawners Wealth",
                     true, "Spawner " +
                 "Wealth: " + spawnerValue, "Click to learn more."));
@@ -107,7 +108,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(14, createGuiItem(Material.SPAWNER, "Spawners Wealth",
                     false, "Disabled"));
         }
-        if (main.getLandManager().getIncludeContainers() && main.getLandManager().getIncludeLand()) {
+        if (main.getLandManager().getIncludeContainers() && main.landIsIncluded()) {
             inv.setItem(15, createGuiItem(Material.CHEST, "Container Wealth",
                     true, "Container Wealth: " + containerValue,
                     "Click to learn more."));

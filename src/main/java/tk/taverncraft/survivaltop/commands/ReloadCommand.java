@@ -59,10 +59,11 @@ public class ReloadCommand {
 
             // reinitialize manager values
             main.getStorageManager().initializeValues();
+            main.getEntityStatsManager().initializeValues();
             main.getServerStatsManager().initializeValues();
-            main.getLandManager().initializeLandType();
             main.getLandManager().initializeCalculationType();
             main.getLandManager().initializeLandOperations();
+            main.getLandManager().initializeLandType();
             main.getInventoryManager().initializeWorth();
             new InfoGui(main);
             main.getGroupManager().initializeLandType();

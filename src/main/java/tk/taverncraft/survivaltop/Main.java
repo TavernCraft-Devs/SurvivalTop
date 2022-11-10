@@ -66,10 +66,15 @@ public class Main extends JavaPlugin {
     private StorageManager storageManager;
 
     // options
+    // todo: move this into an options manager
     private boolean includeBalance;
     private boolean includeLand;
     private boolean includeInventory;
+    private boolean includeSpawner;
+    private boolean includeContainer;
     private boolean groupEnabled;
+    private boolean useGuiStats;
+    private boolean useLeaderboardStats;
 
     // console uuid
     private UUID consoleUuid = UUID.randomUUID();
@@ -161,8 +166,12 @@ public class Main extends JavaPlugin {
     public void setOptions() {
         this.includeBalance = this.getConfig().getBoolean("include-bal", false);
         this.includeLand = this.getConfig().getBoolean("include-land", false);
+        this.includeSpawner = this.getConfig().getBoolean("include-spawners", false);
+        this.includeContainer = this.getConfig().getBoolean("include-containers", false);
         this.includeInventory = this.getConfig().getBoolean("include-inventory", false);
         this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
+        this.useGuiStats = this.getConfig().getBoolean("use-gui-stats", true);
+        this.useLeaderboardStats = this.getConfig().getBoolean("use-leaderboard-stats", false);
     }
 
     /**
@@ -255,12 +264,28 @@ public class Main extends JavaPlugin {
         return includeLand;
     }
 
+    public boolean spawnerIsIncluded() {
+        return includeSpawner;
+    }
+
+    public boolean containerIsIncluded() {
+        return includeContainer;
+    }
+
     public boolean inventoryIsIncluded() {
         return includeInventory;
     }
 
     public boolean groupIsEnabled() {
         return groupEnabled;
+    }
+
+    public boolean isUseGuiStats() {
+        return useGuiStats;
+    }
+
+    public boolean isUseLeaderboardStats() {
+        return useLeaderboardStats;
     }
 
     public static Economy getEconomy() {

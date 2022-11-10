@@ -21,10 +21,6 @@ public class InventoryManager {
     private Main main;
     private LinkedHashMap<String, Double> inventoryWorth = new LinkedHashMap<>();
 
-    // for tracking inventory items to be used in gui
-    // note that uuid below is uuid of the sender
-    private HashMap<UUID, HashMap<String, Integer>> senderInventoryForGui = new HashMap<>();
-
     /**
      * Constructor for InventoryManager.
      *
@@ -40,7 +36,6 @@ public class InventoryManager {
      */
     public void initializeWorth() {
         this.loadInventoryWorth();
-        senderInventoryForGui = new HashMap<>();
     }
 
     /**
@@ -85,38 +80,39 @@ public class InventoryManager {
     /**
      * Gets total worth of inventories for given entity.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get inventory worth for
+     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      *
      * @return double representing its worth
      */
-    public double getEntityInventoryWorth(UUID uuid, String name) {
+    public double getInventoryWorthForEntity(UUID uuid, String name, boolean isLeaderboardUpdate) {
         if (this.main.groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             double totalWorth = 0;
             for (OfflinePlayer player : players) {
-                totalWorth += getByPlayer(uuid, player.getName());
+                totalWorth += getByPlayer(uuid, player.getName(), isLeaderboardUpdate);
             }
             return totalWorth;
         } else {
-            return getByPlayer(uuid, name);
+            return getByPlayer(uuid, name, isLeaderboardUpdate);
         }
     }
 
     /**
      * Get the inventory worth for given player name.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of player to get inventory worth for
      *
      * @return double representing total worth
      */
-    private double getByPlayer(UUID uuid, String name) {
+    private double getByPlayer(UUID uuid, String name, boolean isLeaderboardUpdate) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
         if (offlinePlayer.isOnline()) {
             Player player = offlinePlayer.getPlayer();
             Inventory inventory = player.getInventory();
-            double totalInventoryWorth = calculateInventoryItemValues(uuid, inventory);
+            double totalInventoryWorth = processInventoryWorth(uuid, inventory, !isLeaderboardUpdate);
             return totalInventoryWorth;
         } else {
             return 0;
@@ -126,12 +122,12 @@ public class InventoryManager {
     /**
      * Goes through every item in inventory to get total values.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param inventory inventory of player to get worth for
      *
      * @return double representing total worth
      */
-    private double calculateInventoryItemValues(UUID uuid, Inventory inventory) {
+    private double processInventoryWorth(UUID uuid, Inventory inventory, boolean isStatsAction) {
         double totalInventoryWorth = 0;
         for (ItemStack itemStack : inventory) {
             if (itemStack == null) {
@@ -141,42 +137,12 @@ public class InventoryManager {
             Double worth = inventoryWorth.get(itemName);
             if (worth == null) {
                 worth = (double) 0;
-            } else if (true) {
-                setSenderInventoryForGui(uuid, itemName, itemStack.getAmount());
+            } else if (main.isUseGuiStats() && isStatsAction) {
+                main.getEntityStatsManager().setInventoriesForGuiStats(uuid, itemName,
+                    itemStack.getAmount());
             }
             totalInventoryWorth += worth * itemStack.getAmount();
         }
         return totalInventoryWorth;
-    }
-
-    /**
-     * Sets inventory item count and value to be used in gui.
-     *
-     * @param uuid sender to link inventory to
-     * @param itemName item name to check for
-     */
-    public void setSenderInventoryForGui(UUID uuid, String itemName, int amount) {
-        senderInventoryForGui.computeIfAbsent(uuid, k -> new HashMap<>());
-        Integer currentCount = senderInventoryForGui.get(uuid).get(itemName);
-        if (currentCount == null) {
-            currentCount = 0;
-        }
-        senderInventoryForGui.get(uuid).put(itemName, currentCount + amount);
-    }
-
-    /**
-     * Gets the inventory items to show sender in GUI.
-     *
-     * @return hashmap of inventory item name to its worth
-     */
-    public HashMap<String, Integer> getSenderInventoryForGui(UUID uuid) {
-        return this.senderInventoryForGui.get(uuid);
-    }
-
-    /**
-     * Resets a specific sender's info list after calculating stats.
-     */
-    public void resetSenderLists(UUID uuid) {
-        senderInventoryForGui.remove(uuid);
     }
 }
