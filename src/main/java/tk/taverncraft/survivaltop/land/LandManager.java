@@ -81,7 +81,7 @@ public class LandManager {
     }
 
     /**
-     * Initializes operations to perform for land calculation.
+     * Initializes land operations helper.
      */
     public void initializeLandOperations() {
         this.landOperationsHelper = new LandOperationsHelper(main);
@@ -136,6 +136,8 @@ public class LandManager {
 
     /**
      * Resets a specific sender's info list after calculating stats.
+     *
+     * @param uuid uuid of sender to clean up after
      */
     public void doCleanup(UUID uuid) {
         landOperationsHelper.doStatsCleanup(uuid);

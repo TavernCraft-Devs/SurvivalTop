@@ -165,8 +165,8 @@ public class ServerStatsManager {
                 executePostUpdateSpawners(tempSpawnerCache);
                 executePostUpdateContainers(tempContainerCache);
                 HashMap<UUID, EntityCache> tempSortedCache =
-                        sortTotalWealthCache(uuidToEntityCacheMap);
-                sortWealthCacheKeyValue(tempSortedCache);
+                        sortEntitiesByTotalWealth(uuidToEntityCacheMap);
+                setUpEntityCache(tempSortedCache);
                 main.getLandManager().doCleanup();
                 main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
                 main.getStorageManager().saveToStorage(entityCacheList);
@@ -211,7 +211,7 @@ public class ServerStatsManager {
      *
      * @return sorted total wealth hashmap
      */
-    private HashMap<UUID, EntityCache> sortTotalWealthCache(ConcurrentHashMap<UUID,
+    private HashMap<UUID, EntityCache> sortEntitiesByTotalWealth(ConcurrentHashMap<UUID,
             EntityCache> hm) {
         List<Map.Entry<UUID, EntityCache> > list =
                 new LinkedList<>(hm.entrySet());
@@ -231,7 +231,7 @@ public class ServerStatsManager {
      *
      * @param tempSortedCache hashmap to use to generate cache for
      */
-    private void sortWealthCacheKeyValue(HashMap<UUID, EntityCache> tempSortedCache) {
+    private void setUpEntityCache(HashMap<UUID, EntityCache> tempSortedCache) {
         this.entityPositionCache = new ConcurrentHashMap<>();
         int i = 0;
         for (UUID uuid : tempSortedCache.keySet()) {

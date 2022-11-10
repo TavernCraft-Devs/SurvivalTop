@@ -56,44 +56,13 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
                 claims = getClaimsByPlayer(name);
             }
             for (FLocation claim : claims) {
-                Long chunkX = claim.getX();
-                Long chunkZ = claim.getZ();
-                World world = claim.getWorld();
-                double loc1X = chunkX * 16;
-                double loc1Z = chunkZ * 16;
-                double loc2X = loc1X + 15;
-                double loc2Z = loc1Z + 15;
-                Location loc1 = new Location(world, loc1X, 0, loc1Z);
-                Location loc2 = new Location(world, loc2X, 0, loc2Z);
-                wealth += getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                wealth += landOperationsHelper.getChunkWorth(uuid, claim.getChunk(),
+                        claim.getWorld(), isLeaderboardUpdate);
             }
             return wealth;
         } catch (NoClassDefFoundError | NullPointerException e) {
             return wealth;
         }
-    }
-
-    /**
-     * Gets the worth of a claim identified between 2 locations.
-     *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
-     * @param l1 location 1
-     * @param l2 location 2
-     * @param world world that the claim is in
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing claim worth
-     */
-    private double getClaimWorth(UUID uuid, Location l1, Location l2, World world,
-            boolean isLeaderboardUpdate) {
-        double minX = Math.min(l1.getX(), l2.getX());
-        double minY = this.main.getMinHeight();
-        double minZ = Math.min(l1.getZ(), l2.getZ());
-        double maxX = Math.max(l1.getX(), l2.getX()) + 1;
-        double maxY = this.main.getMaxHeight();
-        double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        return landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
-            isLeaderboardUpdate);
     }
 
     /**

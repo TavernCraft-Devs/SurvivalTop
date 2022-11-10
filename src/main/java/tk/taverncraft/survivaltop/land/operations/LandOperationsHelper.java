@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -42,8 +43,8 @@ public class LandOperationsHelper {
     public LandOperationsHelper(Main main) {
         this.main = main;
         initializeWorth();
-        initializeValues();
-        initializeOperations();
+        initializeLandSubOperations();
+        initializeLandOperations();
     }
 
     /**
@@ -56,18 +57,18 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Initializes preprocessing maps for spawners and containers.
+     * Initializes block, spawner and container operations for land.
      */
-    private void initializeValues() {
+    private void initializeLandSubOperations() {
         blockOperations = new BlockOperations(main, blockWorth);
         spawnerOperations = new SpawnerOperations(main, spawnerWorth);
         containerOperations = new ContainerOperations(main, containerWorth);
     }
 
     /**
-     * Initialize operations to be included.
+     * Initialize land operations to be included.
      */
-    private void initializeOperations() {
+    private void initializeLandOperations() {
         landOperationsForLeaderboard = new ArrayList<>();
         landOperationsForStats = new ArrayList<>();
 
@@ -146,7 +147,7 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Runs update with inclusion of search for spawners.
+     * Gets worth of a claim with possible inclusion of search for spawners/containers.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param maxX max x coordinate
@@ -173,6 +174,43 @@ public class LandOperationsHelper {
             for (int j = (int) minY; j < maxY; j++) {
                 for (int k = (int) minZ; k < maxZ; k++) {
                     Block block = world.getBlockAt(i, j, k);
+                    for (BiFunction<UUID, Block, Double> f : blockOperations) {
+                        double blockWorth = ((Number) f.apply(uuid, block)).doubleValue();
+                        blocksWorth += blockWorth;
+                    }
+                }
+            }
+        }
+        return blocksWorth;
+    }
+
+    /**
+     * Gets worth of a claim with possible inclusion of search for spawners/containers.
+     * Only plugins that claim lands in chunks uses this which is faster.
+     *
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
+     * @param chunk chunk to get worth for.
+     * @param world world to search in
+     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
+     */
+    public double getChunkWorth(UUID uuid, Chunk chunk, World world, boolean isLeaderboardUpdate) {
+        ArrayList<BiFunction<UUID, Block, Double>> blockOperations;
+        if (isLeaderboardUpdate) {
+            blockOperations = landOperationsForLeaderboard;
+        } else {
+            blockOperations = landOperationsForStats;
+        }
+
+        double blocksWorth = 0;
+
+        int x = chunk.getX() << 4;
+        int z = chunk.getZ() << 4;
+        int maxHeight = (int) main.getMaxHeight();
+        int minHeight = (int) main.getMinHeight();
+        for (int i = x; i < x + 16; ++i) {
+            for (int j = z; j < z + 16; ++j) {
+                for (int k = minHeight; k < maxHeight; ++k) {
+                    Block block = world.getBlockAt(i, k, j);
                     for (BiFunction<UUID, Block, Double> f : blockOperations) {
                         double blockWorth = ((Number) f.apply(uuid, block)).doubleValue();
                         blocksWorth += blockWorth;
@@ -234,7 +272,7 @@ public class LandOperationsHelper {
     /**
      * Gets the map of worth for all container items.
      *
-     * @return map of contaimer item ame to value
+     * @return map of container item name to value
      */
     public LinkedHashMap<String, Double> getContainerWorth() {
         return this.containerWorth;
@@ -305,6 +343,8 @@ public class LandOperationsHelper {
 
     /**
      * Resets a specific sender's info list after calculating stats.
+     *
+     * @param uuid uuid of sender to clean up after
      */
     public void doStatsCleanup(UUID uuid) {
         spawnerOperations.doStatsCleanup(uuid);
