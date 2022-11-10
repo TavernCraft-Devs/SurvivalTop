@@ -1,3 +1,5 @@
+# you may find the below list of supported entity types useful:
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
 ZOMBIE: 80
 SKELETON: 100
 SPIDER: 120
