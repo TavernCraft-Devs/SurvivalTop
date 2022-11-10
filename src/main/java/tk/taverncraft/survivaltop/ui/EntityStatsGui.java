@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
  * EntityStatsGui handles all logic related to showing entity stats in a GUI.
@@ -27,11 +28,12 @@ public class EntityStatsGui extends GuiHelper {
     private final int mainPageSize = 27;
 
     /**
-     * Constructor for EntityStatsGui.
+     * Constructor for EntityStatsGui, used in real time stats.
      *
      * @param main plugin class
      * @param uuid uuid of the command sender
      * @param name name of entity to get stats for
+     * @param values real time stats values
      */
     public EntityStatsGui(Main main, UUID uuid, String name, double[] values) {
         this.main = main;
@@ -51,6 +53,27 @@ public class EntityStatsGui extends GuiHelper {
         spawnerViews = prepareViews(spawnerList, name, "Spawner Stats");
         containerViews = prepareViews(containerList, name, "Container Stats");
         inventoryViews = prepareViews(inventoryList, name, "Inventory Stats");
+    }
+
+    /**
+     * Constructor for EntityStatsGui, used in cached stats.
+     *
+     * @param main plugin class
+     * @param uuid uuid of the command sender
+     * @param name name of entity to get stats for
+     * @param eCache cache of entity
+     */
+    public EntityStatsGui(Main main, UUID uuid, String name, EntityCache eCache) {
+        this.main = main;
+        name = name + " ";
+        double balValue = eCache.getBalWealth();
+        double blockValue = eCache.getBlockWealth();
+        double spawnerValue = eCache.getSpawnerWealth();
+        double containerValue = eCache.getContainerWealth();
+        double inventoryValue = eCache.getInventoryWealth();
+        this.values = new double[]{balValue, blockValue, spawnerValue, containerValue,
+                inventoryValue};
+        setUpMainPage(name);
     }
 
     /**

@@ -74,7 +74,8 @@ public class Main extends JavaPlugin {
     private boolean includeContainer;
     private boolean groupEnabled;
     private boolean useGuiStats;
-    private boolean useLeaderboardStats;
+    private boolean useRealTimeStats;
+    private boolean useGuiLeaderboard;
 
     // console uuid
     private UUID consoleUuid = UUID.randomUUID();
@@ -171,7 +172,8 @@ public class Main extends JavaPlugin {
         this.includeInventory = this.getConfig().getBoolean("include-inventory", false);
         this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
         this.useGuiStats = this.getConfig().getBoolean("use-gui-stats", true);
-        this.useLeaderboardStats = this.getConfig().getBoolean("use-leaderboard-stats", false);
+        this.useRealTimeStats = this.getConfig().getBoolean("use-realtime-stats", false);
+        this.useGuiLeaderboard = this.getConfig().getBoolean("use-gui-leaderboard", false);
     }
 
     /**
@@ -284,8 +286,12 @@ public class Main extends JavaPlugin {
         return useGuiStats;
     }
 
-    public boolean isUseLeaderboardStats() {
-        return useLeaderboardStats;
+    public boolean isUseRealTimeStats() {
+        return useRealTimeStats;
+    }
+
+    public boolean isUseGuiLeaderboard() {
+        return useGuiLeaderboard;
     }
 
     public static Economy getEconomy() {

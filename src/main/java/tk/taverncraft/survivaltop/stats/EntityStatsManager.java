@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
@@ -53,6 +54,9 @@ public class EntityStatsManager {
         initializeValues();
     }
 
+    /**
+     * Initialize default values.
+     */
     public void initializeValues() {
         blocksForGuiStats = new HashMap<>();
         spawnersForGuiStats = new HashMap<>();
@@ -61,11 +65,11 @@ public class EntityStatsManager {
     }
 
     /**
-     * Entry point for getting the stats of an entity.
+     * Entry point for getting the real time stats of an entity.
      *
      * @param name name of entity
      */
-    public void getEntityStats(CommandSender sender, UUID uuid, String name) {
+    public void getRealTimeEntityStats(CommandSender sender, UUID uuid, String name) {
         setCalculatingStats(sender);
         BukkitTask task = new BukkitRunnable() {
             @Override
@@ -74,6 +78,67 @@ public class EntityStatsManager {
             }
         }.runTaskAsynchronously(main);
         statsInitialTask.put(uuid, task);
+    }
+
+    /**
+     * Entry point for getting the cached stats of an entity.
+     *
+     * @param name name of entity
+     */
+    public void getCachedEntityStats(CommandSender sender, UUID uuid, String name) {
+        setCalculatingStats(sender);
+        EntityCache eCache = main.getServerStatsManager().getEntityCache(name);
+        // default to real time values if cache not found i.e. leaderboard not updated
+        if (eCache == null) {
+            getRealTimeEntityStats(sender, uuid, name);
+            return;
+        }
+
+        if (main.isUseGuiStats()) {
+            handleCachedStatsInGui(sender, name, eCache);
+        } else {
+            handleCachedStatsInChat(sender, name, eCache);
+        }
+        isCalculatingStats.remove(main.getSenderUuid(sender));
+    }
+
+    /**
+     * Handles sending cached entity stats in a gui.
+     *
+     * @param sender sender who checked for stats
+     * @param name name of entity to get stats for
+     * @param eCache cache for the entity
+     */
+    private void handleCachedStatsInGui(CommandSender sender, String name, EntityCache eCache) {
+        UUID uuid = this.main.getSenderUuid(sender);
+        BukkitTask task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                EntityStatsGui gui = new EntityStatsGui(main, uuid, name, eCache);
+                senderGui.put(uuid, gui);
+                executePostCalculationActions(sender);
+            }
+        }.runTaskAsynchronously(main);
+        this.statsUiTask.put(uuid, task);
+    }
+
+    /**
+     * Handles sending cached entity stats in chat.
+     *
+     * @param sender sender who checked for stats
+     * @param name name of entity to get stats for
+     * @param eCache cache for the entity
+     */
+    private void handleCachedStatsInChat(CommandSender sender, String name, EntityCache eCache) {
+        double balValue = eCache.getBalWealth();
+        double landValue = eCache.getLandWealth();
+        double blockValue = eCache.getBlockWealth();
+        double spawnerValue = eCache.getSpawnerWealth();
+        double containerValue = eCache.getContainerWealth();
+        double inventoryValue = eCache.getInventoryWealth();
+        double totalValue = eCache.getTotalWealth();
+        sendStatsAsMessage(sender, name, balValue, landValue, blockValue, spawnerValue,
+                containerValue, inventoryValue, totalValue);
     }
 
     /**
@@ -112,13 +177,12 @@ public class EntityStatsManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                boolean isPlayer = sender instanceof Player;
                 UUID uuid = main.getSenderUuid(sender);
                 double spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
                 double containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
 
                 // handle gui or non-gui results
-                if (main.isUseGuiStats() && isPlayer) {
+                if (main.isUseGuiStats() && sender instanceof Player) {
                     processStatsGui(sender, name, balWealth, landWealth, spawnerValue,
                         containerValue, invWealth);
                     return;
@@ -181,6 +245,27 @@ public class EntityStatsManager {
         double landValue = blockValue + spawnerValue + containerValue;
         double totalValue = balValue + landValue + inventoryValue;
 
+        sendStatsAsMessage(sender, name, balValue, landValue, blockValue, spawnerValue,
+                containerValue, inventoryValue, totalValue);
+        doCleanUp(sender);
+    }
+
+    /**
+     * Helper method for sending stats in chat.
+     *
+     * @param sender sender who checked for stats
+     * @param name name of entity to get stats  for
+     * @param balValue balance value of entity
+     * @param landValue land value of entity
+     * @param blockValue block value of entity
+     * @param spawnerValue spawner value of entity
+     * @param containerValue container value of entity
+     * @param inventoryValue inventory value of entity
+     * @param totalValue total value of entity
+     */
+    private void sendStatsAsMessage(CommandSender sender, String name, double balValue,
+            double landValue, double blockValue, double spawnerValue, double containerValue,
+            double inventoryValue, double totalValue) {
         String strTotalWealth = String.format("%.02f", totalValue);
         String strBalWealth = String.format("%.02f", balValue);
         String strLandWealth = String.format("%.02f", landValue);
@@ -190,8 +275,8 @@ public class EntityStatsManager {
         String strInvWealth = String.format("%.02f", inventoryValue);
 
         String[] placeholders = new String[]{"%entity%", "%landwealth%", "%balwealth%",
-                "%totalwealth%", "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
-                "%inventorywealth%"};
+            "%totalwealth%", "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
+            "%inventorywealth%"};
 
         String[] wealthValues = new String[]{name, new BigDecimal(strLandWealth).toPlainString(),
             new BigDecimal(strBalWealth).toPlainString(),
@@ -202,7 +287,6 @@ public class EntityStatsManager {
             new BigDecimal(strInvWealth).toPlainString()};
 
         MessageManager.sendMessage(sender, "entity-stats", placeholders, wealthValues);
-        doCleanUp(sender);
     }
 
     /**

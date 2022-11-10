@@ -13,7 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
  * SqlHelper is responsible for reading/writing from MySQL database.

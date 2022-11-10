@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.stats;
+package tk.taverncraft.survivaltop.stats.cache;
 
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class EntityCache {
      * @param containerWealth container wealth of entity
      */
     public EntityCache(UUID uuid, double balWealth, double blockWealth, double invWealth,
-                       double spawnerWealth, double containerWealth) {
+            double spawnerWealth, double containerWealth) {
         this.UUID = uuid;
         this.BAL_WEALTH = balWealth;
         this.BLOCK_WEALTH = blockWealth;

@@ -12,7 +12,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.ChatPaginator;
-import tk.taverncraft.survivaltop.stats.EntityCache;
+
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 import static org.bukkit.util.ChatPaginator.*;
 

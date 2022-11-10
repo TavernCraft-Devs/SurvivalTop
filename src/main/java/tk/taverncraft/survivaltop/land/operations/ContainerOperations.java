@@ -3,7 +3,9 @@ package tk.taverncraft.survivaltop.land.operations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -30,13 +33,34 @@ public class ContainerOperations {
     private HashMap<UUID, ArrayList<Block>> preprocessedContainersForLeaderboard = new HashMap<>();
     private HashMap<UUID, ArrayList<Block>> preprocessedContainersForStats = new HashMap<>();
 
-    private final Set<Material> containerTypes = EnumSet.of(
+    // todo: is there a better way?
+    private final Set<Material> allowedTypes = EnumSet.of(
         Material.CHEST,
         Material.DROPPER,
         Material.HOPPER,
         Material.DISPENSER,
-        Material.TRAPPED_CHEST
+        Material.TRAPPED_CHEST,
+        Material.FURNACE,
+        Material.SHULKER_BOX,
+        Material.WHITE_SHULKER_BOX,
+        Material.ORANGE_SHULKER_BOX,
+        Material.MAGENTA_SHULKER_BOX,
+        Material.LIGHT_BLUE_SHULKER_BOX,
+        Material.YELLOW_SHULKER_BOX,
+        Material.LIME_SHULKER_BOX,
+        Material.PINK_SHULKER_BOX,
+        Material.GRAY_SHULKER_BOX,
+        Material.LIGHT_GRAY_BANNER,
+        Material.CYAN_SHULKER_BOX,
+        Material.PURPLE_SHULKER_BOX,
+        Material.BLUE_SHULKER_BOX,
+        Material.BROWN_SHULKER_BOX,
+        Material.GREEN_SHULKER_BOX,
+        Material.RED_SHULKER_BOX,
+        Material.BLACK_SHULKER_BOX
     );
+
+    private Set<Material> containerTypes;
 
     /**
      * Constructor for ContainerOperations.
@@ -47,6 +71,21 @@ public class ContainerOperations {
     public ContainerOperations(Main main, LinkedHashMap<String, Double> containerWorth) {
         this.main = main;
         this.containerWorth = containerWorth;
+        this.containerTypes = new HashSet<>();
+        setUpContainerType();
+    }
+
+    /**
+     * Set up the containers chosen to be included.
+     */
+    private void setUpContainerType() {
+        List<String> chosenContainers = main.getConfig().getStringList("container-type");
+        for (String container : chosenContainers) {
+            Material material = Material.valueOf(container);
+            if (allowedTypes.contains(material)) {
+                containerTypes.add(material);
+            }
+        }
     }
 
     public void doLeaderboardCleanup() {

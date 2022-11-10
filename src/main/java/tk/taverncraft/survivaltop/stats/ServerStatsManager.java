@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.LeaderboardGui;
 import tk.taverncraft.survivaltop.utils.MessageManager;
 
@@ -239,6 +240,30 @@ public class ServerStatsManager {
             i++;
         }
         this.entityCacheList = new ArrayList<>(tempSortedCache.values());
+    }
+
+    /**
+     * Gets the entity cache with given name.
+     *
+     * @param name name of entity to get cache for
+     *
+     * @return entity cache for the given name
+     */
+    public EntityCache getEntityCache(String name) {
+        UUID uuid;
+        if (main.groupIsEnabled()) {
+            uuid = this.groupNameToUuidMap.get(name);
+            if (uuid == null) {
+                return null;
+            }
+        } else {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+            if (player == null) {
+                return null;
+            }
+            uuid = player.getUniqueId();
+        }
+        return this.uuidToEntityCacheMap.get(uuid);
     }
 
     /**

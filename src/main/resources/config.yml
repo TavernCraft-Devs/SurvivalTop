@@ -13,10 +13,19 @@
 # language file to use (feel free to add your own lang file within the lang folder of the plugin and put the name here)
 lang-file: 'en.yml'
 
-# if true, will provide a detailed gui for viewing entity stats including individual item/block breakdowns
+# if true, will provide a detailed gui for viewing entity stats
+# if realtime stats are used as well, then this includes individual item/block breakdowns
 # if false, will provide only basic entity stats in chat without detailed breakdown
-# for small servers without the computing resources or enormous servers worried about lags, set this to false
+# for servers very worried about lags, consider setting this to false
 use-gui-stats: true
+
+# if true, will provide realtime values when the stats command is executed
+# realtime calculations take a longer time depending on the claim size, spawner count etc
+# if false, will provide the last updated/cached values from the leaderboard update
+# cached values provide near instant results (very much faster) but are not the latest
+# note that if cached values cannot be found, the plugin defaults to getting real time stats
+# note that setting this to false prevents the gui from showing individual item/block breakdowns
+use-realtime-stats: false
 
 #####################################################################################
 #                                                                                   #
@@ -68,6 +77,12 @@ include-spawners: false
 # also requires include-land to be true!
 # note that checks for containers are the most expensive and you should consider disabling this if updates take too long
 include-containers: false
+
+# list of containers that will be checked
+# this list is ignored if include-containers is false
+container-type:
+  - CHEST
+  - TRAPPED_CHEST
 
 #####################################################################################
 #                                                                                   #
