@@ -1,5 +1,6 @@
 package tk.taverncraft.survivaltop.stats;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,7 +104,25 @@ public class ServerStatsManager {
      * Performs update by individual players.
      */
     private void updateForPlayers() {
+        Long lastJoinLimit = this.main.getConfig().getLong("player-last-join-limit", -1);
+
+        // code intentionally duplicated to keep the if condition outside loop to save check time
+
+        // path for if last join filter is off (-1)
+        if (lastJoinLimit <= -1) {
+            Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
+                calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName());
+            });
+            return;
+        }
+
+        // path for if last join filter is on
+        Instant instant = Instant.now();
+        Long currentTime = instant.getEpochSecond();
         Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
+            if (currentTime - (Math.round(offlinePlayer.getLastPlayed() / 1000)) > lastJoinLimit) {
+                return;
+            }
             calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName());
         });
     }
