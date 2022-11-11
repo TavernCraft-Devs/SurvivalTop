@@ -41,6 +41,10 @@ public class StorageManager {
      * @param entityCacheList list of entities to store
      */
     public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
+        // if null means no storage was initialized, so no need to save
+        if (this.storageHelper == null) {
+            return;
+        }
         this.storageHelper.saveToStorage(entityCacheList);
     }
 }

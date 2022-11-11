@@ -59,11 +59,10 @@ public class EntityStatsGui extends GuiHelper {
      * Constructor for EntityStatsGui, used in cached stats.
      *
      * @param main plugin class
-     * @param uuid uuid of the command sender
      * @param name name of entity to get stats for
      * @param eCache cache of entity
      */
-    public EntityStatsGui(Main main, UUID uuid, String name, EntityCache eCache) {
+    public EntityStatsGui(Main main, String name, EntityCache eCache) {
         this.main = main;
         name = name + " ";
         double balValue = eCache.getBalWealth();

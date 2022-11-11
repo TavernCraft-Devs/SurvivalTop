@@ -114,7 +114,7 @@ public class EntityStatsManager {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                EntityStatsGui gui = new EntityStatsGui(main, uuid, name, eCache);
+                EntityStatsGui gui = new EntityStatsGui(main, name, eCache);
                 senderGui.put(uuid, gui);
                 executePostCalculationActions(sender);
             }
