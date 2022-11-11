@@ -21,7 +21,7 @@ The spigot link to download the plugin can be found **[here](https://www.spigotm
 ### Features
 <p align="center">
   <img src="https://i.imgur.com/672b1LW.gif" />
-  <img src="https://imgur.com/83f1mMb.gif" />
+  <img src="https://i.imgur.com/iDigQoo.gif" />
 </p>
 
 Some of the key features provided by the plugin are as shown below:
