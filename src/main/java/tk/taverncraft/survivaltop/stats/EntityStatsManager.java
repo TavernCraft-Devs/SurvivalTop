@@ -187,6 +187,12 @@ public class EntityStatsManager {
                         containerValue, invWealth);
                     return;
                 }
+
+                // check again to make sure reloads stop any stats calculations from continuing
+                if (!senderHasCalculationInProgress(uuid)) {
+                    return;
+                }
+
                 executePostCalculationActions(sender, name, balWealth, landWealth, spawnerValue,
                         containerValue, invWealth);
             }
