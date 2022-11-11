@@ -27,17 +27,13 @@ use-gui-stats: true
 # note that setting this to false prevents the gui from showing individual item/block breakdowns
 use-realtime-stats: false
 
-# this is an option that only applies if you have enable-group set to false (i.e. entity = player)
-# by default, it is set to -1 so no limits are applied at all
-# this option is mostly applicable for very old and large servers that may have thousands of player
-# data, many of them who no longer play actively and so calculating wealth for them is not relevant
-# applying a filter for last join will thus allow you to save the time taken to update leaderboard
-# to use the option, simply set the last join time to filter out in seconds
-# for example, to only include players who have logged in the past 30 days, you will set the below
-# option with a value of 2592000
-# note that checking of stats remain unaffected by this option
-# reminder that if you have enable-group set to true, then this option will be completely ignored
-player-last-join-limit: -1
+# the below options only apply if you have enable-group set to false (i.e. entity = player)
+# these options are also mostly applicable to very old or large servers that find leaderboard
+# updates taking a very long time
+# for a full and clearer explanation on how to use this, please look in general options of our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#general-options
+filter-last-join: false
+filter-player-time: 2592000
 
 #####################################################################################
 #                                                                                   #

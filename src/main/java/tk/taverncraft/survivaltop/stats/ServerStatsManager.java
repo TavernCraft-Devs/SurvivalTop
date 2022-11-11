@@ -104,12 +104,13 @@ public class ServerStatsManager {
      * Performs update by individual players.
      */
     private void updateForPlayers() {
-        Long lastJoinLimit = this.main.getConfig().getLong("player-last-join-limit", -1);
+        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join", false);
+        Long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000);
 
         // code intentionally duplicated to keep the if condition outside loop to save check time
 
-        // path for if last join filter is off (-1)
-        if (lastJoinLimit <= -1) {
+        // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
+        if (!filterLastJoin || lastJoinTime <= 0) {
             Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
                 calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName());
             });
@@ -120,7 +121,7 @@ public class ServerStatsManager {
         Instant instant = Instant.now();
         Long currentTime = instant.getEpochSecond();
         Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-            if (currentTime - (Math.round(offlinePlayer.getLastPlayed() / 1000)) > lastJoinLimit) {
+            if (currentTime - (Math.round(offlinePlayer.getLastPlayed() / 1000)) > lastJoinTime) {
                 return;
             }
             calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName());
