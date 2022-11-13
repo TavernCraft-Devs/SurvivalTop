@@ -175,7 +175,7 @@ public class LandOperationsHelper {
                 for (int k = (int) minZ; k < maxZ; k++) {
                     Block block = world.getBlockAt(i, j, k);
                     for (BiFunction<UUID, Block, Double> f : blockOperations) {
-                        double blockWorth = ((Number) f.apply(uuid, block)).doubleValue();
+                        double blockWorth = f.apply(uuid, block);
                         blocksWorth += blockWorth;
                     }
                 }
@@ -212,7 +212,7 @@ public class LandOperationsHelper {
                 for (int k = minHeight; k < maxHeight; ++k) {
                     Block block = world.getBlockAt(i, k, j);
                     for (BiFunction<UUID, Block, Double> f : blockOperations) {
-                        double blockWorth = ((Number) f.apply(uuid, block)).doubleValue();
+                        double blockWorth = f.apply(uuid, block);
                         blocksWorth += blockWorth;
                     }
                 }

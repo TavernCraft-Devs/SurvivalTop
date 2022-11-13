@@ -72,7 +72,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 3);
             try {
                 UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getPositionOfEntity(uuid);
+                return uuid == null ? "None" : main.getServerStatsManager().getPositionOfEntity(uuid);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "None";
             }
