@@ -93,7 +93,9 @@ abstract class GuiHelper {
 
         // if there is lore
         List<String> parsedLore = new ArrayList<>();
-        for (String str : lore) {
+        int loreSize = lore.length;
+        for (int i = 0; i < loreSize; i++) {
+            String str = lore[i];
             String[] tempArr = str.split(":", 2);
             if (tempArr.length == 2) {
                 parsedLore.add(ChatColor.YELLOW + tempArr[0] + ":" + ChatColor.GREEN + tempArr[1]);

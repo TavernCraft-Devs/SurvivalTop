@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.utils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -123,7 +124,7 @@ public class MessageManager {
         StringBuilder message = new StringBuilder(header);
         int position = 1;
         int currentPage = 1;
-        for (HashMap.Entry<UUID, EntityCache> entry : leaderboard.entrySet()) {
+        for (Map.Entry<UUID, EntityCache> entry : leaderboard.entrySet()) {
             UUID uuid = entry.getKey();
             String name;
 

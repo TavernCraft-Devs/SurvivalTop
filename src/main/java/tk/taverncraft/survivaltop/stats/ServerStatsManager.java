@@ -138,7 +138,9 @@ public class ServerStatsManager {
         this.groupNameToUuidMap = new HashMap<>();
 
         List<String> groups = this.main.getGroupManager().getGroups();
-        for (String group : groups) {
+        int groupSize = groups.size();
+        for (int i = 0; i < groupSize; i++) {
+            String group = groups.get(i);
             UUID tempUuid = UUID.randomUUID();
             groupUuidToNameMap.put(tempUuid, group);
             groupNameToUuidMap.put(group, tempUuid);

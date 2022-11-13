@@ -157,7 +157,9 @@ public class ContainerOperations {
             return 0;
         }
         double totalContainerWorth = 0;
-        for (Block block : blocks) {
+        int numBlocks = blocks.size();
+        for (int i = 0; i < numBlocks; i++) {
+            Block block = blocks.get(i);
             BlockState blockstate = block.getState();
             Inventory inventory;
             if (blockstate instanceof Chest) {

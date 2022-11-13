@@ -117,7 +117,9 @@ public class SpawnerOperations {
             return 0;
         }
         double totalSpawnerWorth = 0;
-        for (Block block : blocks) {
+        int numBlocks = blocks.size();
+        for (int i = 0; i < numBlocks; i++) {
+            Block block = blocks.get(i);
             try {
                 CreatureSpawner spawner = (CreatureSpawner) block.getState();
                 EntityType mobType = spawner.getSpawnedType();

@@ -35,7 +35,9 @@ public class YamlHelper implements StorageHelper {
      * @param entityCacheList list of entities to store
      */
     public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
-        for (EntityCache eCache : entityCacheList) {
+        int cacheSize = entityCacheList.size();
+        for (int i = 0; i < cacheSize; i++) {
+            EntityCache eCache = entityCacheList.get(i);
             saveToFile(eCache);
         }
     }

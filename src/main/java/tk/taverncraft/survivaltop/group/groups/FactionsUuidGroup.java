@@ -17,6 +17,7 @@ import com.massivecraft.factions.Factions;
  * Handles the group logic for FactionsUUID.
  */
 public class FactionsUuidGroup implements GroupHandler {
+    private final int FILTER_SIZE = 3;
     private List<String> filteredGroups = new ArrayList<>() {
         {
             add("§2wilderness");
@@ -127,8 +128,8 @@ public class FactionsUuidGroup implements GroupHandler {
      * @return true if group needs to be filtered, false otherwise
      */
     private boolean isFilteredGroup(String name) {
-        for (String group : filteredGroups) {
-            if (group.equalsIgnoreCase(name)) {
+        for (int i = 0; i < FILTER_SIZE; i++) {
+            if (filteredGroups.get(i).equalsIgnoreCase(name)) {
                 return true;
             }
         }

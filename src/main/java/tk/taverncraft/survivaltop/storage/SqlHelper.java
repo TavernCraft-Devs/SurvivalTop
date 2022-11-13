@@ -59,9 +59,11 @@ public class SqlHelper implements StorageHelper {
         String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
                 "BALANCE_WEALTH, LAND_WEALTH, BLOCK_WEALTH, SPAWNER_WEALTH, CONTAINER_WEALTH, " +
                 "INVENTORY_WEALTH, TOTAL_WEALTH) VALUES ";
-        String body = "";
-        for (EntityCache eCache : entityCacheList) {
-            body += getEntityQuery(eCache);
+        StringBuilder body = new StringBuilder();
+        int cacheSize = entityCacheList.size();
+        for (int i = 0; i < cacheSize; i++) {
+            EntityCache eCache = entityCacheList.get(i);
+            body.append(getEntityQuery(eCache));
         }
 
         if (body.length() == 0) {
