@@ -67,7 +67,6 @@ public class ServerStatsManager {
      */
     public void updateWealthStats(CommandSender sender) {
         try {
-            main.getLandManager().doCleanup();
             MessageManager.sendMessage(sender, "update-started");
             if (this.main.groupIsEnabled()) {
                 updateForGroups();
@@ -83,7 +82,7 @@ public class ServerStatsManager {
 
     /**
      * Processes spawners and containers on main thread before doing post updates on async thread
-     * again.
+     * again (if applicable).
      *
      * @param sender user executing the update
      */
@@ -157,7 +156,7 @@ public class ServerStatsManager {
         if (main.landIsIncluded()) {
             // land calculations are done async and will be retrieved later
             main.getLandManager().createHoldersForLeaderboard(uuid);
-            main.getLandManager().getLandWorthForEntity(uuid, name, true);
+            main.getLandManager().processEntityLand(uuid, name, true);
         }
         if (main.balIsIncluded()) {
             entityBalWorth = main.getBalanceManager().getBalanceForEntity(name);
@@ -186,7 +185,6 @@ public class ServerStatsManager {
                 executePostUpdateInventories(main.getInventoryManager().calculateInventoryWorthForLeaderboard());
                 HashMap<UUID, EntityCache> tempSortedCache = sortEntitiesByTotalWealth(uuidToEntityCacheMap);
                 setUpEntityCache(tempSortedCache);
-                main.getLandManager().doCleanup();
                 main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
                 main.getStorageManager().saveToStorage(entityCacheList);
             }

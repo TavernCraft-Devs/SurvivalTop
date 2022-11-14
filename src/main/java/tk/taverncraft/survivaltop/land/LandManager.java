@@ -3,10 +3,10 @@ package tk.taverncraft.survivaltop.land;
 import java.util.UUID;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.function.Consumer;
 
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
@@ -96,17 +96,15 @@ public class LandManager {
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing its worth
      */
-    public void getLandWorthForEntity(UUID uuid, String name, boolean isLeaderboardUpdate) {
-        landClaimPluginHandler.getLandWorth(uuid, name, isLeaderboardUpdate);
+    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
+        landClaimPluginHandler.processEntityLand(uuid, name, isLeaderboardUpdate);
     }
 
     /**
      * Creates holders for leaderboard.
      *
-     * @param uuid uuid of each entities
+     * @param uuid uuid of each entity
      */
     public void createHoldersForLeaderboard(UUID uuid) {
         landOperationsHelper.createHoldersForLeaderboard(uuid);
@@ -124,7 +122,7 @@ public class LandManager {
     /**
      * Gets the blocks to show sender in GUI.
      *
-     * @return hashmap of block name to its worth
+     * @return hashmap of block material to its worth
      */
     public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
         return landOperationsHelper.getBlocksForGuiStats(uuid);
@@ -133,7 +131,7 @@ public class LandManager {
     /**
      * Gets the spawners to show sender in GUI.
      *
-     * @return hashmap of spawner name to its worth
+     * @return hashmap of spawner entity type to its worth
      */
     public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
         return landOperationsHelper.getSpawnersForGuiStats(uuid);
@@ -142,21 +140,21 @@ public class LandManager {
     /**
      * Gets the container items to show sender in GUI.
      *
-     * @return hashmap of container item name to its worth
+     * @return hashmap of container item material to its worth
      */
     public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
         return landOperationsHelper.getContainersForGuiStats(uuid);
     }
 
     /**
-     * Processes spawner types on the main thread.
+     * Processes spawner types on the main thread for leaderboard.
      */
     public void processSpawnerTypesForLeaderboard() {
         landOperationsHelper.processSpawnerTypesForLeaderboard();
     }
 
     /**
-     * Processes spawner types on the main thread.
+     * Processes spawner types on the main thread for stats.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      */
@@ -165,14 +163,14 @@ public class LandManager {
     }
 
     /**
-     * Processes container items on the main thread.
+     * Processes container items on the main thread for leaderboard.
      */
     public void processContainerItemsForLeaderboard() {
         landOperationsHelper.processContainerItemsForLeaderboard();
     }
 
     /**
-     * Processes container items on the main thread.
+     * Processes container items on the main thread for stats.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      */
@@ -241,22 +239,6 @@ public class LandManager {
     }
 
     /**
-     * Resets all sender info list at end of update.
-     */
-    public void doCleanup() {
-        landOperationsHelper.doLeaderboardCleanup();
-    }
-
-    /**
-     * Resets a specific sender's info list after calculating stats.
-     *
-     * @param uuid uuid of sender to clean up after
-     */
-    public void doCleanup(UUID uuid) {
-        landOperationsHelper.doStatsCleanup(uuid);
-    }
-
-    /**
      * Checks if spawner is included.
      *
      * @return true if included, false otherwise
@@ -277,7 +259,7 @@ public class LandManager {
     /**
      * Gets the map of worth for all blocks.
      *
-     * @return map of block name to value
+     * @return map of block material to value
      */
     public LinkedHashMap<Material, Double> getBlockWorth() {
         return this.landOperationsHelper.getBlockWorth();
@@ -297,7 +279,7 @@ public class LandManager {
     /**
      * Gets the map of worth for all spawners.
      *
-     * @return map of spawner name to value
+     * @return map of spawner entity type to value
      */
     public LinkedHashMap<EntityType, Double> getSpawnerWorth() {
         return this.landOperationsHelper.getSpawnerWorth();
@@ -317,7 +299,7 @@ public class LandManager {
     /**
      * Gets the map of worth for all container items.
      *
-     * @return map of container item name to value
+     * @return map of container item material to value
      */
     public LinkedHashMap<Material, Double> getContainerWorth() {
         return this.landOperationsHelper.getContainerWorth();

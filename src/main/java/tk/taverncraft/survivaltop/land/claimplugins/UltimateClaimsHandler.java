@@ -18,8 +18,6 @@ import com.songoda.ultimateclaims.claim.region.RegionCorners;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
 
-import static org.bukkit.Bukkit.getServer;
-
 /**
  * Handles land wealth calculated using UltimateClaims plugin.
  */
@@ -37,7 +35,8 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
     public UltimateClaimsHandler(Main main, LandOperationsHelper landOperationsHelper) {
         this.main = main;
         this.landOperationsHelper = landOperationsHelper;
-        this.ultimateClaims = (UltimateClaims) getServer().getPluginManager().getPlugin("UltimateClaims");
+        this.ultimateClaims = (UltimateClaims) Bukkit.getServer().getPluginManager()
+                .getPlugin("UltimateClaims");
 
     }
 
@@ -47,10 +46,8 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing its worth
      */
-    public void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
             OfflinePlayer player = Bukkit.getOfflinePlayer(name);
             List<Claim> claims;
@@ -74,7 +71,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
                         World world = Bukkit.getWorld(claim.getClaimedChunks().get(0).getWorld());
                         Location loc1 = new Location(world, x1, 0, z1);
                         Location loc2 = new Location(world, x2, 0, z2);
-                        getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                        processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
                     }
                 }
             }
@@ -90,10 +87,8 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
      * @param l2 location 2
      * @param world world that the claim is in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing claim worth
      */
-    public void getClaimWorth(UUID uuid, Location l1, Location l2, World world,
+    public void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
         double minY = this.main.getMinHeight();
@@ -101,7 +96,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = this.main.getMaxHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
+        landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
 

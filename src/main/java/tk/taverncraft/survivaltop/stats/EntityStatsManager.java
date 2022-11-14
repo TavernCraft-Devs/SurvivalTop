@@ -34,11 +34,6 @@ public class EntityStatsManager {
     public final HashMap<UUID, BukkitTask> statsInitialTask = new HashMap<>();
     public final HashMap<UUID, BukkitTask> statsUiTask = new HashMap<>();
 
-    // for tracking inventories to be used in gui
-    // the below maps are used by EntityStatsGui to create the user interface
-    // note that uuid below is uuid of the sender
-    private HashMap<UUID, HashMap<String, Integer>> inventoriesForGuiStats = new HashMap<>();
-
     // map of sender uuid to the gui to show sender
     private HashMap<UUID, EntityStatsGui> senderGui = new HashMap<>();
 
@@ -49,19 +44,13 @@ public class EntityStatsManager {
      */
     public EntityStatsManager(Main main) {
         this.main = main;
-        initializeValues();
-    }
-
-    /**
-     * Initialize default values.
-     */
-    public void initializeValues() {
-        inventoriesForGuiStats = new HashMap<>();
     }
 
     /**
      * Entry point for getting the real time stats of an entity.
      *
+     * @param sender sender who requested for stats
+     * @param uuid uuid of sender
      * @param name name of entity
      */
     public void getRealTimeEntityStats(CommandSender sender, UUID uuid, String name) {
@@ -78,6 +67,8 @@ public class EntityStatsManager {
     /**
      * Entry point for getting the cached stats of an entity.
      *
+     * @param sender sender who requested for stats
+     * @param uuid uuid of sender
      * @param name name of entity
      */
     public void getCachedEntityStats(CommandSender sender, UUID uuid, String name) {
@@ -94,7 +85,7 @@ public class EntityStatsManager {
         } else {
             handleCachedStatsInChat(sender, name, eCache);
         }
-        isCalculatingStats.remove(main.getSenderUuid(sender));
+        isCalculatingStats.remove(uuid);
     }
 
     /**
@@ -146,22 +137,22 @@ public class EntityStatsManager {
         double balWealth = 0;
         if (main.landIsIncluded()) {
             // land calculations are done async and will be retrieved later
-            getEntityLandWealth(sender, name);
+            processEntityLandWealth(sender, name);
         }
         if (main.balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
         if (main.inventoryIsIncluded()) {
-            getEntityInvWealth(sender, name);
+            processEntityInvWealth(sender, name);
         }
         executePostCalculationActions(sender, name, balWealth);
     }
 
     /**
-     * Processes spawners and containers on the main thread (required).
+     * Handles post calculation actions after land has been processed (if applicable).
      *
-     * @param sender user who is getting stats
-     * @param name name of entity whose stats is being retrieved
+     * @param sender sender who requested for stats
+     * @param name name of entity whose stats are being retrieved
      * @param balWealth bal wealth of the entity
      */
     private void executePostCalculationActions(CommandSender sender, String name, double balWealth) {
@@ -297,9 +288,6 @@ public class EntityStatsManager {
      */
     private void doCleanUp(CommandSender sender) {
         UUID uuid = this.main.getSenderUuid(sender);
-        this.main.getLandManager().doCleanup(uuid);
-        // todo: check if cleanup needed for holders
-        inventoriesForGuiStats.remove(uuid);
         isCalculatingStats.remove(uuid);
         statsInitialTask.remove(uuid);
     }
@@ -341,26 +329,24 @@ public class EntityStatsManager {
     }
 
     /**
-     * Gets the land wealth of an entity.
+     * Processes the land wealth of an entity.
      *
      * @param sender sender who checked for stats
      * @param name name of entity to get land wealth for
      */
-    private void getEntityLandWealth(CommandSender sender, String name) {
+    private void processEntityLandWealth(CommandSender sender, String name) {
         UUID uuid = this.main.getSenderUuid(sender);
         main.getLandManager().createHoldersForStats(uuid);
-        this.main.getLandManager().getLandWorthForEntity(uuid, name, false);
+        this.main.getLandManager().processEntityLand(uuid, name, false);
     }
 
     /**
-     * Gets the inventory wealth of an entity.
+     * Processes the inventory wealth of an entity.
      *
      * @param sender sender who checked for stats
      * @param name name of entity to get inventory wealth for
-     *
-     * @return double value representing entity inventory wealth
      */
-    private void getEntityInvWealth(CommandSender sender, String name) {
+    private void processEntityInvWealth(CommandSender sender, String name) {
         UUID uuid = this.main.getSenderUuid(sender);
         this.main.getInventoryManager().createHolderForStats(uuid);
         this.main.getInventoryManager().getInventoryWorthForStats(uuid, name);
@@ -420,6 +406,8 @@ public class EntityStatsManager {
             statsUiTask.remove(uuid);
         }
     }
+
+    // todo: re-look at how gui stats is done in the next gui update
 
     /**
      * Special handler to open player inventory gui stats main page.

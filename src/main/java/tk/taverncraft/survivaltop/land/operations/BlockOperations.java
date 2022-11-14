@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.land.operations;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -16,6 +17,7 @@ import tk.taverncraft.survivaltop.land.operations.holders.BlockHolder;
  */
 public class BlockOperations {
     private LinkedHashMap<Material, Double> blockWorth;
+    private Set<Material> blockMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, BlockHolder> blockHolderMapForLeaderboard = new HashMap<>();
@@ -24,10 +26,11 @@ public class BlockOperations {
     /**
      * Constructor for BlockOperations.
      *
-     * @param blockWorth map of block names to their values
+     * @param blockWorth map of block materials to their values
      */
     public BlockOperations(LinkedHashMap<Material, Double> blockWorth) {
         this.blockWorth = blockWorth;
+        this.blockMaterial = blockWorth.keySet();
     }
 
     /**
@@ -53,7 +56,7 @@ public class BlockOperations {
     /**
      * Returns block operation for stats.
      *
-     * @return block operation for stats.
+     * @return block operation for stats
      */
     public BiFunction<UUID, Block, Boolean> getStatsOperation() {
         return processBlockForStats;
@@ -65,7 +68,7 @@ public class BlockOperations {
      * @param uuid uuid of each entities
      */
     public void createHolderForLeaderboard(UUID uuid) {
-        blockHolderMapForLeaderboard.put(uuid, new BlockHolder(blockWorth.keySet()));
+        blockHolderMapForLeaderboard.put(uuid, new BlockHolder(blockMaterial));
     }
 
     /**
@@ -74,7 +77,7 @@ public class BlockOperations {
      * @param uuid uuid of sender, not to confused with the entity itself!
      */
     public void createHolderForStats(UUID uuid) {
-        blockHolderMapForStats.put(uuid, new BlockHolder(blockWorth.keySet()));
+        blockHolderMapForStats.put(uuid, new BlockHolder(blockMaterial));
     }
 
     /**
@@ -120,7 +123,7 @@ public class BlockOperations {
     }
 
     /**
-     * Process blocks immediately (and asynchronously).
+     * Process blocks immediately (and asynchronously) for leaderboard.
      */
     private BiFunction<UUID, Block, Boolean> processBlockForLeaderboard = (uuid, block) -> {
         Material material = block.getType();
@@ -132,8 +135,7 @@ public class BlockOperations {
     };
 
     /**
-     * Process blocks immediately (and asynchronously). Check if gui is enabled and prepare
-     * them for gui view if so.
+     * Process blocks immediately (and asynchronously) for stats.
      */
     private BiFunction<UUID, Block, Boolean> processBlockForStats = (uuid, block) -> {
         Material material = block.getType();

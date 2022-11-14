@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -23,6 +24,7 @@ import tk.taverncraft.survivaltop.land.operations.holders.SpawnerHolder;
 public class SpawnerOperations {
     private Main main;
     private LinkedHashMap<EntityType, Double> spawnerWorth;
+    private Set<EntityType> spawnerEntityType;
     private RoseStackerAPI rApi;
 
     // holders containing count of each material mapped to uuid
@@ -42,6 +44,7 @@ public class SpawnerOperations {
     public SpawnerOperations(Main main, LinkedHashMap<EntityType, Double> spawnerWorth) {
         this.main = main;
         this.spawnerWorth = spawnerWorth;
+        this.spawnerEntityType = spawnerWorth.keySet();
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
             rApi = RoseStackerAPI.getInstance();
         }
@@ -56,14 +59,6 @@ public class SpawnerOperations {
      */
     public SpawnerHolder getSpawnerHolderForStats(UUID uuid) {
         return spawnerHolderMapForStats.get(uuid);
-    }
-
-    public void doLeaderboardCleanup() {
-        preprocessedSpawnersForLeaderboard = new HashMap<>();
-    }
-
-    public void doStatsCleanup(UUID uuid) {
-        preprocessedSpawnersForStats.remove(uuid);
     }
 
     /**
@@ -81,7 +76,7 @@ public class SpawnerOperations {
     /**
      * Returns spawner operation for stats.
      *
-     * @return spawner operation for stats.
+     * @return spawner operation for stats
      */
     public BiFunction<UUID, Block, Boolean> getStatsOperation() {
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
@@ -93,10 +88,10 @@ public class SpawnerOperations {
     /**
      * Creates holders for leaderboard.
      *
-     * @param uuid uuid of each entities
+     * @param uuid uuid of each entity
      */
     public void createHolderForLeaderboard(UUID uuid) {
-        spawnerHolderMapForLeaderboard.put(uuid, new SpawnerHolder(spawnerWorth.keySet()));
+        spawnerHolderMapForLeaderboard.put(uuid, new SpawnerHolder(spawnerEntityType));
 
         // temp array list for tracking containers
         preprocessedSpawnersForLeaderboard.put(uuid, new ArrayList<>());
@@ -108,7 +103,7 @@ public class SpawnerOperations {
      * @param uuid uuid of sender, not to confused with the entity itself!
      */
     public void createHolderForStats(UUID uuid) {
-        spawnerHolderMapForStats.put(uuid, new SpawnerHolder(spawnerWorth.keySet()));
+        spawnerHolderMapForStats.put(uuid, new SpawnerHolder(spawnerEntityType));
 
         // temp array list for tracking containers
         preprocessedSpawnersForStats.put(uuid, new ArrayList<>());
@@ -212,7 +207,6 @@ public class SpawnerOperations {
     private BiFunction<UUID, Block, Boolean> preprocessSpawnerForLeaderboard = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
-            preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedSpawnersForLeaderboard.get(uuid).add(block);
             return true;
         }
@@ -228,7 +222,6 @@ public class SpawnerOperations {
     private BiFunction<UUID, Block, Boolean> preprocessSpawnerForStats = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
-            preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedSpawnersForStats.get(uuid).add(block);
             return true;
         }
@@ -244,11 +237,9 @@ public class SpawnerOperations {
             if (rApi.isSpawnerStacked(block)) {
                 int stackSize = rApi.getStackedSpawner(block).getStackSize();
                 for (int i = 0; i < stackSize; i++) {
-                    preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
                     preprocessedSpawnersForLeaderboard.get(uuid).add(block);
                 }
             } else {
-                preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
                 preprocessedSpawnersForLeaderboard.get(uuid).add(block);
             }
             return true;
@@ -265,11 +256,9 @@ public class SpawnerOperations {
             if (rApi.isSpawnerStacked(block)) {
                 int stackSize = rApi.getStackedSpawner(block).getStackSize();
                 for (int i = 0; i < stackSize; i++) {
-                    preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
                     preprocessedSpawnersForStats.get(uuid).add(block);
                 }
             } else {
-                preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
                 preprocessedSpawnersForStats.get(uuid).add(block);
             }
             return true;

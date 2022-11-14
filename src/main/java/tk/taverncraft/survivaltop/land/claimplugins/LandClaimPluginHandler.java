@@ -13,8 +13,6 @@ public interface LandClaimPluginHandler {
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing its worth
      */
-    void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate);
+    void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate);
 }

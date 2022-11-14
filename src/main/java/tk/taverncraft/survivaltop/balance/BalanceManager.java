@@ -64,8 +64,7 @@ public class BalanceManager {
     private double getBalanceByGroup(String group) {
         try {
             double totalBalance = 0;
-            List<OfflinePlayer> offlinePlayers =
-                this.main.getGroupManager().getPlayers(group);
+            List<OfflinePlayer> offlinePlayers = this.main.getGroupManager().getPlayers(group);
             for (OfflinePlayer offlinePlayer : offlinePlayers) {
                 totalBalance += Main.getEconomy().getBalance(offlinePlayer);
             }

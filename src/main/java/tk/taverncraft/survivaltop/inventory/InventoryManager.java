@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import tk.taverncraft.survivaltop.inventory.holders.InventoryHolder;
 public class InventoryManager {
     private Main main;
     private LinkedHashMap<Material, Double> inventoryWorth;
+    private Set<Material> inventoryMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, InventoryHolder> inventoryHolderMapForLeaderboard = new HashMap<>();
@@ -40,10 +42,10 @@ public class InventoryManager {
     /**
      * Creates holders for leaderboard.
      *
-     * @param uuid uuid of each entities
+     * @param uuid uuid of each entity
      */
     public void createHolderForLeaderboard(UUID uuid) {
-        inventoryHolderMapForLeaderboard.put(uuid, new InventoryHolder(inventoryWorth.keySet()));
+        inventoryHolderMapForLeaderboard.put(uuid, new InventoryHolder(inventoryMaterial));
     }
 
     /**
@@ -52,7 +54,7 @@ public class InventoryManager {
      * @param uuid uuid of sender, not to confused with the entity itself!
      */
     public void createHolderForStats(UUID uuid) {
-        inventoryHolderMapForStats.put(uuid, new InventoryHolder(inventoryWorth.keySet()));
+        inventoryHolderMapForStats.put(uuid, new InventoryHolder(inventoryMaterial));
     }
 
     /**
@@ -79,6 +81,7 @@ public class InventoryManager {
                 Bukkit.getLogger().info(e.getMessage());
             }
         }
+        inventoryMaterial = inventoryWorth.keySet();
     }
 
     /**
@@ -104,7 +107,7 @@ public class InventoryManager {
     /**
      * Gets total worth of inventories for given entity.
      *
-     * @param uuid uuid of entities
+     * @param uuid uuid of each entity
      * @param name name of entity to get inventory worth for
      *
      * @return double representing its worth
@@ -142,7 +145,7 @@ public class InventoryManager {
     /**
      * Get the inventory worth for given player name.
      *
-     * @param uuid uuid of entities
+     * @param uuid uuid of each entity
      * @param name name of player to get inventory worth for
      *
      * @return double representing total worth
@@ -176,7 +179,7 @@ public class InventoryManager {
     /**
      * Process the worth of inventory items.
      *
-     * @param uuid uuid of entities
+     * @param uuid uuid of each entity
      * @param inventory inventory to process
      */
     private void processInventoryItemsForLeaderboard(UUID uuid, Inventory inventory) {
@@ -253,6 +256,13 @@ public class InventoryManager {
         return totalInventoryWorth;
     }
 
+    /**
+     * Gets the inventory counter to show in GUI.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return inventory counter
+     */
     public HashMap<Material, Integer> getInventoriesForGuiStats(UUID uuid) {
         return inventoryHolderMapForStats.get(uuid).getCounter();
     }

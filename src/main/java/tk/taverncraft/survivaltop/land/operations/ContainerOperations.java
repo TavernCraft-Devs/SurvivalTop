@@ -28,6 +28,7 @@ import tk.taverncraft.survivaltop.land.operations.holders.ContainerHolder;
 public class ContainerOperations {
     private Main main;
     private LinkedHashMap<Material, Double> containerWorth;
+    private Set<Material> containerMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, ContainerHolder> containerHolderMapForLeaderboard = new HashMap<>();
@@ -76,18 +77,8 @@ public class ContainerOperations {
         this.main = main;
         this.containerWorth = containerWorth;
         this.containerTypes = new HashSet<>();
+        this.containerMaterial = containerWorth.keySet();
         setUpContainerType();
-    }
-
-    /**
-     * Returns container holder for given uuid.
-     *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
-     *
-     * @return container holder for given uuid
-     */
-    public ContainerHolder getContainerHolderForStats(UUID uuid) {
-        return containerHolderMapForStats.get(uuid);
     }
 
     /**
@@ -103,12 +94,15 @@ public class ContainerOperations {
         }
     }
 
-    public void doLeaderboardCleanup() {
-        containerHolderMapForLeaderboard = new HashMap<>();
-    }
-
-    public void doStatsCleanup(UUID uuid) {
-        containerHolderMapForStats.remove(uuid);
+    /**
+     * Returns container holder for given uuid.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return container holder for given uuid
+     */
+    public ContainerHolder getContainerHolderForStats(UUID uuid) {
+        return containerHolderMapForStats.get(uuid);
     }
 
     /**
@@ -123,7 +117,7 @@ public class ContainerOperations {
     /**
      * Returns container operation for stats.
      *
-     * @return container operation for stats.
+     * @return container operation for stats
      */
     public BiFunction<UUID, Block, Boolean> getStatsOperation() {
         return preprocessContainerForStats;
@@ -132,10 +126,10 @@ public class ContainerOperations {
     /**
      * Creates holders for leaderboard.
      *
-     * @param uuid uuid of each entities
+     * @param uuid uuid of each entity
      */
     public void createHolderForLeaderboard(UUID uuid) {
-        containerHolderMapForLeaderboard.put(uuid, new ContainerHolder(containerWorth.keySet()));
+        containerHolderMapForLeaderboard.put(uuid, new ContainerHolder(containerMaterial));
 
         // temp array list also needed for tracking containers
         preprocessedContainersForLeaderboard.put(uuid, new ArrayList<>());
@@ -147,7 +141,7 @@ public class ContainerOperations {
      * @param uuid uuid of sender, not to confused with the entity itself!
      */
     public void createHolderForStats(UUID uuid) {
-        containerHolderMapForStats.put(uuid, new ContainerHolder(containerWorth.keySet()));
+        containerHolderMapForStats.put(uuid, new ContainerHolder(containerMaterial));
 
         // temp array list also needed for tracking containers
         preprocessedContainersForStats.put(uuid, new ArrayList<>());
@@ -268,8 +262,6 @@ public class ContainerOperations {
      */
     private BiFunction<UUID, Block, Boolean> preprocessContainerForLeaderboard = (uuid, block) -> {
         if (containerTypes.contains(block.getType())) {
-            // todo: initialize this so no need to computeifabsent
-            preprocessedContainersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedContainersForLeaderboard.get(uuid).add(block);
             return true;
         }
@@ -285,7 +277,6 @@ public class ContainerOperations {
      */
     private BiFunction<UUID, Block, Boolean> preprocessContainerForStats = (uuid, block) -> {
         if (containerTypes.contains(block.getType())) {
-            preprocessedContainersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedContainersForStats.get(uuid).add(block);
             return true;
         }

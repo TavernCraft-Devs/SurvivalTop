@@ -42,10 +42,8 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing its worth
      */
-    public void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
             Set<SimpleChunkLocation> claims;
             if (this.main.groupIsEnabled()) {
@@ -59,7 +57,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
                 int z = claim.getZ() * 16;
                 Location loc1 = new Location(world, x, 0, z);
                 Location loc2 = new Location(world, x + 15, 0, z + 15);
-                getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException e) {
         }
@@ -73,10 +71,8 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      * @param l2 location 2
      * @param world world that the claim is in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing claim worth
      */
-    public void getClaimWorth(UUID uuid, Location l1, Location l2, World world,
+    public void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
         double minY = this.main.getMinHeight();
@@ -84,7 +80,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = this.main.getMaxHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
+        landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
 

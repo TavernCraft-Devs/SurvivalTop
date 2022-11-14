@@ -59,7 +59,6 @@ public class ReloadCommand {
 
             // reinitialize manager values
             main.getStorageManager().initializeValues();
-            main.getEntityStatsManager().initializeValues();
             main.getServerStatsManager().initializeValues();
             main.getLandManager().initializeCalculationType();
             main.getLandManager().initializeLandOperations();

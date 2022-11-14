@@ -181,8 +181,8 @@ public class LandOperationsHelper {
      * @param world world to search in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void getClaimWorth(UUID uuid, double maxX, double minX, double maxY, double minY,
-            double maxZ, double minZ, World world, boolean isLeaderboardUpdate) {
+    public void processEntityClaim(UUID uuid, double maxX, double minX, double maxY, double minY,
+                                   double maxZ, double minZ, World world, boolean isLeaderboardUpdate) {
         ArrayList<BiFunction<UUID, Block, Boolean>> blockOperations;
         if (isLeaderboardUpdate) {
             blockOperations = landOperationsForLeaderboard;
@@ -213,7 +213,7 @@ public class LandOperationsHelper {
      * @param world world to search in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void getChunkWorth(UUID uuid, Chunk chunk, World world, boolean isLeaderboardUpdate) {
+    public void processEntityChunk(UUID uuid, Chunk chunk, World world, boolean isLeaderboardUpdate) {
         ArrayList<BiFunction<UUID, Block, Boolean>> blockOperations;
         if (isLeaderboardUpdate) {
             blockOperations = landOperationsForLeaderboard;
@@ -242,7 +242,7 @@ public class LandOperationsHelper {
     /**
      * Gets the map of worth for all blocks.
      *
-     * @return map of block name to value
+     * @return map of block material to value
      */
     public LinkedHashMap<Material, Double> getBlockWorth() {
         return this.blockWorth;
@@ -266,7 +266,7 @@ public class LandOperationsHelper {
     /**
      * Gets the map of worth for all spawners.
      *
-     * @return map of spawner name to value
+     * @return map of spawner entity type to value
      */
     public LinkedHashMap<EntityType, Double> getSpawnerWorth() {
         return this.spawnerWorth;
@@ -290,7 +290,7 @@ public class LandOperationsHelper {
     /**
      * Gets the map of worth for all container items.
      *
-     * @return map of container item name to value
+     * @return map of container item material to value
      */
     public LinkedHashMap<Material, Double> getContainerWorth() {
         return this.containerWorth;
@@ -314,7 +314,7 @@ public class LandOperationsHelper {
     /**
      * Gets the blocks to show sender in GUI.
      *
-     * @return hashmap of block name to its worth
+     * @return hashmap of block material to its worth
      */
     public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
         return blockOperations.getBlockHolderForStats(uuid).getCounter();
@@ -323,7 +323,7 @@ public class LandOperationsHelper {
     /**
      * Gets the spawners to show sender in GUI.
      *
-     * @return hashmap of spawner name to its worth
+     * @return hashmap of spawner entity type to its worth
      */
     public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
         return spawnerOperations.getSpawnerHolderForStats(uuid).getCounter();
@@ -332,21 +332,21 @@ public class LandOperationsHelper {
     /**
      * Gets the container items to show sender in GUI.
      *
-     * @return hashmap of container item name to its worth
+     * @return hashmap of container item material to its worth
      */
     public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
         return containerOperations.getContainerHolderForStats(uuid).getCounter();
     }
 
     /**
-     * Processes spawner types on the main thread.
+     * Processes spawner types on the main thread for leaderboard.
      */
     public void processSpawnerTypesForLeaderboard() {
         spawnerOperations.processSpawnerTypesForLeaderboard();
     }
 
     /**
-     * Processes spawner types on the main thread.
+     * Processes spawner types on the main thread for stats.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      */
@@ -355,14 +355,14 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Processes container items on the main thread.
+     * Processes container items on the main thread for leaderboard,
      */
     public void processContainerItemsForLeaderboard() {
         containerOperations.processContainerItemsForLeaderboard();
     }
 
     /**
-     * Processes container items on the main thread.
+     * Processes container items on the main thread for stats.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      */
@@ -428,23 +428,5 @@ public class LandOperationsHelper {
      */
     public double calculateContainerWorthForStats(UUID uuid) {
         return containerOperations.calculateContainerWorthForStats(uuid);
-    }
-
-    /**
-     * Resets all sender info list at end of update.
-     */
-    public void doLeaderboardCleanup() {
-        spawnerOperations.doLeaderboardCleanup();
-        containerOperations.doLeaderboardCleanup();
-    }
-
-    /**
-     * Resets a specific sender's info list after calculating stats.
-     *
-     * @param uuid uuid of sender to clean up after
-     */
-    public void doStatsCleanup(UUID uuid) {
-        spawnerOperations.doStatsCleanup(uuid);
-        containerOperations.doStatsCleanup(uuid);
     }
 }

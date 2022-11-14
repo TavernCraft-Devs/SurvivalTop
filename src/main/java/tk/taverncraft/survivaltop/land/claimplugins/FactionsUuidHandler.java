@@ -6,9 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.FPlayer;
@@ -44,7 +42,7 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
      * @param name name of entity to get land worth for
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
             Set<FLocation> claims;
             if (this.main.groupIsEnabled()) {
@@ -53,8 +51,8 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
                 claims = getClaimsByPlayer(name);
             }
             for (FLocation claim : claims) {
-                landOperationsHelper.getChunkWorth(uuid, claim.getChunk(),
-                        claim.getWorld(), isLeaderboardUpdate);
+                landOperationsHelper.processEntityChunk(uuid, claim.getChunk(), claim.getWorld(),
+                        isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException e) {
         }
