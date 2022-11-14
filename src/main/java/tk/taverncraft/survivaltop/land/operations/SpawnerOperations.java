@@ -7,21 +7,27 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 
+import dev.rosewood.rosestacker.api.RoseStackerAPI;
+
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.land.operations.holders.SpawnerHolder;
 
 /**
  * Handles the logic for performing spawner operations when scanning locations.
  */
 public class SpawnerOperations {
     private Main main;
-    private LinkedHashMap<String, Double> spawnerWorth;
+    private LinkedHashMap<EntityType, Double> spawnerWorth;
     private RoseStackerAPI rApi;
+
+    // holders containing count of each material mapped to uuid
+    private HashMap<UUID, SpawnerHolder> spawnerHolderMapForLeaderboard = new HashMap<>();
+    private HashMap<UUID, SpawnerHolder> spawnerHolderMapForStats = new HashMap<>();
 
     // populated from main thread and processed on async thread later
     private HashMap<UUID, ArrayList<Block>> preprocessedSpawnersForLeaderboard = new HashMap<>();
@@ -33,12 +39,23 @@ public class SpawnerOperations {
      * @param main plugin class
      * @param spawnerWorth map of spawner names to their values
      */
-    public SpawnerOperations(Main main, LinkedHashMap<String, Double> spawnerWorth) {
+    public SpawnerOperations(Main main, LinkedHashMap<EntityType, Double> spawnerWorth) {
         this.main = main;
         this.spawnerWorth = spawnerWorth;
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
             rApi = RoseStackerAPI.getInstance();
         }
+    }
+
+    /**
+     * Returns spawner holder for given uuid.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return spawner holder for given uuid
+     */
+    public SpawnerHolder getSpawnerHolderForStats(UUID uuid) {
+        return spawnerHolderMapForStats.get(uuid);
     }
 
     public void doLeaderboardCleanup() {
@@ -54,7 +71,7 @@ public class SpawnerOperations {
      *
      * @return spawner operation for leaderboard
      */
-    public BiFunction<UUID, Block, Double> getLeaderboardOperation() {
+    public BiFunction<UUID, Block, Boolean> getLeaderboardOperation() {
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
             return preprocessRoseStackerForLeaderboard;
         }
@@ -66,11 +83,35 @@ public class SpawnerOperations {
      *
      * @return spawner operation for stats.
      */
-    public BiFunction<UUID, Block, Double> getStatsOperation() {
+    public BiFunction<UUID, Block, Boolean> getStatsOperation() {
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
             return preprocessRoseStackerForStats;
         }
         return preprocessSpawnerForStats;
+    }
+
+    /**
+     * Creates holders for leaderboard.
+     *
+     * @param uuid uuid of each entities
+     */
+    public void createHolderForLeaderboard(UUID uuid) {
+        spawnerHolderMapForLeaderboard.put(uuid, new SpawnerHolder(spawnerWorth.keySet()));
+
+        // temp array list for tracking containers
+        preprocessedSpawnersForLeaderboard.put(uuid, new ArrayList<>());
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param uuid uuid of sender, not to confused with the entity itself!
+     */
+    public void createHolderForStats(UUID uuid) {
+        spawnerHolderMapForStats.put(uuid, new SpawnerHolder(spawnerWorth.keySet()));
+
+        // temp array list for tracking containers
+        preprocessedSpawnersForStats.put(uuid, new ArrayList<>());
     }
 
     /**
@@ -79,14 +120,12 @@ public class SpawnerOperations {
      * @return map of entities uuid to their spawner worth
      */
     public HashMap<UUID, Double> calculateSpawnerWorthForLeaderboard() {
-        HashMap<UUID, Double> tempSpawnerCache = new HashMap<>();
-        for (Map.Entry<UUID, ArrayList<Block>> map : preprocessedSpawnersForLeaderboard.entrySet()) {
-            UUID uuid = map.getKey();
-            ArrayList<Block> blocks = map.getValue();
-            double value = processSpawnerWorth(blocks, uuid, false);
-            tempSpawnerCache.put(map.getKey(), value);
+        HashMap<UUID, Double> spawnerWorthMap = new HashMap<>();
+        for (Map.Entry<UUID, SpawnerHolder> map : spawnerHolderMapForLeaderboard.entrySet()) {
+            double value = getAllSpawnersWorth(map.getValue());
+            spawnerWorthMap.put(map.getKey(), value);
         }
-        return tempSpawnerCache;
+        return spawnerWorthMap;
     }
 
     /**
@@ -97,48 +136,71 @@ public class SpawnerOperations {
      * @return map of sender uuid to the calculated spawner worth
      */
     public double calculateSpawnerWorthForStats(UUID uuid) {
-        ArrayList<Block> blocks = preprocessedSpawnersForStats.get(uuid);
-        if (blocks == null) {
-            return 0;
-        }
-        return processSpawnerWorth(blocks, uuid, true);
+        return getAllSpawnersWorth(spawnerHolderMapForStats.get(uuid));
     }
 
     /**
-     * Process the worth of spawners (for individuals which may need GUI).
+     * Process the worth of spawners.
      *
-     * @param blocks list of spawner blocks
+     * @param spawnerHolder holder containing spawner count
      *
      * @return double value representing total worth of spawners
      */
-    public double processSpawnerWorth(ArrayList<Block> blocks, UUID uuid,
-                                      boolean isStatsAction) {
-        if (blocks == null) {
-            return 0;
-        }
+    public double getAllSpawnersWorth(SpawnerHolder spawnerHolder) {
         double totalSpawnerWorth = 0;
+        HashMap<EntityType, Integer> counter = spawnerHolder.getCounter();
+        for (Map.Entry<EntityType, Integer> map : counter.entrySet()) {
+            // count multiply by worth, then added to total
+            totalSpawnerWorth += map.getValue() * spawnerWorth.get(map.getKey());
+        }
+        return totalSpawnerWorth;
+    }
+
+    /**
+     * Process the worth of spawners.
+     */
+    public void processSpawnerTypesForLeaderboard() {
+        for (Map.Entry<UUID, ArrayList<Block>> map : preprocessedSpawnersForLeaderboard.entrySet()) {
+            UUID uuid = map.getKey();
+            ArrayList<Block> blocks = map.getValue();
+            int numBlocks = blocks.size();
+            for (int i = 0; i < numBlocks; i++) {
+                Block block = blocks.get(i);
+                try {
+                    CreatureSpawner spawner = (CreatureSpawner) block.getState();
+                    EntityType mobType = spawner.getSpawnedType();
+                    if (spawnerWorth.containsKey(mobType)) {
+                        spawnerHolderMapForLeaderboard.get(uuid).addToHolder(mobType);
+                    }
+                } catch (ClassCastException e) {
+                    // error thrown if player breaks spawner just as calculation is taking place
+                }
+            }
+        }
+    }
+
+    /**
+     * Process the worth of spawners.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return double value representing total worth of spawners
+     */
+    public void processSpawnerTypesForStats(UUID uuid) {
+        ArrayList<Block> blocks = preprocessedSpawnersForStats.get(uuid);
         int numBlocks = blocks.size();
         for (int i = 0; i < numBlocks; i++) {
             Block block = blocks.get(i);
             try {
                 CreatureSpawner spawner = (CreatureSpawner) block.getState();
                 EntityType mobType = spawner.getSpawnedType();
-                String mobName = mobType.getName();
-                if (mobName != null) {
-                    String mobNameUpperCase = mobName.toUpperCase();
-                    Double value = spawnerWorth.get(mobNameUpperCase);
-                    if (value == null) {
-                        value = 0.0;
-                    } else if (main.isUseGuiStats() && isStatsAction) {
-                        main.getEntityStatsManager().setSpawnersForGuiStats(uuid, mobNameUpperCase);
-                    }
-                    totalSpawnerWorth += value;
+                if (spawnerWorth.containsKey(mobType)) {
+                    spawnerHolderMapForStats.get(uuid).addToHolder(mobType);
                 }
             } catch (ClassCastException e) {
                 // error thrown if player breaks spawner just as calculation is taking place
             }
         }
-        return totalSpawnerWorth;
     }
 
     /**
@@ -147,13 +209,14 @@ public class SpawnerOperations {
      * checked. This always returns 0 since if a block is not a spawner (ignored) and if it is
      * a spawner, then it is set to be processed later anyways
      */
-    private BiFunction<UUID, Block, Double> preprocessSpawnerForLeaderboard = (uuid, block) -> {
+    private BiFunction<UUID, Block, Boolean> preprocessSpawnerForLeaderboard = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
             preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedSpawnersForLeaderboard.get(uuid).add(block);
+            return true;
         }
-        return 0.0;
+        return false;
     };
 
     /**
@@ -162,19 +225,20 @@ public class SpawnerOperations {
      * This always returns 0 since if a block is not a spawner (ignored) and if it is
      * a spawner, then it is set to be processed later anyways
      */
-    private BiFunction<UUID, Block, Double> preprocessSpawnerForStats = (uuid, block) -> {
+    private BiFunction<UUID, Block, Boolean> preprocessSpawnerForStats = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
             preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedSpawnersForStats.get(uuid).add(block);
+            return true;
         }
-        return 0.0;
+        return false;
     };
 
     /**
      * Variation of preprocessSpawnerForLeaderboard for RoseStacker support.
      */
-    private BiFunction<UUID, Block, Double> preprocessRoseStackerForLeaderboard = (uuid, block) -> {
+    private BiFunction<UUID, Block, Boolean> preprocessRoseStackerForLeaderboard = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
             if (rApi.isSpawnerStacked(block)) {
@@ -187,14 +251,15 @@ public class SpawnerOperations {
                 preprocessedSpawnersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
                 preprocessedSpawnersForLeaderboard.get(uuid).add(block);
             }
+            return true;
         }
-        return 0.0;
+        return false;
     };
 
     /**
      * Variation of preprocessSpawnerForStats for RoseStacker support.
      */
-    private BiFunction<UUID, Block, Double> preprocessRoseStackerForStats = (uuid, block) -> {
+    private BiFunction<UUID, Block, Boolean> preprocessRoseStackerForStats = (uuid, block) -> {
         Material material = block.getType();
         if (material.equals(Material.SPAWNER)) {
             if (rApi.isSpawnerStacked(block)) {
@@ -207,7 +272,8 @@ public class SpawnerOperations {
                 preprocessedSpawnersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
                 preprocessedSpawnersForStats.get(uuid).add(block);
             }
+            return true;
         }
-        return 0.0;
+        return false;
     };
 }

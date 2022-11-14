@@ -15,19 +15,23 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.land.operations.holders.ContainerHolder;
 
 /**
  * Handles the logic for performing container operations when scanning locations.
  */
 public class ContainerOperations {
     private Main main;
-    private LinkedHashMap<String, Double> containerWorth;
+    private LinkedHashMap<Material, Double> containerWorth;
+
+    // holders containing count of each material mapped to uuid
+    private HashMap<UUID, ContainerHolder> containerHolderMapForLeaderboard = new HashMap<>();
+    private HashMap<UUID, ContainerHolder> containerHolderMapForStats = new HashMap<>();
 
     // populated from main thread and processed on async thread later
     private HashMap<UUID, ArrayList<Block>> preprocessedContainersForLeaderboard = new HashMap<>();
@@ -68,11 +72,22 @@ public class ContainerOperations {
      * @param main plugin class
      * @param containerWorth map of container item names to their values
      */
-    public ContainerOperations(Main main, LinkedHashMap<String, Double> containerWorth) {
+    public ContainerOperations(Main main, LinkedHashMap<Material, Double> containerWorth) {
         this.main = main;
         this.containerWorth = containerWorth;
         this.containerTypes = new HashSet<>();
         setUpContainerType();
+    }
+
+    /**
+     * Returns container holder for given uuid.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return container holder for given uuid
+     */
+    public ContainerHolder getContainerHolderForStats(UUID uuid) {
+        return containerHolderMapForStats.get(uuid);
     }
 
     /**
@@ -89,11 +104,11 @@ public class ContainerOperations {
     }
 
     public void doLeaderboardCleanup() {
-        preprocessedContainersForLeaderboard = new HashMap<>();
+        containerHolderMapForLeaderboard = new HashMap<>();
     }
 
     public void doStatsCleanup(UUID uuid) {
-        preprocessedContainersForStats.remove(uuid);
+        containerHolderMapForStats.remove(uuid);
     }
 
     /**
@@ -101,7 +116,7 @@ public class ContainerOperations {
      *
      * @return container operation for leaderboard
      */
-    public BiFunction<UUID, Block, Double> getLeaderboardOperation() {
+    public BiFunction<UUID, Block, Boolean> getLeaderboardOperation() {
         return preprocessContainerForLeaderboard;
     }
 
@@ -110,8 +125,32 @@ public class ContainerOperations {
      *
      * @return container operation for stats.
      */
-    public BiFunction<UUID, Block, Double> getStatsOperation() {
+    public BiFunction<UUID, Block, Boolean> getStatsOperation() {
         return preprocessContainerForStats;
+    }
+
+    /**
+     * Creates holders for leaderboard.
+     *
+     * @param uuid uuid of each entities
+     */
+    public void createHolderForLeaderboard(UUID uuid) {
+        containerHolderMapForLeaderboard.put(uuid, new ContainerHolder(containerWorth.keySet()));
+
+        // temp array list also needed for tracking containers
+        preprocessedContainersForLeaderboard.put(uuid, new ArrayList<>());
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param uuid uuid of sender, not to confused with the entity itself!
+     */
+    public void createHolderForStats(UUID uuid) {
+        containerHolderMapForStats.put(uuid, new ContainerHolder(containerWorth.keySet()));
+
+        // temp array list also needed for tracking containers
+        preprocessedContainersForStats.put(uuid, new ArrayList<>());
     }
 
     /**
@@ -120,14 +159,12 @@ public class ContainerOperations {
      * @return map of entities uuid to their container worth
      */
     public HashMap<UUID, Double> calculateContainerWorthForLeaderboard() {
-        HashMap<UUID, Double> tempContainerCache = new HashMap<>();
-        for (Map.Entry<UUID, ArrayList<Block>> map : preprocessedContainersForLeaderboard.entrySet()) {
-            UUID uuid = map.getKey();
-            ArrayList<Block> blocks = map.getValue();
-            double value = processContainerWorth(blocks, uuid, false);
-            tempContainerCache.put(map.getKey(), value);
+        HashMap<UUID, Double> containerWorthMap = new HashMap<>();
+        for (Map.Entry<UUID, ContainerHolder> map : containerHolderMapForLeaderboard.entrySet()) {
+            double value = getAllContainersWorth(map.getValue());
+            containerWorthMap.put(map.getKey(), value);
         }
-        return tempContainerCache;
+        return containerWorthMap;
     }
 
     /**
@@ -138,53 +175,89 @@ public class ContainerOperations {
      * @return map of sender uuid to the calculated container worth
      */
     public double calculateContainerWorthForStats(UUID uuid) {
-        ArrayList<Block> blocks = preprocessedContainersForStats.get(uuid);
-        if (blocks == null) {
-            return 0;
-        }
-        return processContainerWorth(blocks, uuid, true);
+        return getAllContainersWorth(containerHolderMapForStats.get(uuid));
     }
 
     /**
-     * Process the worth of container items (for individuals who may need GUI).
+     * Process the worth of container items.
      *
-     * @param blocks list of containers
+     * @param containerHolder holder containing container item count
      *
-     * @return double value representing total worth of container items
+     * @return double value representing total worth of containers
      */
-    public double processContainerWorth(ArrayList<Block> blocks, UUID uuid, boolean isStatsAction) {
-        if (blocks == null) {
-            return 0;
-        }
+    public double getAllContainersWorth(ContainerHolder containerHolder) {
         double totalContainerWorth = 0;
+        HashMap<Material, Integer> counter = containerHolder.getCounter();
+        for (Map.Entry<Material, Integer> map : counter.entrySet()) {
+            // count multiply by worth, then added to total
+            totalContainerWorth += map.getValue() * containerWorth.get(map.getKey());
+        }
+        return totalContainerWorth;
+    }
+
+    /**
+     * Process the worth of container items.
+     */
+    public void processContainerItemsForLeaderboard() {
+        for (Map.Entry<UUID, ArrayList<Block>> map : preprocessedContainersForLeaderboard.entrySet()) {
+            UUID uuid = map.getKey();
+            ArrayList<Block> blocks = map.getValue();
+            int numBlocks = blocks.size();
+            for (int i = 0; i < numBlocks; i++) {
+                Inventory inventory = getBlockInventory(blocks.get(i));
+                for (ItemStack itemStack : inventory) {
+                    if (itemStack == null) {
+                        continue;
+                    }
+                    Material material = itemStack.getType();
+                    if (containerWorth.containsKey(material)) {
+                        containerHolderMapForLeaderboard.get(uuid).addToHolder(material);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Process the worth of container items.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     */
+    public void processContainerItemsForStats(UUID uuid) {
+        ArrayList<Block> blocks = preprocessedContainersForStats.get(uuid);
         int numBlocks = blocks.size();
         for (int i = 0; i < numBlocks; i++) {
-            Block block = blocks.get(i);
-            BlockState blockstate = block.getState();
-            Inventory inventory;
-            if (blockstate instanceof Chest) {
-                Chest chest = (Chest) blockstate;
-                inventory = chest.getBlockInventory();
-            } else {
-                InventoryHolder inventoryHolder = (InventoryHolder) blockstate;
-                inventory = inventoryHolder.getInventory();
-            }
+            Inventory inventory = getBlockInventory(blocks.get(i));
             for (ItemStack itemStack : inventory) {
                 if (itemStack == null) {
                     continue;
                 }
-                String itemName = itemStack.getType().toString().toUpperCase();
-                Double worth = containerWorth.get(itemName);
-                if (worth == null) {
-                    worth = (double) 0;
-                } else if (main.isUseGuiStats() && isStatsAction) {
-                    main.getEntityStatsManager().setContainersForGuiStats(uuid, itemName,
-                        itemStack.getAmount());
+                Material material = itemStack.getType();
+                if (containerWorth.containsKey(material)) {
+                    containerHolderMapForStats.get(uuid).addToHolder(material);
                 }
-                totalContainerWorth += worth * itemStack.getAmount();
             }
         }
-        return totalContainerWorth;
+    }
+
+    /**
+     * Helper method for getting inventory of container block.
+     *
+     * @param block block to get inventory for
+     *
+     * @return inventory of given block
+     */
+    private Inventory getBlockInventory(Block block) {
+        BlockState blockstate = block.getState();
+        Inventory inventory;
+        if (blockstate instanceof Chest) {
+            Chest chest = (Chest) blockstate;
+            inventory = chest.getBlockInventory();
+        } else {
+            InventoryHolder inventoryHolder = (InventoryHolder) blockstate;
+            inventory = inventoryHolder.getInventory();
+        }
+        return inventory;
     }
 
     /**
@@ -193,13 +266,14 @@ public class ContainerOperations {
      * checked. This always returns 0 since if a block is not a container (ignored) and if it is
      * a container, then it is set to be processed later anyways
      */
-    private BiFunction<UUID, Block, Double> preprocessContainerForLeaderboard = (uuid, block) -> {
-        Material material = block.getType();
-        if (containerTypes.contains(material)) {
+    private BiFunction<UUID, Block, Boolean> preprocessContainerForLeaderboard = (uuid, block) -> {
+        if (containerTypes.contains(block.getType())) {
+            // todo: initialize this so no need to computeifabsent
             preprocessedContainersForLeaderboard.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedContainersForLeaderboard.get(uuid).add(block);
+            return true;
         }
-        return 0.0;
+        return false;
     };
 
 
@@ -209,12 +283,12 @@ public class ContainerOperations {
      * This always returns 0 since if a block is not a container (ignored) and if it is
      * a container, then it is set to be processed later anyways
      */
-    private BiFunction<UUID, Block, Double> preprocessContainerForStats = (uuid, block) -> {
-        Material material = block.getType();
-        if (containerTypes.contains(material)) {
+    private BiFunction<UUID, Block, Boolean> preprocessContainerForStats = (uuid, block) -> {
+        if (containerTypes.contains(block.getType())) {
             preprocessedContainersForStats.computeIfAbsent(uuid, k -> new ArrayList<>());
             preprocessedContainersForStats.get(uuid).add(block);
+            return true;
         }
-        return 0.0;
+        return false;
     };
 }

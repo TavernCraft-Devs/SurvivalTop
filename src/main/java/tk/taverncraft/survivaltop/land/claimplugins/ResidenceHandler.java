@@ -43,8 +43,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
      *
      * @return double representing its worth
      */
-    public double getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
-        double wealth = 0;
+    public void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
             List<ClaimedResidence> claims;
             if (this.main.groupIsEnabled()) {
@@ -58,12 +57,10 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
                     Location loc1 = area.getHighLocation();
                     Location loc2 = area.getLowLocation();
                     World world = area.getWorld();
-                    wealth += getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                    getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
                 }
             }
-            return wealth;
         } catch (NoClassDefFoundError | NullPointerException e) {
-            return wealth;
         }
     }
 
@@ -78,7 +75,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
      *
      * @return double representing claim worth
      */
-    public double getClaimWorth(UUID uuid, Location l1, Location l2, World world,
+    public void getClaimWorth(UUID uuid, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
         double minY = Math.min(l1.getY(), l2.getY());
@@ -86,7 +83,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = Math.max(l1.getY(), l2.getY()) + 1;
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        return landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
+        landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
 

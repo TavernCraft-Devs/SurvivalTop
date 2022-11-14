@@ -8,30 +8,21 @@ import java.util.UUID;
  */
 public class EntityCache {
     private final UUID UUID;
-    private final double BAL_WEALTH;
-    private final double BLOCK_WEALTH;
-    private final double SPAWNER_WEALTH;
-    private final double CONTAINER_WEALTH;
-    private final double INVENTORY_WEALTH;
+    private double balWealth = 0;
+    private double blockWealth = 0;
+    private double spawnerWealth = 0;
+    private double containerWealth = 0;
+    private double inventoryWealth = 0;
 
     /**
      * Constructor for EntityCache.
      *
      * @param uuid uuid of entity
      * @param balWealth balance wealth of entity
-     * @param blockWealth block wealth of entity
-     * @param invWealth inventory wealth of entity
-     * @param spawnerWealth spawner wealth of entity
-     * @param containerWealth container wealth of entity
      */
-    public EntityCache(UUID uuid, double balWealth, double blockWealth, double invWealth,
-            double spawnerWealth, double containerWealth) {
+    public EntityCache(UUID uuid, double balWealth) {
         this.UUID = uuid;
-        this.BAL_WEALTH = balWealth;
-        this.BLOCK_WEALTH = blockWealth;
-        this.INVENTORY_WEALTH = invWealth;
-        this.SPAWNER_WEALTH = spawnerWealth;
-        this.CONTAINER_WEALTH = containerWealth;
+        this.balWealth = balWealth;
     }
 
     /**
@@ -49,7 +40,7 @@ public class EntityCache {
      * @return balance wealth of entity
      */
     public double getBalWealth() {
-        return BAL_WEALTH;
+        return balWealth;
     }
 
     /**
@@ -58,7 +49,7 @@ public class EntityCache {
      * @return block wealth of entity
      */
     public double getBlockWealth() {
-        return BLOCK_WEALTH;
+        return blockWealth;
     }
 
     /**
@@ -67,7 +58,7 @@ public class EntityCache {
      * @return spawner wealth of the entity
      */
     public double getSpawnerWealth() {
-        return SPAWNER_WEALTH;
+        return spawnerWealth;
     }
 
     /**
@@ -76,7 +67,7 @@ public class EntityCache {
      * @return container wealth of the entity
      */
     public double getContainerWealth() {
-        return CONTAINER_WEALTH;
+        return containerWealth;
     }
 
     /**
@@ -85,7 +76,7 @@ public class EntityCache {
      * @return inventory wealth of the entity
      */
     public double getInventoryWealth() {
-        return INVENTORY_WEALTH;
+        return inventoryWealth;
     }
 
     /**
@@ -95,7 +86,7 @@ public class EntityCache {
      * @return land wealth of the entity
      */
     public double getLandWealth() {
-        return BLOCK_WEALTH + SPAWNER_WEALTH + CONTAINER_WEALTH;
+        return blockWealth + spawnerWealth + containerWealth;
     }
 
     /**
@@ -105,30 +96,42 @@ public class EntityCache {
      * @return total wealth of the entity
      */
     public Double getTotalWealth() {
-        return BAL_WEALTH + getLandWealth() + INVENTORY_WEALTH;
+        return balWealth + getLandWealth() + inventoryWealth;
+    }
+
+    /**
+     * Sets the block wealth of an entity.
+     *
+     * @param newBlockWealth block wealth to set
+     */
+    public void setBlockWealth(double newBlockWealth) {
+        this.blockWealth = newBlockWealth;
     }
 
     /**
      * Sets the spawner wealth of an entity.
      *
      * @param newSpawnerWealth spawner wealth to set
-     *
-     * @return new entity cache with the set spawner value
      */
-    public EntityCache setSpawnerWealth(double newSpawnerWealth) {
-        return new EntityCache(UUID, BAL_WEALTH, BLOCK_WEALTH, INVENTORY_WEALTH,
-                newSpawnerWealth, CONTAINER_WEALTH);
+    public void setSpawnerWealth(double newSpawnerWealth) {
+        this.spawnerWealth = newSpawnerWealth;
     }
 
     /**
      * Sets the container wealth of an entity.
      *
      * @param newContainerWealth container wealth to set
-     *
-     * @return new entity cache with the set container value
      */
-    public EntityCache setContainerWealth(double newContainerWealth) {
-        return new EntityCache(UUID, BAL_WEALTH, BLOCK_WEALTH, INVENTORY_WEALTH,
-            SPAWNER_WEALTH, newContainerWealth);
+    public void setContainerWealth(double newContainerWealth) {
+        this.containerWealth = newContainerWealth;
+    }
+
+    /**
+     * Sets the inventory wealth of an entity.
+     *
+     * @param newInventoryWealth inventory wealth to set
+     */
+    public void setInventoryWealth(double newInventoryWealth) {
+        this.inventoryWealth = newInventoryWealth;
     }
 }

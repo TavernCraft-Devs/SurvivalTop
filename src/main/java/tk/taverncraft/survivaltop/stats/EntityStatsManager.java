@@ -9,8 +9,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,12 +34,9 @@ public class EntityStatsManager {
     public final HashMap<UUID, BukkitTask> statsInitialTask = new HashMap<>();
     public final HashMap<UUID, BukkitTask> statsUiTask = new HashMap<>();
 
-    // for tracking blocks, spawners and containers to be used in gui
+    // for tracking inventories to be used in gui
     // the below maps are used by EntityStatsGui to create the user interface
     // note that uuid below is uuid of the sender
-    private HashMap<UUID, HashMap<String, Integer>> blocksForGuiStats = new HashMap<>();
-    private HashMap<UUID, HashMap<String, Integer>> spawnersForGuiStats = new HashMap<>();
-    private HashMap<UUID, HashMap<String, Integer>> containersForGuiStats = new HashMap<>();
     private HashMap<UUID, HashMap<String, Integer>> inventoriesForGuiStats = new HashMap<>();
 
     // map of sender uuid to the gui to show sender
@@ -58,9 +56,6 @@ public class EntityStatsManager {
      * Initialize default values.
      */
     public void initializeValues() {
-        blocksForGuiStats = new HashMap<>();
-        spawnersForGuiStats = new HashMap<>();
-        containersForGuiStats = new HashMap<>();
         inventoriesForGuiStats = new HashMap<>();
     }
 
@@ -116,7 +111,7 @@ public class EntityStatsManager {
             public void run() {
                 EntityStatsGui gui = new EntityStatsGui(main, name, eCache);
                 senderGui.put(uuid, gui);
-                executePostCalculationActions(sender);
+                showEntityStatsToUser(sender);
             }
         }.runTaskAsynchronously(main);
         this.statsUiTask.put(uuid, task);
@@ -148,19 +143,18 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      */
     private void calculateEntityStats(CommandSender sender, String name) {
-        double landWealth = 0;
         double balWealth = 0;
-        double invWealth = 0;
         if (main.landIsIncluded()) {
-            landWealth = getEntityLandWealth(sender, name);
+            // land calculations are done async and will be retrieved later
+            getEntityLandWealth(sender, name);
         }
         if (main.balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
         if (main.inventoryIsIncluded()) {
-            invWealth = getEntityInvWealth(sender, name);
+            getEntityInvWealth(sender, name);
         }
-        processSpawnersAndContainers(sender, name, balWealth, landWealth, invWealth);
+        executePostCalculationActions(sender, name, balWealth);
     }
 
     /**
@@ -169,22 +163,23 @@ public class EntityStatsManager {
      * @param sender user who is getting stats
      * @param name name of entity whose stats is being retrieved
      * @param balWealth bal wealth of the entity
-     * @param landWealth land wealth of the entity
-     * @param invWealth inv wealth of the entity
      */
-    private void processSpawnersAndContainers(CommandSender sender, String name, double balWealth,
-            double landWealth, double invWealth) {
+    private void executePostCalculationActions(CommandSender sender, String name, double balWealth) {
+        UUID uuid = main.getSenderUuid(sender);
+        double blockValue = main.getLandManager().calculateBlockWorthForStats(uuid);
+        double inventoryValue = main.getInventoryManager().calculateInventoryWorthForStats(uuid);
         new BukkitRunnable() {
             @Override
             public void run() {
-                UUID uuid = main.getSenderUuid(sender);
+                main.getLandManager().processSpawnerTypesForStats(uuid);
+                main.getLandManager().processContainerItemsForStats(uuid);
                 double spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
                 double containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
 
                 // handle gui or non-gui results
                 if (main.isUseGuiStats() && sender instanceof Player) {
-                    processStatsGui(sender, name, balWealth, landWealth, spawnerValue,
-                        containerValue, invWealth);
+                    processStatsGui(sender, name, balWealth, blockValue, spawnerValue,
+                        containerValue, inventoryValue);
                     return;
                 }
 
@@ -193,8 +188,8 @@ public class EntityStatsManager {
                     return;
                 }
 
-                executePostCalculationActions(sender, name, balWealth, landWealth, spawnerValue,
-                        containerValue, invWealth);
+                showEntityStatsToUser(sender, name, balWealth, blockValue, spawnerValue,
+                        containerValue, inventoryValue);
             }
         }.runTask(main);
     }
@@ -213,7 +208,7 @@ public class EntityStatsManager {
             public void run() {
                 EntityStatsGui gui = new EntityStatsGui(main, uuid, name, values);
                 senderGui.put(uuid, gui);
-                executePostCalculationActions(sender);
+                showEntityStatsToUser(sender);
             }
         }.runTaskAsynchronously(main);
         this.statsUiTask.put(uuid, task);
@@ -225,7 +220,7 @@ public class EntityStatsManager {
      *
      * @param sender user who requested for stats
      */
-    private void executePostCalculationActions(CommandSender sender) {
+    private void showEntityStatsToUser(CommandSender sender) {
         TextComponent message = new TextComponent("Click here to view stats!");
         message.setColor(ChatColor.GOLD);
         message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
@@ -242,7 +237,7 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      * @param values balance values breakdown
      */
-    private void executePostCalculationActions(CommandSender sender, String name, double... values) {
+    private void showEntityStatsToUser(CommandSender sender, String name, double... values) {
         double balValue = values[0];
         double blockValue = values[1];
         double spawnerValue = values[2];
@@ -303,73 +298,10 @@ public class EntityStatsManager {
     private void doCleanUp(CommandSender sender) {
         UUID uuid = this.main.getSenderUuid(sender);
         this.main.getLandManager().doCleanup(uuid);
-        blocksForGuiStats.remove(uuid);
-        spawnersForGuiStats.remove(uuid);
-        containersForGuiStats.remove(uuid);
+        // todo: check if cleanup needed for holders
         inventoriesForGuiStats.remove(uuid);
         isCalculatingStats.remove(uuid);
         statsInitialTask.remove(uuid);
-    }
-
-    /**
-     * Sets block count and value to be used in gui.
-     *
-     * @param uuid sender to link block to
-     * @param block block to check for
-     */
-    public void setBlocksForGuiStats(UUID uuid, Block block) {
-        blocksForGuiStats.computeIfAbsent(uuid, k -> new HashMap<>());
-        String name = block.getType().toString();
-        Integer currentCount = blocksForGuiStats.get(uuid).get(name);
-        if (currentCount == null) {
-            currentCount = 0;
-        }
-        blocksForGuiStats.get(uuid).put(name, currentCount + 1);
-    }
-
-    /**
-     * Sets spawner count and value to be used in gui.
-     *
-     * @param uuid sender to link spawner to
-     * @param mobName spawner name to check for
-     */
-    public void setSpawnersForGuiStats(UUID uuid, String mobName) {
-        spawnersForGuiStats.computeIfAbsent(uuid, k -> new HashMap<>());
-        Integer currentCount = spawnersForGuiStats.get(uuid).get(mobName);
-        if (currentCount == null) {
-            currentCount = 0;
-        }
-        spawnersForGuiStats.get(uuid).put(mobName, currentCount + 1);
-    }
-
-    /**
-     * Sets container count and value to be used in gui.
-     *
-     * @param uuid sender to link container to
-     * @param itemName item name to check for
-     */
-    public void setContainersForGuiStats(UUID uuid, String itemName, int amount) {
-        containersForGuiStats.computeIfAbsent(uuid, k -> new HashMap<>());
-        Integer currentCount = containersForGuiStats.get(uuid).get(itemName);
-        if (currentCount == null) {
-            currentCount = 0;
-        }
-        containersForGuiStats.get(uuid).put(itemName, currentCount + amount);
-    }
-
-    /**
-     * Sets inventory item count and value to be used in gui.
-     *
-     * @param uuid sender to link inventory to
-     * @param itemName item name to check for
-     */
-    public void setInventoriesForGuiStats(UUID uuid, String itemName, int amount) {
-        inventoriesForGuiStats.computeIfAbsent(uuid, k -> new HashMap<>());
-        Integer currentCount = inventoriesForGuiStats.get(uuid).get(itemName);
-        if (currentCount == null) {
-            currentCount = 0;
-        }
-        inventoriesForGuiStats.get(uuid).put(itemName, currentCount + amount);
     }
 
     /**
@@ -377,8 +309,8 @@ public class EntityStatsManager {
      *
      * @return hashmap of block name to its worth
      */
-    public HashMap<String, Integer> getBlocksForGuiStats(UUID uuid) {
-        return this.blocksForGuiStats.get(uuid);
+    public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
+        return main.getLandManager().getBlocksForGuiStats(uuid);
     }
 
     /**
@@ -386,8 +318,8 @@ public class EntityStatsManager {
      *
      * @return hashmap of spawner name to its worth
      */
-    public HashMap<String, Integer> getSpawnersForGuiStats(UUID uuid) {
-        return this.spawnersForGuiStats.get(uuid);
+    public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
+        return main.getLandManager().getSpawnersForGuiStats(uuid);
     }
 
     /**
@@ -395,8 +327,8 @@ public class EntityStatsManager {
      *
      * @return hashmap of container item name to its worth
      */
-    public HashMap<String, Integer> getContainersForGuiStats(UUID uuid) {
-        return this.containersForGuiStats.get(uuid);
+    public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
+        return main.getLandManager().getContainersForGuiStats(uuid);
     }
 
     /**
@@ -404,8 +336,8 @@ public class EntityStatsManager {
      *
      * @return hashmap of inventory item name to its worth
      */
-    public HashMap<String, Integer> getInventoriesForGuiStats(UUID uuid) {
-        return this.inventoriesForGuiStats.get(uuid);
+    public HashMap<Material, Integer> getInventoriesForGuiStats(UUID uuid) {
+        return main.getInventoryManager().getInventoriesForGuiStats(uuid);
     }
 
     /**
@@ -413,12 +345,11 @@ public class EntityStatsManager {
      *
      * @param sender sender who checked for stats
      * @param name name of entity to get land wealth for
-     *
-     * @return double value representing entity land wealth
      */
-    private double getEntityLandWealth(CommandSender sender, String name) {
+    private void getEntityLandWealth(CommandSender sender, String name) {
         UUID uuid = this.main.getSenderUuid(sender);
-        return this.main.getLandManager().getLandWorthForEntity(uuid, name, false);
+        main.getLandManager().createHoldersForStats(uuid);
+        this.main.getLandManager().getLandWorthForEntity(uuid, name, false);
     }
 
     /**
@@ -429,9 +360,10 @@ public class EntityStatsManager {
      *
      * @return double value representing entity inventory wealth
      */
-    private double getEntityInvWealth(CommandSender sender, String name) {
+    private void getEntityInvWealth(CommandSender sender, String name) {
         UUID uuid = this.main.getSenderUuid(sender);
-        return this.main.getInventoryManager().getInventoryWorthForEntity(uuid, name, false);
+        this.main.getInventoryManager().createHolderForStats(uuid);
+        this.main.getInventoryManager().getInventoryWorthForStats(uuid, name);
     }
 
     /**

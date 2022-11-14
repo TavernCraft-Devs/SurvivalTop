@@ -50,8 +50,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
      *
      * @return double representing its worth
      */
-    public double getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
-        double wealth = 0;
+    public void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
             OfflinePlayer player = Bukkit.getOfflinePlayer(name);
             List<Claim> claims;
@@ -75,13 +74,11 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
                         World world = Bukkit.getWorld(claim.getClaimedChunks().get(0).getWorld());
                         Location loc1 = new Location(world, x1, 0, z1);
                         Location loc2 = new Location(world, x2, 0, z2);
-                        wealth += getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                        getClaimWorth(uuid, loc1, loc2, world, isLeaderboardUpdate);
                     }
                 }
             }
-            return wealth;
         } catch (NoClassDefFoundError | NullPointerException e) {
-            return wealth;
         }
     }
 
@@ -96,7 +93,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
      *
      * @return double representing claim worth
      */
-    public double getClaimWorth(UUID uuid, Location l1, Location l2, World world,
+    public void getClaimWorth(UUID uuid, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
         double minY = this.main.getMinHeight();
@@ -104,7 +101,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = this.main.getMaxHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        return landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
+        landOperationsHelper.getClaimWorth(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
 

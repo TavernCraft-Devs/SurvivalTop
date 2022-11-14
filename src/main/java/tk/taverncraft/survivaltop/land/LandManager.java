@@ -3,7 +3,10 @@ package tk.taverncraft.survivaltop.land;
 import java.util.UUID;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
@@ -88,6 +91,116 @@ public class LandManager {
     }
 
     /**
+     * Get the worth of a land.
+     *
+     * @param uuid uuid of sender if this is run through stats command; otherwise entities
+     * @param name name of entity to get land worth for
+     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
+     *
+     * @return double representing its worth
+     */
+    public void getLandWorthForEntity(UUID uuid, String name, boolean isLeaderboardUpdate) {
+        landClaimPluginHandler.getLandWorth(uuid, name, isLeaderboardUpdate);
+    }
+
+    /**
+     * Creates holders for leaderboard.
+     *
+     * @param uuid uuid of each entities
+     */
+    public void createHoldersForLeaderboard(UUID uuid) {
+        landOperationsHelper.createHoldersForLeaderboard(uuid);
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     */
+    public void createHoldersForStats(UUID uuid) {
+        landOperationsHelper.createHoldersForStats(uuid);
+    }
+
+    /**
+     * Gets the blocks to show sender in GUI.
+     *
+     * @return hashmap of block name to its worth
+     */
+    public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
+        return landOperationsHelper.getBlocksForGuiStats(uuid);
+    }
+
+    /**
+     * Gets the spawners to show sender in GUI.
+     *
+     * @return hashmap of spawner name to its worth
+     */
+    public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
+        return landOperationsHelper.getSpawnersForGuiStats(uuid);
+    }
+
+    /**
+     * Gets the container items to show sender in GUI.
+     *
+     * @return hashmap of container item name to its worth
+     */
+    public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
+        return landOperationsHelper.getContainersForGuiStats(uuid);
+    }
+
+    /**
+     * Processes spawner types on the main thread.
+     */
+    public void processSpawnerTypesForLeaderboard() {
+        landOperationsHelper.processSpawnerTypesForLeaderboard();
+    }
+
+    /**
+     * Processes spawner types on the main thread.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     */
+    public void processSpawnerTypesForStats(UUID uuid) {
+        landOperationsHelper.processSpawnerTypesForStats(uuid);
+    }
+
+    /**
+     * Processes container items on the main thread.
+     */
+    public void processContainerItemsForLeaderboard() {
+        landOperationsHelper.processContainerItemsForLeaderboard();
+    }
+
+    /**
+     * Processes container items on the main thread.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     */
+    public void processContainerItemsForStats(UUID uuid) {
+        landOperationsHelper.processContainerItemsForStats(uuid);
+    }
+
+    /**
+     * Calculates block worth for all entities.
+     *
+     * @return map of entities uuid to their block worth
+     */
+    public HashMap<UUID, Double> calculateBlockWorthForLeaderboard() {
+        return landOperationsHelper.calculateBlockWorthForLeaderboard();
+    }
+
+    /**
+     * Calculates block worth for a specified entity.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return map of sender uuid to the calculated block worth
+     */
+    public double calculateBlockWorthForStats(UUID uuid) {
+        return landOperationsHelper.calculateBlockWorthForStats(uuid);
+    }
+
+    /**
      * Calculates spawner worth for all entities.
      *
      * @return map of entities uuid to their spawner worth
@@ -162,36 +275,23 @@ public class LandManager {
     }
 
     /**
-     * Get the worth of a land.
-     *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
-     * @param name name of entity to get land worth for
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing its worth
-     */
-    public double getLandWorthForEntity(UUID uuid, String name, boolean isLeaderboardUpdate) {
-        return landClaimPluginHandler.getLandWorth(uuid, name, isLeaderboardUpdate);
-    }
-
-    /**
      * Gets the map of worth for all blocks.
      *
      * @return map of block name to value
      */
-    public LinkedHashMap<String, Double> getBlockWorth() {
+    public LinkedHashMap<Material, Double> getBlockWorth() {
         return this.landOperationsHelper.getBlockWorth();
     }
 
     /**
      * Get the worth of a block.
      *
-     * @param name name of block
+     * @param material material of block
      *
      * @return double representing its worth
      */
-    public double getBlockWorth(String name) {
-        return this.landOperationsHelper.getBlockWorth(name);
+    public double getBlockWorth(Material material) {
+        return this.landOperationsHelper.getBlockWorth(material);
     }
 
     /**
@@ -199,19 +299,19 @@ public class LandManager {
      *
      * @return map of spawner name to value
      */
-    public LinkedHashMap<String, Double> getSpawnerWorth() {
+    public LinkedHashMap<EntityType, Double> getSpawnerWorth() {
         return this.landOperationsHelper.getSpawnerWorth();
     }
 
     /**
      * Get the worth of a spawner.
      *
-     * @param name name of spawner
+     * @param entityType entity type of spawner
      *
      * @return double representing its worth
      */
-    public double getSpawnerWorth(String name) {
-        return this.landOperationsHelper.getSpawnerWorth(name);
+    public double getSpawnerWorth(EntityType entityType) {
+        return this.landOperationsHelper.getSpawnerWorth(entityType);
     }
 
     /**
@@ -219,19 +319,19 @@ public class LandManager {
      *
      * @return map of container item name to value
      */
-    public LinkedHashMap<String, Double> getContainerWorth() {
+    public LinkedHashMap<Material, Double> getContainerWorth() {
         return this.landOperationsHelper.getContainerWorth();
     }
 
     /**
      * Get the worth of a container item.
      *
-     * @param name name of container item
+     * @param material material of container item
      *
      * @return double representing its worth
      */
-    public double getContainerWorth(String name) {
-        return this.landOperationsHelper.getContainerWorth(name);
+    public double getContainerWorth(Material material) {
+        return this.landOperationsHelper.getContainerWorth(material);
     }
 }
 

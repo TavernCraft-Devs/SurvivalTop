@@ -43,11 +43,8 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
-     *
-     * @return double representing its worth
      */
-    public double getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
-        double wealth = 0;
+    public void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
             Set<FLocation> claims;
             if (this.main.groupIsEnabled()) {
@@ -56,12 +53,10 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
                 claims = getClaimsByPlayer(name);
             }
             for (FLocation claim : claims) {
-                wealth += landOperationsHelper.getChunkWorth(uuid, claim.getChunk(),
+                landOperationsHelper.getChunkWorth(uuid, claim.getChunk(),
                         claim.getWorld(), isLeaderboardUpdate);
             }
-            return wealth;
         } catch (NoClassDefFoundError | NullPointerException e) {
-            return wealth;
         }
     }
 

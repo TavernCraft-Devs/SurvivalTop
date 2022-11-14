@@ -27,13 +27,13 @@ public class LandOperationsHelper {
     // list of operations to perform for calculating land wealth
     // leaderboard and stats uses different calculations because of gui setups and
     // different tracking mechanisms (i.e. for stats, inventory needs to be shown to sender)
-    ArrayList<BiFunction<UUID, Block, Double>> landOperationsForLeaderboard = new ArrayList<>();
-    ArrayList<BiFunction<UUID, Block, Double>> landOperationsForStats = new ArrayList<>();
+    ArrayList<BiFunction<UUID, Block, Boolean>> landOperationsForLeaderboard = new ArrayList<>();
+    ArrayList<BiFunction<UUID, Block, Boolean>> landOperationsForStats = new ArrayList<>();
 
     // worth of blocks, spawners and containers
-    private LinkedHashMap<String, Double> blockWorth = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> spawnerWorth = new LinkedHashMap<>();
-    private LinkedHashMap<String, Double> containerWorth = new LinkedHashMap<>();
+    private LinkedHashMap<Material, Double> blockWorth = new LinkedHashMap<>();
+    private LinkedHashMap<EntityType, Double> spawnerWorth = new LinkedHashMap<>();
+    private LinkedHashMap<Material, Double> containerWorth = new LinkedHashMap<>();
 
     /**
      * Constructor for LandOperationsHelper.
@@ -60,7 +60,7 @@ public class LandOperationsHelper {
      * Initializes block, spawner and container operations for land.
      */
     private void initializeLandSubOperations() {
-        blockOperations = new BlockOperations(main, blockWorth);
+        blockOperations = new BlockOperations(blockWorth);
         spawnerOperations = new SpawnerOperations(main, spawnerWorth);
         containerOperations = new ContainerOperations(main, containerWorth);
     }
@@ -101,7 +101,7 @@ public class LandOperationsHelper {
                 if (material == null || !material.isBlock() || !material.isSolid()) {
                     continue;
                 }
-                blockWorth.put(key.toUpperCase(), main.getBlocksConfig().getDouble(key));
+                blockWorth.put(material, main.getBlocksConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
@@ -120,7 +120,7 @@ public class LandOperationsHelper {
                 if (entityType == null) {
                     continue;
                 }
-                spawnerWorth.put(key.toUpperCase(), main.getSpawnersConfig().getDouble(key));
+                spawnerWorth.put(entityType, main.getSpawnersConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
@@ -139,11 +139,33 @@ public class LandOperationsHelper {
                 if (material == null) {
                     continue;
                 }
-                containerWorth.put(key.toUpperCase(), main.getContainersConfig().getDouble(key));
+                containerWorth.put(material, main.getContainersConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Creates holders for leaderboard.
+     *
+     * @param uuid uuid of each entities
+     */
+    public void createHoldersForLeaderboard(UUID uuid) {
+        blockOperations.createHolderForLeaderboard(uuid);
+        spawnerOperations.createHolderForLeaderboard(uuid);
+        containerOperations.createHolderForLeaderboard(uuid);
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param uuid uuid of sender, not to confused with the entity itself!
+     */
+    public void createHoldersForStats(UUID uuid) {
+        blockOperations.createHolderForStats(uuid);
+        spawnerOperations.createHolderForStats(uuid);
+        containerOperations.createHolderForStats(uuid);
     }
 
     /**
@@ -159,29 +181,27 @@ public class LandOperationsHelper {
      * @param world world to search in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public double getClaimWorth(UUID uuid, double maxX, double minX, double maxY, double minY,
+    public void getClaimWorth(UUID uuid, double maxX, double minX, double maxY, double minY,
             double maxZ, double minZ, World world, boolean isLeaderboardUpdate) {
-        ArrayList<BiFunction<UUID, Block, Double>> blockOperations;
+        ArrayList<BiFunction<UUID, Block, Boolean>> blockOperations;
         if (isLeaderboardUpdate) {
             blockOperations = landOperationsForLeaderboard;
         } else {
             blockOperations = landOperationsForStats;
         }
 
-        double blocksWorth = 0;
-
         for (int i = (int) minX; i < maxX; i++) {
             for (int j = (int) minY; j < maxY; j++) {
                 for (int k = (int) minZ; k < maxZ; k++) {
                     Block block = world.getBlockAt(i, j, k);
-                    for (BiFunction<UUID, Block, Double> f : blockOperations) {
-                        double blockWorth = f.apply(uuid, block);
-                        blocksWorth += blockWorth;
+                    for (BiFunction<UUID, Block, Boolean> f : blockOperations) {
+                        if (f.apply(uuid, block)) {
+                            break;
+                        }
                     }
                 }
             }
         }
-        return blocksWorth;
     }
 
     /**
@@ -193,15 +213,13 @@ public class LandOperationsHelper {
      * @param world world to search in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public double getChunkWorth(UUID uuid, Chunk chunk, World world, boolean isLeaderboardUpdate) {
-        ArrayList<BiFunction<UUID, Block, Double>> blockOperations;
+    public void getChunkWorth(UUID uuid, Chunk chunk, World world, boolean isLeaderboardUpdate) {
+        ArrayList<BiFunction<UUID, Block, Boolean>> blockOperations;
         if (isLeaderboardUpdate) {
             blockOperations = landOperationsForLeaderboard;
         } else {
             blockOperations = landOperationsForStats;
         }
-
-        double blocksWorth = 0;
 
         int x = chunk.getX() << 4;
         int z = chunk.getZ() << 4;
@@ -211,14 +229,14 @@ public class LandOperationsHelper {
             for (int j = z; j < z + 16; ++j) {
                 for (int k = minHeight; k < maxHeight; ++k) {
                     Block block = world.getBlockAt(i, k, j);
-                    for (BiFunction<UUID, Block, Double> f : blockOperations) {
-                        double blockWorth = f.apply(uuid, block);
-                        blocksWorth += blockWorth;
+                    for (BiFunction<UUID, Block, Boolean> f : blockOperations) {
+                        if (f.apply(uuid, block)) {
+                            break;
+                        }
                     }
                 }
             }
         }
-        return blocksWorth;
     }
 
     /**
@@ -226,19 +244,19 @@ public class LandOperationsHelper {
      *
      * @return map of block name to value
      */
-    public LinkedHashMap<String, Double> getBlockWorth() {
+    public LinkedHashMap<Material, Double> getBlockWorth() {
         return this.blockWorth;
     }
 
     /**
      * Get the worth of a block.
      *
-     * @param name name of block
+     * @param material material of block
      *
      * @return double representing its worth
      */
-    public double getBlockWorth(String name) {
-        Double value = this.blockWorth.get(name);
+    public double getBlockWorth(Material material) {
+        Double value = this.blockWorth.get(material);
         if (value == null) {
             return 0;
         }
@@ -250,19 +268,19 @@ public class LandOperationsHelper {
      *
      * @return map of spawner name to value
      */
-    public LinkedHashMap<String, Double> getSpawnerWorth() {
+    public LinkedHashMap<EntityType, Double> getSpawnerWorth() {
         return this.spawnerWorth;
     }
 
     /**
      * Get the worth of a spawner.
      *
-     * @param name name of spawner
+     * @param entityType entity type of spawner
      *
      * @return double representing its worth
      */
-    public double getSpawnerWorth(String name) {
-        Double value = this.spawnerWorth.get(name);
+    public double getSpawnerWorth(EntityType entityType) {
+        Double value = this.spawnerWorth.get(entityType);
         if (value == null) {
             return 0;
         }
@@ -274,23 +292,102 @@ public class LandOperationsHelper {
      *
      * @return map of container item name to value
      */
-    public LinkedHashMap<String, Double> getContainerWorth() {
+    public LinkedHashMap<Material, Double> getContainerWorth() {
         return this.containerWorth;
     }
 
     /**
      * Get the worth of a container item.
      *
-     * @param name name of container item
+     * @param material material of container item
      *
      * @return double representing its worth
      */
-    public double getContainerWorth(String name) {
-        Double value = this.containerWorth.get(name);
+    public double getContainerWorth(Material material) {
+        Double value = this.containerWorth.get(material);
         if (value == null) {
             return 0;
         }
         return value;
+    }
+
+    /**
+     * Gets the blocks to show sender in GUI.
+     *
+     * @return hashmap of block name to its worth
+     */
+    public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
+        return blockOperations.getBlockHolderForStats(uuid).getCounter();
+    }
+
+    /**
+     * Gets the spawners to show sender in GUI.
+     *
+     * @return hashmap of spawner name to its worth
+     */
+    public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
+        return spawnerOperations.getSpawnerHolderForStats(uuid).getCounter();
+    }
+
+    /**
+     * Gets the container items to show sender in GUI.
+     *
+     * @return hashmap of container item name to its worth
+     */
+    public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
+        return containerOperations.getContainerHolderForStats(uuid).getCounter();
+    }
+
+    /**
+     * Processes spawner types on the main thread.
+     */
+    public void processSpawnerTypesForLeaderboard() {
+        spawnerOperations.processSpawnerTypesForLeaderboard();
+    }
+
+    /**
+     * Processes spawner types on the main thread.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     */
+    public void processSpawnerTypesForStats(UUID uuid) {
+        spawnerOperations.processSpawnerTypesForStats(uuid);
+    }
+
+    /**
+     * Processes container items on the main thread.
+     */
+    public void processContainerItemsForLeaderboard() {
+        containerOperations.processContainerItemsForLeaderboard();
+    }
+
+    /**
+     * Processes container items on the main thread.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     */
+    public void processContainerItemsForStats(UUID uuid) {
+        containerOperations.processContainerItemsForStats(uuid);
+    }
+
+    /**
+     * Calculates block worth for all entities.
+     *
+     * @return map of entities uuid to their block worth
+     */
+    public HashMap<UUID, Double> calculateBlockWorthForLeaderboard() {
+        return blockOperations.calculateBlockWorthForLeaderboard();
+    }
+
+    /**
+     * Calculates block worth for a specified entity.
+     *
+     * @param uuid uuid of sender, not to be confused with the entity itself!
+     *
+     * @return map of sender uuid to the calculated block worth
+     */
+    public double calculateBlockWorthForStats(UUID uuid) {
+        return blockOperations.calculateBlockWorthForStats(uuid);
     }
 
     /**

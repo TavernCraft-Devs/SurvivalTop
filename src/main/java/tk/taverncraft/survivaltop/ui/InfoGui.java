@@ -1,11 +1,13 @@
 package tk.taverncraft.survivaltop.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import tk.taverncraft.survivaltop.Main;
 
@@ -35,10 +37,15 @@ public class InfoGui extends GuiHelper {
      * @param main plugin class
      */
     public InfoGui(Main main) {
-        InfoGui.blockList = main.getLandManager().getBlockWorth();
-        InfoGui.spawnerList = main.getLandManager().getSpawnerWorth();
-        InfoGui.containerList = main.getLandManager().getContainerWorth();
-        InfoGui.inventoryList = main.getInventoryManager().getInventoryItemWorth();
+        // todo: cleanup this entire mess during the ui update
+        HashMap<Material, Double> blockList = main.getLandManager().getBlockWorth();
+        HashMap<EntityType, Double> spawnerList = main.getLandManager().getSpawnerWorth();
+        HashMap<Material, Double> containerList = main.getLandManager().getContainerWorth();
+        HashMap<Material, Double> inventoryList = main.getInventoryManager().getInventoryItemWorth();
+        InfoGui.blockList = changeMaterialDoubleToString(blockList);
+        InfoGui.spawnerList = changeEntityTypeDoubleToString(spawnerList);
+        InfoGui.containerList = changeMaterialDoubleToString(containerList);
+        InfoGui.inventoryList = changeMaterialDoubleToString(inventoryList);
         initializeAllPages();
     }
 

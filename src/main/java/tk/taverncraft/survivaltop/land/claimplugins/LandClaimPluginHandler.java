@@ -16,5 +16,5 @@ public interface LandClaimPluginHandler {
      *
      * @return double representing its worth
      */
-    double getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate);
+    void getLandWorth(UUID uuid, String name, boolean isLeaderboardUpdate);
 }
