@@ -86,6 +86,24 @@ public class SpawnerOperations {
     }
 
     /**
+     * Cleans up holders and preprocessed spawners after leaderboard update.
+     */
+    public void doCleanUpForLeaderboard() {
+        spawnerHolderMapForLeaderboard = new HashMap<>();
+        preprocessedSpawnersForLeaderboard = new HashMap<>();
+    }
+
+    /**
+     * Cleans up holders and preprocessed spawners after stats update.
+     *
+     * @param uuid uuid of sender
+     */
+    public void doCleanUpForStats(UUID uuid) {
+        spawnerHolderMapForStats.remove(uuid);
+        preprocessedSpawnersForStats.remove(uuid);
+    }
+
+    /**
      * Creates holders for leaderboard.
      *
      * @param uuid uuid of each entity

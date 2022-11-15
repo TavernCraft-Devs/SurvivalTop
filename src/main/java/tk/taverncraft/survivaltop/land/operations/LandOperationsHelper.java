@@ -147,6 +147,26 @@ public class LandOperationsHelper {
     }
 
     /**
+     * Cleans up holders after leaderboard update.
+     */
+    public void doCleanUpForLeaderboard() {
+        blockOperations.doCleanUpForLeaderboard();
+        spawnerOperations.doCleanUpForLeaderboard();
+        containerOperations.doCleanUpForLeaderboard();
+    }
+
+    /**
+     * Cleans up holders after stats update.
+     *
+     * @param uuid uuid of sender
+     */
+    public void doCleanUpForStats(UUID uuid) {
+        blockOperations.doCleanUpForStats(uuid);
+        spawnerOperations.doCleanUpForStats(uuid);
+        containerOperations.doCleanUpForStats(uuid);
+    }
+
+    /**
      * Creates holders for leaderboard.
      *
      * @param uuid uuid of each entities

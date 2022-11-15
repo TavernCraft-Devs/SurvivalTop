@@ -91,6 +91,22 @@ public class LandManager {
     }
 
     /**
+     * Cleans up holders after leaderboard update.
+     */
+    public void doCleanUpForLeaderboard() {
+        landOperationsHelper.doCleanUpForLeaderboard();
+    }
+
+    /**
+     * Cleans up holders after stats update.
+     *
+     * @param uuid uuid of sender
+     */
+    public void doCleanUpForStats(UUID uuid) {
+        landOperationsHelper.doCleanUpForStats(uuid);
+    }
+
+    /**
      * Get the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities

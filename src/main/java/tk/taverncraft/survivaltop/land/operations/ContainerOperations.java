@@ -124,6 +124,24 @@ public class ContainerOperations {
     }
 
     /**
+     * Cleans up holders and preprocessed containers after leaderboard update.
+     */
+    public void doCleanUpForLeaderboard() {
+        containerHolderMapForLeaderboard = new HashMap<>();
+        preprocessedContainersForLeaderboard = new HashMap<>();
+    }
+
+    /**
+     * Cleans up holders and preprocessed containers after stats update.
+     *
+     * @param uuid uuid of sender
+     */
+    public void doCleanUpForStats(UUID uuid) {
+        containerHolderMapForStats.remove(uuid);
+        preprocessedContainersForStats.remove(uuid);
+    }
+
+    /**
      * Creates holders for leaderboard.
      *
      * @param uuid uuid of each entity

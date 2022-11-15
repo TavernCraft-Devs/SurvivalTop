@@ -63,6 +63,22 @@ public class BlockOperations {
     }
 
     /**
+     * Cleans up holders after leaderboard update.
+     */
+    public void doCleanUpForLeaderboard() {
+        blockHolderMapForLeaderboard = new HashMap<>();
+    }
+
+    /**
+     * Cleans up holders after stats update.
+     *
+     * @param uuid uuid of sender
+     */
+    public void doCleanUpForStats(UUID uuid) {
+        blockHolderMapForStats.remove(uuid);
+    }
+
+    /**
      * Creates holders for leaderboard.
      *
      * @param uuid uuid of each entities

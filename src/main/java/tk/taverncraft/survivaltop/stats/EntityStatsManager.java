@@ -296,6 +296,8 @@ public class EntityStatsManager {
      */
     private void doCleanUp(CommandSender sender) {
         UUID uuid = this.main.getSenderUuid(sender);
+        main.getLandManager().doCleanUpForStats(uuid);
+        main.getInventoryManager().doCleanUpForStats(uuid);
         isCalculatingStats.remove(uuid);
         statsInitialTask.remove(uuid);
     }

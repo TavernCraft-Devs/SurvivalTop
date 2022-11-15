@@ -193,6 +193,8 @@ public class ServerStatsManager {
                 }
                 HashMap<UUID, EntityCache> tempSortedCache = sortEntitiesByTotalWealth(uuidToEntityCacheMap);
                 setUpEntityCache(tempSortedCache);
+                main.getLandManager().doCleanUpForLeaderboard();
+                main.getInventoryManager().doCleanUpForLeaderboard();
                 main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
                 main.getStorageManager().saveToStorage(entityCacheList);
             }
