@@ -179,10 +179,18 @@ public class ServerStatsManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                executePostUpdateBlocks(main.getLandManager().calculateBlockWorthForLeaderboard());
-                executePostUpdateSpawners(main.getLandManager().calculateSpawnerWorthForLeaderboard());
-                executePostUpdateContainers(main.getLandManager().calculateContainerWorthForLeaderboard());
-                executePostUpdateInventories(main.getInventoryManager().calculateInventoryWorthForLeaderboard());
+                if (main.landIsIncluded()) {
+                    executePostUpdateBlocks(main.getLandManager().calculateBlockWorthForLeaderboard());
+                }
+                if (main.spawnerIsIncluded()) {
+                    executePostUpdateSpawners(main.getLandManager().calculateSpawnerWorthForLeaderboard());
+                }
+                if (main.containerIsIncluded()) {
+                    executePostUpdateContainers(main.getLandManager().calculateContainerWorthForLeaderboard());
+                }
+                if (main.inventoryIsIncluded()) {
+                    executePostUpdateInventories(main.getInventoryManager().calculateInventoryWorthForLeaderboard());
+                }
                 HashMap<UUID, EntityCache> tempSortedCache = sortEntitiesByTotalWealth(uuidToEntityCacheMap);
                 setUpEntityCache(tempSortedCache);
                 main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);

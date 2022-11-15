@@ -134,43 +134,51 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      */
     private void calculateEntityStats(CommandSender sender, String name) {
+        UUID uuid = main.getSenderUuid(sender);
         double balWealth = 0;
+        double blockValue = 0;
+        double inventoryValue = 0;
         if (main.landIsIncluded()) {
             // land calculations are done async and will be retrieved later
             processEntityLandWealth(sender, name);
+            blockValue = main.getLandManager().calculateBlockWorthForStats(uuid);
         }
         if (main.balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
         if (main.inventoryIsIncluded()) {
             processEntityInvWealth(sender, name);
+            inventoryValue = main.getInventoryManager().calculateInventoryWorthForStats(uuid);
         }
-        executePostCalculationActions(sender, name, balWealth);
+        executePostCalculationActions(sender, uuid, name, balWealth, blockValue, inventoryValue);
     }
 
     /**
      * Handles post calculation actions after land has been processed (if applicable).
      *
      * @param sender sender who requested for stats
+     * @param uuid uuid of sender
      * @param name name of entity whose stats are being retrieved
      * @param balWealth bal wealth of the entity
      */
-    private void executePostCalculationActions(CommandSender sender, String name, double balWealth) {
-        UUID uuid = main.getSenderUuid(sender);
-        double blockValue = main.getLandManager().calculateBlockWorthForStats(uuid);
-        double inventoryValue = main.getInventoryManager().calculateInventoryWorthForStats(uuid);
+    private void executePostCalculationActions(CommandSender sender, UUID uuid, String name,
+            double balWealth, double blockWealth, double inventoryWealth) {
         new BukkitRunnable() {
             @Override
             public void run() {
-                main.getLandManager().processSpawnerTypesForStats(uuid);
-                main.getLandManager().processContainerItemsForStats(uuid);
+                if (main.spawnerIsIncluded()) {
+                    main.getLandManager().processSpawnerTypesForStats(uuid);
+                }
+                if (main.containerIsIncluded()) {
+                    main.getLandManager().processContainerItemsForStats(uuid);
+                }
                 double spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
                 double containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
 
                 // handle gui or non-gui results
                 if (main.isUseGuiStats() && sender instanceof Player) {
-                    processStatsGui(sender, name, balWealth, blockValue, spawnerValue,
-                        containerValue, inventoryValue);
+                    processStatsGui(sender, name, balWealth, blockWealth, spawnerValue,
+                        containerValue, inventoryWealth);
                     return;
                 }
 
@@ -179,8 +187,8 @@ public class EntityStatsManager {
                     return;
                 }
 
-                showEntityStatsToUser(sender, name, balWealth, blockValue, spawnerValue,
-                        containerValue, inventoryValue);
+                showEntityStatsToUser(sender, name, balWealth, blockWealth, spawnerValue,
+                        containerValue, inventoryWealth);
             }
         }.runTask(main);
     }
