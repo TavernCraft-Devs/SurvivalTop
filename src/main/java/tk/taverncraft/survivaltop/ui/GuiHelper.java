@@ -1,16 +1,12 @@
 package tk.taverncraft.survivaltop.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -82,7 +78,7 @@ abstract class GuiHelper {
         if (isEnchanted) {
             try {
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
         }
@@ -110,31 +106,5 @@ abstract class GuiHelper {
         meta.setLore(parsedLore);
         item.setItemMeta(meta);
         return item;
-    }
-
-    /**
-     * Temp helper function to convert material map to string map.
-     *
-     * @param hMap map to convert
-     */
-    protected LinkedHashMap<String, Double> changeMaterialDoubleToString(HashMap<Material, Double> hMap) {
-        LinkedHashMap<String, Double> newMap = new LinkedHashMap<>();
-        for (Map.Entry<Material, Double> map : hMap.entrySet()) {
-            newMap.put(map.getKey().name(), map.getValue());
-        }
-        return newMap;
-    }
-
-    /**
-     * Temp helper function to convert entity type map to string map.
-     *
-     * @param hMap map to convert
-     */
-    protected LinkedHashMap<String, Double> changeEntityTypeDoubleToString(HashMap<EntityType, Double> hMap) {
-        LinkedHashMap<String, Double> newMap = new LinkedHashMap<>();
-        for (Map.Entry<EntityType, Double> map : hMap.entrySet()) {
-            newMap.put(map.getKey().getName().toUpperCase(), map.getValue());
-        }
-        return newMap;
     }
 }

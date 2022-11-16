@@ -24,7 +24,7 @@ public class McmmoPartyGroup implements GroupHandler {
     public McmmoPartyGroup() {}
 
     /**
-     * Checks if a group is exist.
+     * Checks if a group exists.
      *
      * @param name name of group to check for
      *

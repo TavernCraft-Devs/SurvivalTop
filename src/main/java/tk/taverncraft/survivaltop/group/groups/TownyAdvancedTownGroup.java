@@ -15,7 +15,7 @@ import com.palmergames.bukkit.towny.object.Town;
  * Handles the group logic for Towny Advanced (Towns).
  */
 public class TownyAdvancedTownGroup implements GroupHandler {
-    private TownyAPI api;
+    private final TownyAPI api;
 
     /**
      * Constructor for TownyAdvancedTownGroup.
@@ -25,7 +25,7 @@ public class TownyAdvancedTownGroup implements GroupHandler {
     }
 
     /**
-     * Checks if a group is exist.
+     * Checks if a group exists.
      *
      * @param name name of group to check for
      *

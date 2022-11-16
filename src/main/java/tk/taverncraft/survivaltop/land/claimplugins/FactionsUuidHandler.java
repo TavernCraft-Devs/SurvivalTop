@@ -21,8 +21,8 @@ import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
  * Handles land wealth calculated using FactionsUuid plugin.
  */
 public class FactionsUuidHandler implements LandClaimPluginHandler {
-    private Main main;
-    private LandOperationsHelper landOperationsHelper;
+    private final Main main;
+    private final LandOperationsHelper landOperationsHelper;
 
     /**
      * Constructor for FactionsUuidHandler.
@@ -36,7 +36,7 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
     }
 
     /**
-     * Get the worth of a land.
+     * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
@@ -54,7 +54,7 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
                 landOperationsHelper.processEntityChunk(uuid, claim.getChunk(), claim.getWorld(),
                         isLeaderboardUpdate);
             }
-        } catch (NoClassDefFoundError | NullPointerException e) {
+        } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
     }
 

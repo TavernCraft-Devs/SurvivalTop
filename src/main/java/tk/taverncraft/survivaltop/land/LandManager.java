@@ -13,15 +13,11 @@ import tk.taverncraft.survivaltop.utils.MutableInt;
  * LandManager is responsible for all land value calculations.
  */
 public class LandManager {
-    private Main main;
+    private final Main main;
 
     // helper classes
     private LandOperationsHelper landOperationsHelper;
     private LandClaimPluginHandler landClaimPluginHandler;
-
-    // boolean to determine what is included in land wealth
-    private boolean includeSpawners;
-    private boolean includeContainers;
 
     /**
      * Constructor for LandManager.
@@ -30,7 +26,6 @@ public class LandManager {
      */
     public LandManager(Main main) throws NullPointerException {
         this.main = main;
-        initializeCalculationType();
         initializeLandOperations();
         initializeLandType();
     }
@@ -74,14 +69,6 @@ public class LandManager {
     }
 
     /**
-     * Initializes land type to calculate depending on config.
-     */
-    public void initializeCalculationType() {
-        includeSpawners = main.getConfig().getBoolean("include-spawners", false);
-        includeContainers = main.getConfig().getBoolean("include-containers", false);
-    }
-
-    /**
      * Initializes land operations helper.
      */
     public void initializeLandOperations() {
@@ -105,7 +92,7 @@ public class LandManager {
     }
 
     /**
-     * Get the worth of a land.
+     * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
@@ -253,24 +240,6 @@ public class LandManager {
     }
 
     /**
-     * Checks if spawner is included.
-     *
-     * @return true if included, false otherwise
-     */
-    public boolean getIncludeSpawners() {
-        return this.includeSpawners;
-    }
-
-    /**
-     * Checks if container is included.
-     *
-     * @return true if included, false otherwise
-     */
-    public boolean getIncludeContainers() {
-        return this.includeContainers;
-    }
-
-    /**
      * Gets the map of worth for all blocks.
      *
      * @return map of block material to value
@@ -280,7 +249,7 @@ public class LandManager {
     }
 
     /**
-     * Get the worth of a block.
+     * Gets the worth of a block.
      *
      * @param material material of block
      *
@@ -300,7 +269,7 @@ public class LandManager {
     }
 
     /**
-     * Get the worth of a spawner.
+     * Gets the worth of a spawner.
      *
      * @param entityType entity type of spawner
      *
@@ -320,7 +289,7 @@ public class LandManager {
     }
 
     /**
-     * Get the worth of a container item.
+     * Gets the worth of a container item.
      *
      * @param material material of container item
      *

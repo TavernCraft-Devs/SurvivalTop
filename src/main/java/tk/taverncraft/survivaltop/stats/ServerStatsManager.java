@@ -25,7 +25,7 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
  * ServerStatsManager handles all logic for updating of server-wide stats.
  */
 public class ServerStatsManager {
-    private Main main;
+    private final Main main;
 
     // cache values used for leaderboard/papi
     private ConcurrentHashMap<UUID, Integer> entityPositionCache;
@@ -37,7 +37,7 @@ public class ServerStatsManager {
     private HashMap<String, UUID> groupNameToUuidMap;
 
     // leaderboard gui, for upcoming update
-    private HashMap<UUID, LeaderboardGui> leaderboardGui = new HashMap<>();
+    private final HashMap<UUID, LeaderboardGui> leaderboardGui = new HashMap<>();
 
     /**
      * Constructor for ServerStatsManager.
@@ -108,9 +108,8 @@ public class ServerStatsManager {
 
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
         if (!filterLastJoin || lastJoinTime <= 0) {
-            Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-                calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName());
-            });
+            Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer ->
+                calculateAndCacheEntities(offlinePlayer.getUniqueId(), offlinePlayer.getName()));
             return;
         }
 
@@ -163,7 +162,7 @@ public class ServerStatsManager {
         }
         if (main.inventoryIsIncluded()) {
             main.getInventoryManager().createHolderForLeaderboard(uuid);
-            main.getInventoryManager().getInventoryWorthForLeaderboard(uuid, name);
+            main.getInventoryManager().processInvWorthForLeaderboard(uuid, name);
         }
         EntityCache eCache = new EntityCache(uuid, entityBalWorth);
         uuidToEntityCacheMap.put(uuid, eCache);

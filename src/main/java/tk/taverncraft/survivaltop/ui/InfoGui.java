@@ -1,13 +1,11 @@
 package tk.taverncraft.survivaltop.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;

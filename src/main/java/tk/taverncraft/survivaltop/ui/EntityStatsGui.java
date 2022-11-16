@@ -16,8 +16,8 @@ import tk.taverncraft.survivaltop.stats.cache.EntityCache;
  * EntityStatsGui handles all logic related to showing entity stats in a GUI.
  */
 public class EntityStatsGui extends GuiHelper {
-    private Main main;
-    private double[] values;
+    private final Main main;
+    private final double[] values;
 
     // list of inventories
     private Inventory mainPage;
@@ -126,7 +126,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
                     false, "Disabled"));
         }
-        if (main.getLandManager().getIncludeSpawners() && main.landIsIncluded()) {
+        if (main.spawnerIsIncluded() && main.landIsIncluded()) {
             inv.setItem(14, createGuiItem(Material.SPAWNER, "Spawners Wealth",
                     true, "Spawner " +
                 "Wealth: " + spawnerValue, "Click to learn more."));
@@ -134,7 +134,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(14, createGuiItem(Material.SPAWNER, "Spawners Wealth",
                     false, "Disabled"));
         }
-        if (main.getLandManager().getIncludeContainers() && main.landIsIncluded()) {
+        if (main.containerIsIncluded() && main.landIsIncluded()) {
             inv.setItem(15, createGuiItem(Material.CHEST, "Container Wealth",
                     true, "Container Wealth: " + containerValue,
                     "Click to learn more."));
@@ -245,26 +245,31 @@ public class EntityStatsGui extends GuiHelper {
             String name = map.getKey();
             int quantity = map.getValue().get();
             double value;
-            if (viewType.equals("Block Stats")) {
+            switch (viewType) {
+            case "Block Stats":
                 value = main.getLandManager().getBlockWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
                     false, "Quantity: " + quantity,
                     "Item Worth: " + value, "Total Value: " + value * quantity));
-            } else if (viewType.equals("Spawner Stats")) {
+                break;
+            case "Spawner Stats":
                 value = main.getLandManager().getSpawnerWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.SPAWNER, name,
                     false, "Quantity: " + quantity,
                     "Item Worth: " + value, "Total Value: " + value * quantity));
-            } else if (viewType.equals("Container Stats")) {
+                break;
+            case "Container Stats":
                 value = main.getLandManager().getContainerWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
                     false, "Quantity: " + quantity,
                     "Item Worth: " + value, "Total Value: " + value * quantity));
-            } else {
+                break;
+            default:
                 value = main.getInventoryManager().getInventoryItemWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
                     false, "Quantity: " + quantity,
                     "Item Worth: " + value, "Total Value: " + value * quantity));
+                break;
             }
 
             slot++;

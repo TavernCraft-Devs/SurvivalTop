@@ -19,7 +19,7 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
 public class SignBreakEvent implements Listener {
 
     private final String signRemovePerm = "survtop.sign.remove";
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for SignBreakEvent.

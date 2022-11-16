@@ -11,10 +11,10 @@ import tk.taverncraft.survivaltop.Main;
  * DependencyManager handles the checking for dependencies.
  */
 public class DependencyManager {
-    private Main main;
+    private final Main main;
 
     // a map of configuration text to the plugin it uses
-    private HashMap<String, String> pluginMap = new HashMap<String, String>() {{
+    private final HashMap<String, String> pluginMap = new HashMap<>() {{
         put("factionsuuid", "Factions");
         put("griefprevention", "GriefPrevention");
         put("residence", "Residence");
@@ -98,12 +98,6 @@ public class DependencyManager {
         boolean enabled;
         if (main.balIsIncluded()) {
             String depPlugin = "Vault";
-            if (depPlugin == null) {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to find Vault plugin even " +
-                    "though balance is included!");
-                main.disableBal();
-                return false;
-            }
             enabled = isDependencyEnabled(depPlugin);
 
             if (enabled) {

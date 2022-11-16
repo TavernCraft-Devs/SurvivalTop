@@ -12,7 +12,7 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class TopCommand {
 
     private final String topPerm = "survtop.top";
-    private ValidationManager validationManager;
+    private final ValidationManager validationManager;
 
     /**
      * Constructor for TopCommand.

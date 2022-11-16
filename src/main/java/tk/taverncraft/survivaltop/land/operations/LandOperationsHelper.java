@@ -20,7 +20,7 @@ import tk.taverncraft.survivaltop.utils.MutableInt;
  * Helper function for loading the logic of calculations.
  */
 public class LandOperationsHelper {
-    private Main main;
+    private final Main main;
     private BlockOperations blockOperations;
     private SpawnerOperations spawnerOperations;
     private ContainerOperations containerOperations;

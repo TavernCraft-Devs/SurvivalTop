@@ -13,8 +13,8 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class ReloadCommand {
 
     private final String reloadPerm = "survtop.reload";
-    private Main main;
-    private ValidationManager validationManager;
+    private final Main main;
+    private final ValidationManager validationManager;
 
     /**
      * Constructor for ReloadCommand.
@@ -60,7 +60,6 @@ public class ReloadCommand {
             // reinitialize manager values
             main.getStorageManager().initializeValues();
             main.getServerStatsManager().initializeValues();
-            main.getLandManager().initializeCalculationType();
             main.getLandManager().initializeLandOperations();
             main.getLandManager().initializeLandType();
             main.getInventoryManager().initializeWorth();

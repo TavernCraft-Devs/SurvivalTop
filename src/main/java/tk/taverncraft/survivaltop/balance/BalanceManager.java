@@ -11,7 +11,7 @@ import tk.taverncraft.survivaltop.Main;
  * BalanceManager handles logic for retrieving entity balances.
  */
 public class BalanceManager {
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for BalanceManager.

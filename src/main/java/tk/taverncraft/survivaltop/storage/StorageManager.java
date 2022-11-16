@@ -9,7 +9,7 @@ import tk.taverncraft.survivaltop.stats.cache.EntityCache;
  * StorageManager decides the storage helper to use.
  */
 public class StorageManager {
-    private Main main;
+    private final Main main;
     private StorageHelper storageHelper;
 
     /**

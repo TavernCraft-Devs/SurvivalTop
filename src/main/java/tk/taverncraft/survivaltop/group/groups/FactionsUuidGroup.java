@@ -18,7 +18,7 @@ import com.massivecraft.factions.Factions;
  */
 public class FactionsUuidGroup implements GroupHandler {
     private final int FILTER_SIZE = 3;
-    private List<String> filteredGroups = new ArrayList<>() {
+    private final List<String> filteredGroups = new ArrayList<>() {
         {
             add("§2wilderness");
             add("§6safezone");
@@ -32,7 +32,7 @@ public class FactionsUuidGroup implements GroupHandler {
     public FactionsUuidGroup() {}
 
     /**
-     * Checks if a group is exist.
+     * Checks if a group exists.
      *
      * @param name name of group to check for
      *

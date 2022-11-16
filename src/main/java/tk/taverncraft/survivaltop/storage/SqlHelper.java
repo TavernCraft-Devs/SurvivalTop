@@ -19,7 +19,7 @@ import tk.taverncraft.survivaltop.stats.cache.EntityCache;
  * SqlHelper is responsible for reading/writing from MySQL database.
  */
 public class SqlHelper implements StorageHelper {
-    private Main main;
+    private final Main main;
     private String dbName;
     private String tableName;
     private String port;

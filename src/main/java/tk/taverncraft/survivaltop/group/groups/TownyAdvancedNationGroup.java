@@ -19,7 +19,7 @@ import com.palmergames.bukkit.towny.object.Town;
  * Handles the group logic for Towny Advanced (Nations).
  */
 public class TownyAdvancedNationGroup implements GroupHandler {
-    private TownyAPI api;
+    private final TownyAPI api;
 
     /**
      * Constructor for TownyAdvancedNationGroup.
@@ -29,7 +29,7 @@ public class TownyAdvancedNationGroup implements GroupHandler {
     }
 
     /**
-     * Checks if a group is exist.
+     * Checks if a group exists.
      *
      * @param name name of group to check for
      *
@@ -72,8 +72,7 @@ public class TownyAdvancedNationGroup implements GroupHandler {
         for (Town town : towns) {
             try {
                 nationNames.add(town.getNation().getName());
-            } catch (NotRegisteredException e) {
-                continue;
+            } catch (NotRegisteredException ignored) {
             }
         }
 

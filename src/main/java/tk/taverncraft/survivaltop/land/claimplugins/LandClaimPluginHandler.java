@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface LandClaimPluginHandler {
 
     /**
-     * Get the worth of a land.
+     * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for

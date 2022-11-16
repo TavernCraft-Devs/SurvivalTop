@@ -9,7 +9,7 @@ import tk.taverncraft.survivaltop.utils.MutableInt;
  * Holder for tracking count of inventory items.
  */
 public class InventoryHolder {
-    private HashMap<String, MutableInt> counter;
+    private final HashMap<String, MutableInt> counter;
 
     /**
      * Constructor for InventoryHolder.

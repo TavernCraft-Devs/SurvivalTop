@@ -10,7 +10,7 @@ import tk.taverncraft.survivaltop.Main;
  * CommandParser contains the onCommand method that handles user command input.
  */
 public class CommandParser implements CommandExecutor {
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for CommandParser.

@@ -16,7 +16,7 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class ItemInfoCommand {
 
     private final String itemInfoPerm = "survtop.iteminfo";
-    private ValidationManager validationManager;
+    private final ValidationManager validationManager;
 
     /**
      * Constructor for ItemInfoCommand.

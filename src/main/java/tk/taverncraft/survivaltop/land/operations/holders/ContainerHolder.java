@@ -9,7 +9,7 @@ import java.util.Set;
  * Holder for tracking count of container items.
  */
 public class ContainerHolder {
-    private HashMap<String, MutableInt> counter;
+    private final HashMap<String, MutableInt> counter;
 
     /**
      * Constructor for ContainerHolder.

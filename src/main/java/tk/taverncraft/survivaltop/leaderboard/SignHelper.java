@@ -23,7 +23,7 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
  * SignHelper handles all the operations required to update/remove a leaderboard sign.
  */
 public class SignHelper {
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for SignHelper.

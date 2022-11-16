@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -22,13 +23,14 @@ import tk.taverncraft.survivaltop.utils.MutableInt;
  * Handles logic for calculating the worth of entity inventory.
  */
 public class InventoryManager {
-    private Main main;
+    private final Main main;
     private LinkedHashMap<String, Double> inventoryWorth;
     private Set<String> inventoryMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, InventoryHolder> inventoryHolderMapForLeaderboard = new HashMap<>();
-    private HashMap<UUID, InventoryHolder> inventoryHolderMapForStats = new HashMap<>();
+    private final ConcurrentHashMap<UUID, InventoryHolder> inventoryHolderMapForStats =
+            new ConcurrentHashMap<>();
 
     /**
      * Constructor for InventoryManager.
@@ -122,14 +124,12 @@ public class InventoryManager {
     }
 
     /**
-     * Gets total worth of inventories for given entity.
+     * Processes the worth of inventories for given entity.
      *
      * @param uuid uuid of each entity
      * @param name name of entity to get inventory worth for
-     *
-     * @return double representing its worth
      */
-    public void getInventoryWorthForLeaderboard(UUID uuid, String name) {
+    public void processInvWorthForLeaderboard(UUID uuid, String name) {
         if (this.main.groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             for (OfflinePlayer player : players) {
@@ -141,14 +141,12 @@ public class InventoryManager {
     }
 
     /**
-     * Gets total worth of inventories for given entity.
+     * Processes the worth of inventories for given entity.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      * @param name name of entity to get inventory worth for
-     *
-     * @return double representing its worth
      */
-    public void getInventoryWorthForStats(UUID uuid, String name) {
+    public void processInvWorthForStats(UUID uuid, String name) {
         if (this.main.groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             for (OfflinePlayer player : players) {
@@ -160,12 +158,10 @@ public class InventoryManager {
     }
 
     /**
-     * Get the inventory worth for given player name.
+     * Processes the inventory worth for given player name.
      *
      * @param uuid uuid of each entity
      * @param name name of player to get inventory worth for
-     *
-     * @return double representing total worth
      */
     private void processPlayerForLeaderboard(UUID uuid, String name) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
@@ -177,12 +173,10 @@ public class InventoryManager {
     }
 
     /**
-     * Get the inventory worth for given player name.
+     * Processes the inventory worth for given player name.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      * @param name name of player to get inventory worth for
-     *
-     * @return double representing total worth
      */
     private void processPlayerForStats(UUID uuid, String name) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
@@ -194,7 +188,7 @@ public class InventoryManager {
     }
 
     /**
-     * Process the worth of inventory items.
+     * Processes the worth of inventory items.
      *
      * @param uuid uuid of each entity
      * @param inventory inventory to process
@@ -204,16 +198,16 @@ public class InventoryManager {
             if (itemStack == null) {
                 continue;
             }
-            Material material = itemStack.getType();
-            if (inventoryWorth.containsKey(material)) {
-                inventoryHolderMapForLeaderboard.get(uuid).addToHolder(material.name(),
+            String material = itemStack.getType().name();
+            if (inventoryMaterial.contains(material)) {
+                inventoryHolderMapForLeaderboard.get(uuid).addToHolder(material,
                     itemStack.getAmount());
             }
         }
     }
 
     /**
-     * Process the worth of inventory items.
+     * Processes the worth of inventory items.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      * @param inventory inventory to process
@@ -223,10 +217,9 @@ public class InventoryManager {
             if (itemStack == null) {
                 continue;
             }
-            Material material = itemStack.getType();
-            if (inventoryWorth.containsKey(material)) {
-                inventoryHolderMapForStats.get(uuid).addToHolder(material.name(),
-                        itemStack.getAmount());
+            String material = itemStack.getType().name();
+            if (inventoryMaterial.contains(material)) {
+                inventoryHolderMapForStats.get(uuid).addToHolder(material, itemStack.getAmount());
             }
         }
     }

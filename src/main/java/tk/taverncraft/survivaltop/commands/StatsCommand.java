@@ -16,8 +16,8 @@ public class StatsCommand {
 
     private final String statsSelfPerm = "survtop.stats.self";
     private final String statsOthersPerm = "survtop.stats.others";
-    private Main main;
-    private ValidationManager validationManager;
+    private final Main main;
+    private final ValidationManager validationManager;
 
     /**
      * Constructor for StatsCommand.

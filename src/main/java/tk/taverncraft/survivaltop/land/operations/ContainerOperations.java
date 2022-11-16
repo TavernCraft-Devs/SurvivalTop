@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import org.bukkit.Material;
@@ -27,17 +28,19 @@ import tk.taverncraft.survivaltop.utils.MutableInt;
  * Handles the logic for performing container operations when scanning locations.
  */
 public class ContainerOperations {
-    private Main main;
-    private LinkedHashMap<String, Double> containerWorth;
-    private Set<String> containerMaterial;
+    private final Main main;
+    private final LinkedHashMap<String, Double> containerWorth;
+    private final Set<String> containerMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, ContainerHolder> containerHolderMapForLeaderboard = new HashMap<>();
-    private HashMap<UUID, ContainerHolder> containerHolderMapForStats = new HashMap<>();
+    private final ConcurrentHashMap<UUID, ContainerHolder> containerHolderMapForStats =
+            new ConcurrentHashMap<>();
 
     // populated from main thread and processed on async thread later
     private HashMap<UUID, ArrayList<Block>> preprocessedContainersForLeaderboard = new HashMap<>();
-    private HashMap<UUID, ArrayList<Block>> preprocessedContainersForStats = new HashMap<>();
+    private final ConcurrentHashMap<UUID, ArrayList<Block>> preprocessedContainersForStats =
+            new ConcurrentHashMap<>();
 
     // todo: is there a better way?
     private final Set<Material> allowedTypes = EnumSet.of(
@@ -88,9 +91,9 @@ public class ContainerOperations {
     private void setUpContainerType() {
         List<String> chosenContainers = main.getConfig().getStringList("container-type");
         for (String container : chosenContainers) {
-            String material = Material.valueOf(container).name();
+            Material material = Material.valueOf(container);
             if (allowedTypes.contains(material)) {
-                containerTypes.add(material);
+                containerTypes.add(material.name());
             }
         }
     }
@@ -192,7 +195,7 @@ public class ContainerOperations {
     }
 
     /**
-     * Process the worth of container items.
+     * Gets the total worth of container items.
      *
      * @param containerHolder holder containing container item count
      *
@@ -209,7 +212,7 @@ public class ContainerOperations {
     }
 
     /**
-     * Process the worth of container items.
+     * Processes the worth of container items.
      */
     public void processContainerItemsForLeaderboard() {
         for (Map.Entry<UUID, ArrayList<Block>> map : preprocessedContainersForLeaderboard.entrySet()) {
@@ -232,7 +235,7 @@ public class ContainerOperations {
     }
 
     /**
-     * Process the worth of container items.
+     * Processes the worth of container items.
      *
      * @param uuid uuid of sender, not to be confused with the entity itself!
      */
@@ -274,13 +277,13 @@ public class ContainerOperations {
     }
 
     /**
-     * Preprocess containers to be handled on main thread later for when the leaderboard command is
+     * Preprocesses containers to be handled on main thread later for when the leaderboard command is
      * being updated. Uuid here belongs to the sender and comes with the block that is being
      * checked. This always returns 0 since if a block is not a container (ignored) and if it is
      * a container, then it is set to be processed later anyways
      */
-    private BiFunction<UUID, Block, Boolean> preprocessContainerForLeaderboard = (uuid, block) -> {
-        if (containerTypes.contains(block.getType())) {
+    private final BiFunction<UUID, Block, Boolean> preprocessContainerForLeaderboard = (uuid, block) -> {
+        if (containerTypes.contains(block.getType().name())) {
             preprocessedContainersForLeaderboard.get(uuid).add(block);
             return true;
         }
@@ -289,13 +292,13 @@ public class ContainerOperations {
 
 
     /**
-     * Preprocess containers to be handled on main thread later for when the stats command is
+     * Preprocesses containers to be handled on main thread later for when the stats command is
      * executed. Uuid here belongs to the sender and comes with the block that is being checked.
      * This always returns 0 since if a block is not a container (ignored) and if it is
      * a container, then it is set to be processed later anyways
      */
-    private BiFunction<UUID, Block, Boolean> preprocessContainerForStats = (uuid, block) -> {
-        if (containerTypes.contains(block.getType())) {
+    private final BiFunction<UUID, Block, Boolean> preprocessContainerForStats = (uuid, block) -> {
+        if (containerTypes.contains(block.getType().name())) {
             preprocessedContainersForStats.get(uuid).add(block);
             return true;
         }

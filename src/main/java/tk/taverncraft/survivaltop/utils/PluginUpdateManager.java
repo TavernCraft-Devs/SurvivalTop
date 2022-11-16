@@ -14,8 +14,8 @@ import org.bukkit.util.Consumer;
  */
 public class PluginUpdateManager {
 
-    private JavaPlugin plugin;
-    private int resourceId;
+    private final JavaPlugin plugin;
+    private final int resourceId;
 
     /**
      * Constructor for PluginUpdateManager.

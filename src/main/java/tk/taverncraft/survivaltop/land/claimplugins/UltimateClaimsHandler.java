@@ -22,9 +22,9 @@ import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
  * Handles land wealth calculated using UltimateClaims plugin.
  */
 public class UltimateClaimsHandler implements LandClaimPluginHandler  {
-    private Main main;
-    private LandOperationsHelper landOperationsHelper;
-    private UltimateClaims ultimateClaims;
+    private final Main main;
+    private final LandOperationsHelper landOperationsHelper;
+    private final UltimateClaims ultimateClaims;
 
     /**
      * Constructor for UltimateClaimsHandler.
@@ -41,7 +41,7 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
     }
 
     /**
-     * Get the worth of a land.
+     * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
@@ -75,12 +75,12 @@ public class UltimateClaimsHandler implements LandClaimPluginHandler  {
                     }
                 }
             }
-        } catch (NoClassDefFoundError | NullPointerException e) {
+        } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
     }
 
     /**
-     * Gets the worth of a claim identified between 2 locations.
+     * Processes the worth of a claim identified between 2 locations.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param l1 location 1

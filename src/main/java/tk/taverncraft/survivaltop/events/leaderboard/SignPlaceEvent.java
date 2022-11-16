@@ -18,7 +18,7 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
 public class SignPlaceEvent implements Listener {
 
     private final String signAddPerm = "survtop.sign.add";
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for SignPlaceEvent.

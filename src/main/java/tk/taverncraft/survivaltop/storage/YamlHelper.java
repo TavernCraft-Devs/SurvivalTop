@@ -18,7 +18,7 @@ import tk.taverncraft.survivaltop.stats.cache.EntityCache;
  * YamlHelper is responsible for reading/writing from yml files.
  */
 public class YamlHelper implements StorageHelper {
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for YamlHelper.

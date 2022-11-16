@@ -16,7 +16,7 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
  * LeaderboardManager contains the main logic related to updating the leaderboard.
  */
 public class LeaderboardManager {
-    private Main main;
+    private final Main main;
     private boolean isUpdating;
     private BukkitTask leaderboardTask;
 

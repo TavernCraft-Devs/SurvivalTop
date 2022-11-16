@@ -8,7 +8,7 @@ import tk.taverncraft.survivaltop.Main;
  * ValidationManager performs basic validation operations.
  */
 public class ValidationManager {
-    private Main main;
+    private final Main main;
 
     /**
      * Constructor for ValidationManager.

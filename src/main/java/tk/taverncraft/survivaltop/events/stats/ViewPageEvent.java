@@ -15,7 +15,7 @@ import tk.taverncraft.survivaltop.ui.InfoGui;
  * ViewPageEvent checks for when a player clicks on GUI menu.
  */
 public class ViewPageEvent implements Listener {
-    private Main main;
+    private final Main main;
 
     // used to identify inventory gui, consider a better alternative?
     private final String identifier = "§s§u§r§v§t§o§p";

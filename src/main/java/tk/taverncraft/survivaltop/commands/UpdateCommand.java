@@ -13,8 +13,8 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class UpdateCommand {
 
     private final String updatePerm = "survtop.update";
-    private Main main;
-    private ValidationManager validationManager;
+    private final Main main;
+    private final ValidationManager validationManager;
 
     /**
      * Constructor for UpdateCommand.

@@ -20,8 +20,8 @@ import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
  * Handles land wealth calculated using Residence plugin.
  */
 public class ResidenceHandler implements LandClaimPluginHandler  {
-    private Main main;
-    private LandOperationsHelper landOperationsHelper;
+    private final Main main;
+    private final LandOperationsHelper landOperationsHelper;
 
     /**
      * Constructor for ResidenceHandler.
@@ -35,7 +35,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
     }
 
     /**
-     * Get the worth of a land.
+     * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
@@ -58,12 +58,12 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
                     processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
                 }
             }
-        } catch (NoClassDefFoundError | NullPointerException e) {
+        } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
     }
 
     /**
-     * Gets the worth of a claim identified between 2 locations.
+     * Processes the worth of a claim identified between 2 locations.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param l1 location 1

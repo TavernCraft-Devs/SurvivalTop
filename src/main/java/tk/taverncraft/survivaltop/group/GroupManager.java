@@ -18,7 +18,7 @@ import tk.taverncraft.survivaltop.group.groups.TownyAdvancedTownGroup;
  * GroupManager is responsible for all group operations.
  */
 public class GroupManager {
-    private Main main;
+    private final Main main;
 
     // helper classes
     private GroupHandler groupHandler;

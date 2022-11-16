@@ -9,7 +9,7 @@ import java.util.Set;
  * Holder for tracking count of spawners.
  */
 public class SpawnerHolder {
-    private HashMap<String, MutableInt> counter;
+    private final HashMap<String, MutableInt> counter;
 
     /**
      * Constructor for SpawnerHolder.

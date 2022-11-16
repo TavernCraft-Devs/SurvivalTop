@@ -26,7 +26,7 @@ import tk.taverncraft.survivaltop.utils.MessageManager;
  * store any information. Information storage belongs to the overall ServerStatsManager.
  */
 public class EntityStatsManager {
-    private Main main;
+    private final Main main;
 
     // prevent stats command spam by tracking stats tasks
     public final HashMap<UUID, Boolean> isCalculatingStats = new HashMap<>();
@@ -34,7 +34,7 @@ public class EntityStatsManager {
     public final HashMap<UUID, BukkitTask> statsUiTask = new HashMap<>();
 
     // map of sender uuid to the gui to show sender
-    private HashMap<UUID, EntityStatsGui> senderGui = new HashMap<>();
+    private final HashMap<UUID, EntityStatsGui> senderGui = new HashMap<>();
 
     /**
      * Constructor for EntityStatsManager.
@@ -358,7 +358,7 @@ public class EntityStatsManager {
     private void processEntityInvWealth(CommandSender sender, String name) {
         UUID uuid = this.main.getSenderUuid(sender);
         this.main.getInventoryManager().createHolderForStats(uuid);
-        this.main.getInventoryManager().getInventoryWorthForStats(uuid, name);
+        this.main.getInventoryManager().processInvWorthForStats(uuid, name);
     }
 
     /**

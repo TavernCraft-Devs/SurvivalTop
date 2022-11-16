@@ -26,7 +26,7 @@ public class PartiesGroup implements GroupHandler {
     }
 
     /**
-     * Checks if a group is exist.
+     * Checks if a group exists.
      *
      * @param name name of group to check for
      *

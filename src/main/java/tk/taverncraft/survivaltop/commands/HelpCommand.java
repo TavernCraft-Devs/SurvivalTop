@@ -12,7 +12,7 @@ import tk.taverncraft.survivaltop.utils.ValidationManager;
 public class HelpCommand {
 
     private final String helpPerm = "survtop.help";
-    private ValidationManager validationManager;
+    private final ValidationManager validationManager;
 
     /**
      * Constructor for HelpCommand.

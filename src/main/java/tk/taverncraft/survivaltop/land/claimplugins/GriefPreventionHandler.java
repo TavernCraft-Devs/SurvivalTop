@@ -19,8 +19,8 @@ import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
  * Handles land wealth calculated using GriefPrevention plugin.
  */
 public class GriefPreventionHandler implements LandClaimPluginHandler {
-    private Main main;
-    private LandOperationsHelper landOperationsHelper;
+    private final Main main;
+    private final LandOperationsHelper landOperationsHelper;
 
     /**
      * Constructor for GriefPreventionHandler.
@@ -34,7 +34,7 @@ public class GriefPreventionHandler implements LandClaimPluginHandler {
     }
 
     /**
-     * Get the worth of a land.
+     * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
@@ -54,12 +54,12 @@ public class GriefPreventionHandler implements LandClaimPluginHandler {
                 World world = loc1.getWorld();
                 processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
             }
-        } catch (NoClassDefFoundError | NullPointerException e) {
+        } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
     }
 
     /**
-     * Gets the worth of a claim identified between 2 locations.
+     * Processes the worth of a claim identified between 2 locations.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param l1 location 1

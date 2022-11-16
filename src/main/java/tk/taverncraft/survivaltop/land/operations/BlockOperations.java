@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import org.bukkit.block.Block;
@@ -16,14 +17,12 @@ import tk.taverncraft.survivaltop.utils.MutableInt;
  * Handles the logic for performing block operations when scanning locations.
  */
 public class BlockOperations {
-    private LinkedHashMap<String, Double> blockWorth;
+    private final LinkedHashMap<String, Double> blockWorth;
     private Set<String> blockMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, BlockHolder> blockHolderMapForLeaderboard = new HashMap<>();
-
-    // todo: check concurrency for this
-    private HashMap<UUID, BlockHolder> blockHolderMapForStats = new HashMap<>();
+    private final ConcurrentHashMap<UUID, BlockHolder> blockHolderMapForStats = new ConcurrentHashMap<>();
 
     /**
      * Constructor for BlockOperations.
@@ -124,7 +123,7 @@ public class BlockOperations {
     }
 
     /**
-     * Process the worth of blocks.
+     * Gets the total worth of blocks.
      *
      * @param blockHolder holder containing block count
      *
@@ -141,9 +140,9 @@ public class BlockOperations {
     }
 
     /**
-     * Process blocks immediately (and asynchronously) for leaderboard.
+     * Processes blocks immediately (and asynchronously) for leaderboard.
      */
-    private BiFunction<UUID, Block, Boolean> processBlockForLeaderboard = (uuid, block) -> {
+    private final BiFunction<UUID, Block, Boolean> processBlockForLeaderboard = (uuid, block) -> {
         String material = block.getType().name();
         if (blockMaterial.contains(material)) {
             blockHolderMapForLeaderboard.get(uuid).addToHolder(material);
@@ -153,9 +152,9 @@ public class BlockOperations {
     };
 
     /**
-     * Process blocks immediately (and asynchronously) for stats.
+     * Processes blocks immediately (and asynchronously) for stats.
      */
-    private BiFunction<UUID, Block, Boolean> processBlockForStats = (uuid, block) -> {
+    private final BiFunction<UUID, Block, Boolean> processBlockForStats = (uuid, block) -> {
         String material = block.getType().name();
         if (blockMaterial.contains(material)) {
             blockHolderMapForStats.get(uuid).addToHolder(material);
