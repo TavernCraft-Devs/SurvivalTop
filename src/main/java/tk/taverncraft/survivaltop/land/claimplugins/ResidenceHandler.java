@@ -100,7 +100,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
      * @param name name of entity
      */
     private List<ClaimedResidence> getClaims(String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return getClaimsByGroup(name);
         } else {
             return getClaimsByPlayer(name);

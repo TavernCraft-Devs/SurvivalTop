@@ -79,7 +79,7 @@ public class EntityStatsManager {
             return;
         }
 
-        if (main.isUseGuiStats()) {
+        if (main.getOptions().isUseGuiStats()) {
             handleCachedStatsInGui(sender, name, eCache);
         } else {
             handleCachedStatsInChat(sender, name, eCache);
@@ -137,15 +137,15 @@ public class EntityStatsManager {
         double balWealth = 0;
         double blockValue = 0;
         double inventoryValue = 0;
-        if (main.landIsIncluded()) {
+        if (main.getOptions().landIsIncluded()) {
             // land calculations are done async and will be retrieved later
             processEntityLandWealth(sender, name);
             blockValue = main.getLandManager().calculateBlockWorthForStats(uuid);
         }
-        if (main.balIsIncluded()) {
+        if (main.getOptions().balIsIncluded()) {
             balWealth = getEntityBalWealth(name);
         }
-        if (main.inventoryIsIncluded()) {
+        if (main.getOptions().inventoryIsIncluded()) {
             processEntityInvWealth(sender, name);
             inventoryValue = main.getInventoryManager().calculateInventoryWorthForStats(uuid);
         }
@@ -165,17 +165,17 @@ public class EntityStatsManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (main.spawnerIsIncluded()) {
+                if (main.getOptions().spawnerIsIncluded()) {
                     main.getLandManager().processSpawnerTypesForStats(uuid);
                 }
-                if (main.containerIsIncluded()) {
+                if (main.getOptions().containerIsIncluded()) {
                     main.getLandManager().processContainerItemsForStats(uuid);
                 }
                 double spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
                 double containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
 
                 // handle gui or non-gui results
-                if (main.isUseGuiStats() && sender instanceof Player) {
+                if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
                     processStatsGui(sender, name, balWealth, blockWealth, spawnerValue,
                         containerValue, inventoryWealth);
                     return;

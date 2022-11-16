@@ -47,9 +47,9 @@ public class ReloadCommand {
             // stop existing player stats calculations
             main.getEntityStatsManager().stopEntityStatsCalculations();
 
-            // reload files
+            // reload configs and reinitialize options
             main.createConfigs();
-            main.setOptions();
+            main.getOptions().initializeOptions();
 
             // check dependencies
             if (!main.getDependencyManager().checkAllDependencies()) {

@@ -68,7 +68,7 @@ public class ServerStatsManager {
     public void updateWealthStats(CommandSender sender) {
         try {
             MessageManager.sendMessage(sender, "update-started");
-            if (this.main.groupIsEnabled()) {
+            if (this.main.getOptions().groupIsEnabled()) {
                 updateForGroups();
             } else {
                 updateForPlayers();
@@ -152,15 +152,15 @@ public class ServerStatsManager {
      */
     private void calculateAndCacheEntities(UUID uuid, String name) {
         double entityBalWorth = 0;
-        if (main.landIsIncluded()) {
+        if (main.getOptions().landIsIncluded()) {
             // land calculations are done async and will be retrieved later
             main.getLandManager().createHoldersForLeaderboard(uuid);
             main.getLandManager().processEntityLand(uuid, name, true);
         }
-        if (main.balIsIncluded()) {
+        if (main.getOptions().balIsIncluded()) {
             entityBalWorth = main.getBalanceManager().getBalanceForEntity(name);
         }
-        if (main.inventoryIsIncluded()) {
+        if (main.getOptions().inventoryIsIncluded()) {
             main.getInventoryManager().createHolderForLeaderboard(uuid);
             main.getInventoryManager().processInvWorthForLeaderboard(uuid, name);
         }
@@ -178,16 +178,16 @@ public class ServerStatsManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (main.landIsIncluded()) {
+                if (main.getOptions().landIsIncluded()) {
                     executePostUpdateBlocks(main.getLandManager().calculateBlockWorthForLeaderboard());
                 }
-                if (main.spawnerIsIncluded()) {
+                if (main.getOptions().spawnerIsIncluded()) {
                     executePostUpdateSpawners(main.getLandManager().calculateSpawnerWorthForLeaderboard());
                 }
-                if (main.containerIsIncluded()) {
+                if (main.getOptions().containerIsIncluded()) {
                     executePostUpdateContainers(main.getLandManager().calculateContainerWorthForLeaderboard());
                 }
-                if (main.inventoryIsIncluded()) {
+                if (main.getOptions().inventoryIsIncluded()) {
                     executePostUpdateInventories(main.getInventoryManager().calculateInventoryWorthForLeaderboard());
                 }
                 HashMap<UUID, EntityCache> tempSortedCache = sortEntitiesByTotalWealth(uuidToEntityCacheMap);
@@ -290,7 +290,7 @@ public class ServerStatsManager {
      */
     public EntityCache getEntityCache(String name) {
         UUID uuid;
-        if (main.groupIsEnabled()) {
+        if (main.getOptions().groupIsEnabled()) {
             uuid = this.groupNameToUuidMap.get(name);
             if (uuid == null) {
                 return null;
@@ -320,7 +320,7 @@ public class ServerStatsManager {
             return "None";
         }
 
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return this.groupUuidToNameMap.get(uuid);
         } else {
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);

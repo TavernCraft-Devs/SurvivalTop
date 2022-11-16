@@ -52,11 +52,12 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
         int townSize = this.main.getConfig().getInt("town-block-size", 16);
         for (TownBlock claim : claims) {
             double minX = claim.getX() * townSize;
+            double minY = this.main.getOptions().getMinLandHeight();
             double minZ = claim.getZ() * townSize;
             double maxX = minX + townSize;
+            double maxY = this.main.getOptions().getMaxLandHeight();
             double maxZ = minZ + townSize;
-            numBlocks += (maxX - minX) * (maxZ - minZ) *
-                (this.main.getMaxLandHeight() - this.main.getMinLandHeight());
+            numBlocks += (maxX - minX) * (maxZ - minZ) * (maxY - minY);
         }
         return new Long[]{(long) claims.size(), numBlocks};
     }
@@ -97,8 +98,8 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      */
     public void processEntityClaim(UUID uuid, double maxX, double maxZ, double minX, double minZ,
             World world, boolean isLeaderboardUpdate) {
-        double minY = this.main.getMinLandHeight();
-        double maxY = this.main.getMaxLandHeight();
+        double minY = this.main.getOptions().getMinLandHeight();
+        double maxY = this.main.getOptions().getMaxLandHeight();
         landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
@@ -109,7 +110,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      * @param name name of entity
      */
     private Collection<TownBlock> getClaims(String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return getClaimsByGroup(name);
         } else {
             return getClaimsByPlayer(name);

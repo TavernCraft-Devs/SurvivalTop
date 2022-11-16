@@ -44,8 +44,9 @@ public class GriefPreventionHandler implements LandClaimPluginHandler {
         long numBlocks = 0;
         Vector<Claim> claims = getClaims(name);
         for (Claim claim : claims) {
-            numBlocks += claim.getArea() *
-                    (this.main.getMaxLandHeight() - this.main.getMinLandHeight());
+            double maxY = main.getOptions().getMaxLandHeight();
+            double minY = main.getOptions().getMinLandHeight();
+            numBlocks += claim.getArea() * (maxY - minY);
         }
         return new Long[]{(long) claims.size(), numBlocks};
     }
@@ -82,10 +83,10 @@ public class GriefPreventionHandler implements LandClaimPluginHandler {
     public void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
-        double minY = this.main.getMinLandHeight();
+        double minY = main.getOptions().getMinLandHeight();
         double minZ = Math.min(l1.getZ(), l2.getZ());
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
-        double maxY = this.main.getMaxLandHeight();
+        double maxY = main.getOptions().getMaxLandHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
         landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
@@ -97,7 +98,7 @@ public class GriefPreventionHandler implements LandClaimPluginHandler {
      * @param name name of entity
      */
     private Vector<Claim> getClaims(String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return getClaimsByGroup(name);
         } else {
             return getClaimsByPlayer(name);

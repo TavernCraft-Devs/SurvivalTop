@@ -25,6 +25,7 @@ import tk.taverncraft.survivaltop.commands.CommandTabCompleter;
 import tk.taverncraft.survivaltop.events.DependencyLoadEvent;
 import tk.taverncraft.survivaltop.leaderboard.LeaderboardManager;
 import tk.taverncraft.survivaltop.logs.LogManager;
+import tk.taverncraft.survivaltop.options.Options;
 import tk.taverncraft.survivaltop.stats.EntityStatsManager;
 import tk.taverncraft.survivaltop.stats.ServerStatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
@@ -69,17 +70,7 @@ public class Main extends JavaPlugin {
 
     // options
     // todo: move this into an options manager
-    private boolean includeBalance;
-    private boolean includeLand;
-    private boolean includeInventory;
-    private boolean includeSpawner;
-    private boolean includeContainer;
-    private boolean groupEnabled;
-    private boolean useGuiStats;
-    private boolean useRealTimeStats;
-    private boolean useGuiLeaderboard;
-    private int maxLandHeight;
-    private int minLandHeight;
+    private Options options;
 
     // console uuid
     private final UUID consoleUuid = UUID.randomUUID();
@@ -104,7 +95,10 @@ public class Main extends JavaPlugin {
 
         // config setup
         createConfigs();
-        setOptions();
+
+        // set options
+        this.options = new Options(this);
+        options.initializeOptions();
 
         //this.createScheduleConfig();
         this.getCommand("survivaltop").setTabCompleter(new CommandTabCompleter());
@@ -169,20 +163,6 @@ public class Main extends JavaPlugin {
         configManager.createSignsConfig();
     }
 
-    public void setOptions() {
-        this.includeBalance = this.getConfig().getBoolean("include-bal", false);
-        this.includeLand = this.getConfig().getBoolean("include-land", false);
-        this.includeSpawner = this.getConfig().getBoolean("include-spawners", false);
-        this.includeContainer = this.getConfig().getBoolean("include-containers", false);
-        this.includeInventory = this.getConfig().getBoolean("include-inventory", false);
-        this.groupEnabled = this.getConfig().getBoolean("enable-group", false);
-        this.useGuiStats = this.getConfig().getBoolean("use-gui-stats", true);
-        this.useRealTimeStats = this.getConfig().getBoolean("use-realtime-stats", false);
-        this.useGuiLeaderboard = this.getConfig().getBoolean("use-gui-leaderboard", false);
-        setMaxLandHeight();
-        setMinLandHeight();
-    }
-
     /**
      * Loads dependencies.
      */
@@ -229,94 +209,12 @@ public class Main extends JavaPlugin {
         perms = rsp.getProvider();
     }
 
-    public double getMaxLandHeight() {
-        return this.maxLandHeight;
-    }
-
-    public double getMinLandHeight() {
-        return this.minLandHeight;
-    }
-
-    private void setMaxLandHeight() {
-        if (Bukkit.getVersion().contains("1.18") || Bukkit.getVersion().contains("1.19")) {
-            this.maxLandHeight = 320;
-        } else {
-            this.maxLandHeight = 256;
-        }
-
-        if (!getConfig().getString("max-land-height", "default")
-            .equalsIgnoreCase("default")) {
-            this.maxLandHeight = getConfig().getInt("max-land-height", this.maxLandHeight);
-        }
-    }
-
-    private void setMinLandHeight() {
-        if (Bukkit.getVersion().contains("1.18") || Bukkit.getVersion().contains("1.19")) {
-            this.minLandHeight = -64;
-        } else {
-            this.minLandHeight = 0;
-        }
-
-        if (!getConfig().getString("min-land-height", "default")
-            .equalsIgnoreCase("default")) {
-            this.minLandHeight = getConfig().getInt("min-land-height", this.minLandHeight);
-        }
-    }
-
     public UUID getSenderUuid(CommandSender sender) {
         if (sender instanceof Player) {
             return ((Player) sender).getUniqueId();
         } else {
             return this.consoleUuid;
         }
-    }
-
-    public void disableBal() {
-        this.includeBalance = false;
-    }
-
-    public void disableLand() {
-        this.includeLand = false;
-    }
-
-    public void disableGroup() {
-        this.groupEnabled = false;
-    }
-
-    public boolean balIsIncluded() {
-        return includeBalance;
-    }
-
-    public boolean landIsIncluded() {
-        return includeLand;
-    }
-
-    public boolean spawnerIsIncluded() {
-        return includeSpawner;
-    }
-
-    public boolean containerIsIncluded() {
-        return includeContainer;
-    }
-
-    public boolean inventoryIsIncluded() {
-        return includeInventory;
-    }
-
-    public boolean groupIsEnabled() {
-        return groupEnabled;
-    }
-
-    public boolean isUseGuiStats() {
-        return useGuiStats;
-    }
-
-    public boolean isUseRealTimeStats() {
-        return useRealTimeStats;
-    }
-
-    public boolean isUseGuiLeaderboard() {
-        return useGuiLeaderboard;
     }
 
     public static Economy getEconomy() {
@@ -413,5 +311,9 @@ public class Main extends JavaPlugin {
 
     public LogManager getLogManager() {
         return this.logManager;
+    }
+
+    public Options getOptions() {
+        return this.options;
     }
 }

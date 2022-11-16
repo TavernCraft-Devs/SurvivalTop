@@ -164,13 +164,13 @@ public class PapiManager extends PlaceholderExpansion {
         String entityName;
         if (args.length == length) {
             entityName = player.getName();
-            if (this.main.groupIsEnabled()) {
+            if (this.main.getOptions().groupIsEnabled()) {
                 String group = this.main.getGroupManager().getGroupOfPlayer(entityName);
                 return this.main.getServerStatsManager().getGroupNameToUuidMap().get(group);
             }
         } else {
             entityName = args[length];
-            if (this.main.groupIsEnabled()) {
+            if (this.main.getOptions().groupIsEnabled()) {
                 return this.main.getServerStatsManager().getGroupNameToUuidMap().get(entityName);
             }
         }

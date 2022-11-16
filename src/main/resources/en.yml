@@ -18,7 +18,7 @@ log-complete: '&aLog dump complete! You may find the latest output inside the pl
 # leaderboard/stats messages
 update-started: '&aStarted leaderboard update. This may take a while depending on the player-base size.'
 update-in-progress: '&cThe leaderboard update is currently in progress, please try again later.'
-update-complete: '&aThe leaderboard update is complete!'
+update-complete: '&aThe leaderboard update completed in &b%time% &aseconds!' #%time%
 start-calculating-stats: '&aPlease give a few moments for calculating stats...'
 calculation-in-progress: '&cYour previous stats request is still in progress!'
 no-updated-leaderboard: '&cThere is no updated leaderboard yet!'

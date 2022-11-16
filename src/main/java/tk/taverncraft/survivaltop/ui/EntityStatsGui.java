@@ -108,14 +108,14 @@ public class EntityStatsGui extends GuiHelper {
 
         inv.setItem(10, createGuiItem(Material.BEACON, "Total Combined Wealth",
                 true,"Total Wealth: " + totalValue));
-        if (main.balIsIncluded()) {
+        if (main.getOptions().balIsIncluded()) {
             inv.setItem(11, createGuiItem(Material.EMERALD, "Total Balance Wealth",
                     true, "Balance Wealth: " + balValue));
         } else {
             inv.setItem(11, createGuiItem(Material.EMERALD, "Total Balance Wealth",
                     false, "Disabled"));
         }
-        if (main.landIsIncluded()) {
+        if (main.getOptions().landIsIncluded()) {
             inv.setItem(12, createGuiItem(Material.GOLDEN_SHOVEL, "Total Land Wealth",
                     true, "Land Wealth: " + landValue));
             inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
@@ -126,7 +126,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(13, createGuiItem(Material.GRASS_BLOCK, "Blocks Wealth",
                     false, "Disabled"));
         }
-        if (main.spawnerIsIncluded() && main.landIsIncluded()) {
+        if (main.getOptions().spawnerIsIncluded() && main.getOptions().landIsIncluded()) {
             inv.setItem(14, createGuiItem(Material.SPAWNER, "Spawners Wealth",
                     true, "Spawner " +
                 "Wealth: " + spawnerValue, "Click to learn more."));
@@ -134,7 +134,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(14, createGuiItem(Material.SPAWNER, "Spawners Wealth",
                     false, "Disabled"));
         }
-        if (main.containerIsIncluded() && main.landIsIncluded()) {
+        if (main.getOptions().containerIsIncluded() && main.getOptions().landIsIncluded()) {
             inv.setItem(15, createGuiItem(Material.CHEST, "Container Wealth",
                     true, "Container Wealth: " + containerValue,
                     "Click to learn more."));
@@ -142,7 +142,7 @@ public class EntityStatsGui extends GuiHelper {
             inv.setItem(15, createGuiItem(Material.CHEST, "Container Wealth",
                     false, "Disabled"));
         }
-        if (main.inventoryIsIncluded()) {
+        if (main.getOptions().inventoryIsIncluded()) {
             inv.setItem(16, createGuiItem(Material.PLAYER_HEAD, "Inventory Wealth",
                 true, "Inventory Wealth: " + inventoryValue,
                 "Click to learn more."));

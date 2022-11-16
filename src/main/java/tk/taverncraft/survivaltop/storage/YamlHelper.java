@@ -52,7 +52,7 @@ public class YamlHelper implements StorageHelper {
         String entityFileName;
         String entityName = "None";
         String entityType = "player";
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             entityFileName = this.main.getServerStatsManager().getGroupUuidToNameMap().get(uuid);
             entityName = entityFileName;
             entityType = "group";

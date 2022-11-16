@@ -80,7 +80,7 @@ public class SqlHelper implements StorageHelper {
              PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
             if (conn != null) {
                 // necessary to delete table for group since temp uuid results in multiple entries
-                if (this.main.groupIsEnabled()) {
+                if (this.main.getOptions().groupIsEnabled()) {
                     delStmt.execute();
                 }
                 stmt.executeUpdate();
@@ -189,7 +189,7 @@ public class SqlHelper implements StorageHelper {
         UUID uuid = eCache.getUuid();
         String entityName = "None";
         String entityType = "player";
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             entityName = this.main.getServerStatsManager().getGroupUuidToNameMap().get(uuid);
             entityType = "group";
         } else {

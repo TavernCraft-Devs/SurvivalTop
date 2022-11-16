@@ -30,7 +30,7 @@ public class BalanceManager {
      * @return total balance of entity
      */
     public double getBalanceForEntity(String name) {
-        if (main.groupIsEnabled()) {
+        if (main.getOptions().groupIsEnabled()) {
             return getBalanceByGroup(name);
         }
         return getBalanceByPlayer(name);

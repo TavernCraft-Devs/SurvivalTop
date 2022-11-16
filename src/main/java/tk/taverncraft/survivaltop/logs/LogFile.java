@@ -26,7 +26,7 @@ public class LogFile {
         return this.survivalTopVersion;
     }
 
-    public String getWorldRadius() {
+    public String getWorldSize() {
         return this.worldRadius;
     }
 

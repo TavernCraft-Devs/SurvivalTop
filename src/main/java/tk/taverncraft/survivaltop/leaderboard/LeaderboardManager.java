@@ -1,5 +1,6 @@
 package tk.taverncraft.survivaltop.leaderboard;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -19,6 +20,8 @@ public class LeaderboardManager {
     private final Main main;
     private boolean isUpdating;
     private BukkitTask leaderboardTask;
+    private long leaderboardUpdateStartTime;
+    private long lastUpdateDuration;
 
     /**
      * Constructor for LeaderboardManager.
@@ -99,6 +102,7 @@ public class LeaderboardManager {
      * @param sender user executing the update
      */
     public void initiateLeaderboardUpdate(CommandSender sender) {
+        leaderboardUpdateStartTime = Instant.now().getEpochSecond();
         main.getServerStatsManager().updateWealthStats(sender);
     }
 
@@ -111,9 +115,12 @@ public class LeaderboardManager {
     public void completeLeaderboardUpdate(CommandSender sender,
             HashMap<UUID, EntityCache> tempSortedCache) {
         MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0), main.groupIsEnabled(),
+                "minimum-wealth", 0.0), main.getOptions().groupIsEnabled(),
                 this.main.getServerStatsManager().getGroupUuidToNameMap());
-        MessageManager.sendMessage(sender, "update-complete");
+        lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
+        MessageManager.sendMessage(sender, "update-complete",
+                new String[]{"%time%"},
+                new String[]{String.valueOf(lastUpdateDuration)});
         Bukkit.getScheduler().runTask(main, () -> {
             try {
                 new SignHelper(main).updateSigns();
@@ -142,5 +149,14 @@ public class LeaderboardManager {
      */
     public boolean isUpdating() {
         return this.isUpdating;
+    }
+
+    /**
+     * Gets the duration for the last leaderboard update.
+     *
+     * @return time in seconds taken for last leaderboard update
+     */
+    public long getLastUpdateDuration() {
+        return this.lastUpdateDuration;
     }
 }

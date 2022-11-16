@@ -130,7 +130,7 @@ public class InventoryManager {
      * @param name name of entity to get inventory worth for
      */
     public void processInvWorthForLeaderboard(UUID uuid, String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             for (OfflinePlayer player : players) {
                 processPlayerForLeaderboard(uuid, player.getName());
@@ -147,7 +147,7 @@ public class InventoryManager {
      * @param name name of entity to get inventory worth for
      */
     public void processInvWorthForStats(UUID uuid, String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             for (OfflinePlayer player : players) {
                 processPlayerForStats(uuid, player.getName());

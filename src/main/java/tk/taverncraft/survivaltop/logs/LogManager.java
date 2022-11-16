@@ -62,7 +62,7 @@ public class LogManager {
 
             @Override
             public void run() {
-                if (main.groupIsEnabled()) {
+                if (main.getOptions().groupIsEnabled()) {
                     processByGroups();
                 } else {
                     processByPlayers();

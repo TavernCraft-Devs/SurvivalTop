@@ -43,7 +43,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      */
     public Long[] getClaimsInfo(String name) {
         Set<SimpleChunkLocation> claims = getClaims(name);
-        double height = main.getMaxLandHeight() - main.getMinLandHeight();
+        double height = main.getOptions().getMaxLandHeight() - main.getOptions().getMinLandHeight();
         long numBlocks = claims.size() * 16L * 16L * Double.valueOf(height).longValue();
         return new Long[]{(long) claims.size(), numBlocks};
     }
@@ -72,7 +72,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      * @param name name of entity
      */
     private Set<SimpleChunkLocation> getClaims(String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return getClaimsByGroup(name);
         } else {
             return getClaimsByPlayer(name);

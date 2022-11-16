@@ -109,7 +109,7 @@ public class GriefDefenderHandler implements LandClaimPluginHandler {
      * @param name name of entity
      */
     private List<Claim> getClaims(String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return getClaimsByGroup(name);
         } else {
             return getClaimsByPlayer(name);

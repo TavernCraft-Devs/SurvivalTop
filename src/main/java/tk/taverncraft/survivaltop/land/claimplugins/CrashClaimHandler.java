@@ -45,10 +45,10 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
         ArrayList<Claim> claims = getClaims(name);
         for (Claim claim : claims) {
             double minX = Math.min(claim.getMaxX(), claim.getMinX());
-            double minY = this.main.getMinLandHeight();
+            double minY = main.getOptions().getMinLandHeight();
             double minZ = Math.min(claim.getMaxZ(), claim.getMinZ());
             double maxX = Math.max(claim.getMaxX(), claim.getMinX()) + 1;
-            double maxY = this.main.getMaxLandHeight();
+            double maxY = main.getOptions().getMaxLandHeight();
             double maxZ = Math.max(claim.getMaxZ(), claim.getMinZ()) + 1;
             numBlocks += (maxX - minX) * (maxY - minY) * (maxZ - minZ);
         }
@@ -91,10 +91,10 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
     private void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
-        double minY = this.main.getMinLandHeight();
+        double minY = main.getOptions().getMinLandHeight();
         double minZ = Math.min(l1.getZ(), l2.getZ());
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
-        double maxY = this.main.getMaxLandHeight();
+        double maxY = main.getOptions().getMaxLandHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
         landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
@@ -106,7 +106,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
      * @param name name of entity
      */
     private ArrayList<Claim> getClaims(String name) {
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             return getClaimsByGroup(name);
         } else {
             return getClaimsByPlayer(name);

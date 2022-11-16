@@ -138,18 +138,37 @@ public class ConfigManager {
      * Dumps details into a log file, triggered by the dump command.
      */
     public void dumpToLogFile(LogFile logFile) {
-        String fileName = "dump-" + Instant.now().getEpochSecond();
+        String fileName = "dump-" + Instant.now().getEpochSecond() + ".yml";
         File configFile = new File(main.getDataFolder() + "/dumps", fileName);
         FileConfiguration config = new YamlConfiguration();
         configFile.getParentFile().mkdirs();
-        main.saveResource(fileName, false);
 
-        config.set("Minecraft-version", logFile.getMinecraftVersion());
-        config.set("SurvivalTop-version", logFile.getMinecraftVersion());
-        config.set("World-size", logFile.getWorldRadius());
-        config.set("Num-entities", logFile.getNumEntities());
-        config.set("Num-claims", logFile.getNumClaims());
-        config.set("Num-blocks", logFile.getNumBlocks());
+        config.set("minecraft-version", logFile.getMinecraftVersion());
+        config.set("survivalTop-version", logFile.getSurvivalTopVersion());
+        config.set("world-size", logFile.getWorldSize());
+        config.set("num-entities", logFile.getNumEntities());
+        config.set("num-claims", logFile.getNumClaims());
+        config.set("num-blocks", logFile.getNumBlocks());
+        config.set("use-gui-stats", main.getOptions().isUseGuiStats());
+        config.set("use-realtime-stats", main.getOptions().isUseRealTimeStats());
+        config.set("filter-last-join", main.getOptions().filterLastJoin());
+        config.set("filter-player-time", main.getOptions().filterPlayerTime());
+        config.set("enable-group", main.getOptions().groupIsEnabled());
+        config.set("group-type", main.getOptions().getGroupType());
+        config.set("include-bal", main.getOptions().balIsIncluded());
+        config.set("include-land", main.getOptions().landIsIncluded());
+        config.set("land-type", main.getOptions().getLandType());
+        config.set("include-spawners", main.getOptions().spawnerIsIncluded());
+        config.set("include-containers", main.getOptions().containerIsIncluded());
+        config.set("max-land-height", main.getOptions().getMaxLandHeight());
+        config.set("min-land-height", main.getOptions().getMinLandHeight());
+        config.set("include-inventory", main.getOptions().inventoryIsIncluded());
+        config.set("update-interval", main.getOptions().getUpdateInterval());
+        config.set("update-on-start", main.getOptions().updateOnStart());
+        config.set("minimum-wealth", main.getOptions().getMinimumWealth());
+        config.set("last-update-duration", main.getLeaderboardManager().getLastUpdateDuration());
+        config.set("storage-type", main.getOptions().getStorageType());
+
         try {
             config.save(configFile);
         } catch (IOException e) {

@@ -66,7 +66,7 @@ public class StatsCommand {
         String name = player.getName();
 
         // if group is enabled, get name of the group the player belongs to instead
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             name = this.main.getGroupManager().getGroupOfPlayer(name);
             if (!this.validationManager.groupExist(name, sender)) {
                 return;
@@ -80,7 +80,7 @@ public class StatsCommand {
         }
 
         MessageManager.sendMessage(sender, "start-calculating-stats");
-        if (main.isUseRealTimeStats()) {
+        if (main.getOptions().isUseRealTimeStats()) {
             main.getEntityStatsManager().getRealTimeEntityStats(sender, uuid, name);
         } else {
             main.getEntityStatsManager().getCachedEntityStats(sender, uuid, name);
@@ -100,7 +100,7 @@ public class StatsCommand {
         }
 
         // check if group/player provided exist
-        if (this.main.groupIsEnabled()) {
+        if (this.main.getOptions().groupIsEnabled()) {
             if (!this.validationManager.groupExist(args[1], sender)) {
                 return;
             }
@@ -119,7 +119,7 @@ public class StatsCommand {
         }
 
         MessageManager.sendMessage(sender, "start-calculating-stats");
-        if (main.isUseRealTimeStats()) {
+        if (main.getOptions().isUseRealTimeStats()) {
             main.getEntityStatsManager().getRealTimeEntityStats(sender, uuid, name);
         } else {
             main.getEntityStatsManager().getCachedEntityStats(sender, uuid, name);

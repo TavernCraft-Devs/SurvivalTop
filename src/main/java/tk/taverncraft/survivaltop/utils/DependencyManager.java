@@ -96,7 +96,7 @@ public class DependencyManager {
      */
     private boolean checkBal() {
         boolean enabled;
-        if (main.balIsIncluded()) {
+        if (main.getOptions().balIsIncluded()) {
             String depPlugin = "Vault";
             enabled = isDependencyEnabled(depPlugin);
 
@@ -104,7 +104,7 @@ public class DependencyManager {
                 Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with Vault!");
             } else {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with Vault!");
-                main.disableBal();
+                main.getOptions().disableBal();
                 return false;
             }
         }
@@ -118,14 +118,14 @@ public class DependencyManager {
      */
     private boolean checkLand() {
         boolean enabled;
-        if (main.landIsIncluded()) {
+        if (main.getOptions().landIsIncluded()) {
             String landType = main.getConfig().getString("land-type",
                 "griefprevention").toLowerCase();
             String depPlugin = pluginMap.get(landType);
             if (depPlugin == null) {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
                     + landType + ", did you make a typo in the config?");
-                main.disableLand();
+                main.getOptions().disableLand();
                 return false;
             }
             enabled = isDependencyEnabled(depPlugin);
@@ -136,7 +136,7 @@ public class DependencyManager {
             } else {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
                     + depPlugin + " for land type!");
-                main.disableLand();
+                main.getOptions().disableLand();
                 return false;
             }
         }
@@ -157,7 +157,7 @@ public class DependencyManager {
             if (depPlugin == null) {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
                     + groupType + ", did you make a typo in the config?");
-                main.disableGroup();
+                main.getOptions().disableGroup();
                 return false;
             }
             enabled = isDependencyEnabled(depPlugin);
@@ -168,7 +168,7 @@ public class DependencyManager {
             } else {
                 Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
                     + depPlugin + " for group type!");
-                main.disableGroup();
+                main.getOptions().disableGroup();
                 return false;
             }
         }

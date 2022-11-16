@@ -29,7 +29,7 @@ use-realtime-stats: false
 
 #####################################################################################
 #                                                                                   #
-#                     Filter Options (Not applicable for groups!)                   #
+#                                  Filter Options                                   #
 #                                                                                   #
 #####################################################################################
 
@@ -97,6 +97,13 @@ include-containers: false
 container-type:
   - CHEST
   - TRAPPED_CHEST
+
+# the following 2 options are recommended to be left as default to use the heights provided by
+# the land plugin
+# if you wish to adjust this, kindly refer to a more detailed explanation on the wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
+max-land-height: default
+min-land-height: default
 
 #####################################################################################
 #                                                                                   #

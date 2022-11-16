@@ -73,18 +73,18 @@ public class LandOperationsHelper {
         landOperationsForLeaderboard = new ArrayList<>();
         landOperationsForStats = new ArrayList<>();
 
-        if (main.landIsIncluded()) {
+        if (main.getOptions().landIsIncluded()) {
             landOperationsForLeaderboard.add(blockOperations.getLeaderboardOperation());
             landOperationsForStats.add(blockOperations.getStatsOperation());
         } else {
             return;
         }
-        if (main.spawnerIsIncluded()) {
+        if (main.getOptions().spawnerIsIncluded()) {
             landOperationsForLeaderboard.add(spawnerOperations.getLeaderboardOperation());
             landOperationsForStats.add(spawnerOperations.getStatsOperation());
         }
 
-        if (main.containerIsIncluded()) {
+        if (main.getOptions().containerIsIncluded()) {
             landOperationsForLeaderboard.add(containerOperations.getLeaderboardOperation());
             landOperationsForStats.add(containerOperations.getStatsOperation());
         }
@@ -244,8 +244,8 @@ public class LandOperationsHelper {
 
         int x = chunk.getX() << 4;
         int z = chunk.getZ() << 4;
-        int maxHeight = (int) main.getMaxLandHeight();
-        int minHeight = (int) main.getMinLandHeight();
+        int maxHeight = (int) main.getOptions().getMaxLandHeight();
+        int minHeight = (int) main.getOptions().getMinLandHeight();
         for (int i = x; i < x + 16; ++i) {
             for (int j = z; j < z + 16; ++j) {
                 for (int k = minHeight; k < maxHeight; ++k) {
