@@ -4,12 +4,10 @@ import java.util.UUID;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
-
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * LandManager is responsible for all land value calculations.
@@ -140,7 +138,7 @@ public class LandManager {
      *
      * @return hashmap of block material to its worth
      */
-    public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getBlocksForGuiStats(UUID uuid) {
         return landOperationsHelper.getBlocksForGuiStats(uuid);
     }
 
@@ -149,7 +147,7 @@ public class LandManager {
      *
      * @return hashmap of spawner entity type to its worth
      */
-    public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getSpawnersForGuiStats(UUID uuid) {
         return landOperationsHelper.getSpawnersForGuiStats(uuid);
     }
 
@@ -158,7 +156,7 @@ public class LandManager {
      *
      * @return hashmap of container item material to its worth
      */
-    public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getContainersForGuiStats(UUID uuid) {
         return landOperationsHelper.getContainersForGuiStats(uuid);
     }
 
@@ -277,7 +275,7 @@ public class LandManager {
      *
      * @return map of block material to value
      */
-    public LinkedHashMap<Material, Double> getBlockWorth() {
+    public LinkedHashMap<String, Double> getBlockWorth() {
         return this.landOperationsHelper.getBlockWorth();
     }
 
@@ -288,7 +286,7 @@ public class LandManager {
      *
      * @return double representing its worth
      */
-    public double getBlockWorth(Material material) {
+    public double getBlockWorth(String material) {
         return this.landOperationsHelper.getBlockWorth(material);
     }
 
@@ -297,7 +295,7 @@ public class LandManager {
      *
      * @return map of spawner entity type to value
      */
-    public LinkedHashMap<EntityType, Double> getSpawnerWorth() {
+    public LinkedHashMap<String, Double> getSpawnerWorth() {
         return this.landOperationsHelper.getSpawnerWorth();
     }
 
@@ -308,7 +306,7 @@ public class LandManager {
      *
      * @return double representing its worth
      */
-    public double getSpawnerWorth(EntityType entityType) {
+    public double getSpawnerWorth(String entityType) {
         return this.landOperationsHelper.getSpawnerWorth(entityType);
     }
 
@@ -317,7 +315,7 @@ public class LandManager {
      *
      * @return map of container item material to value
      */
-    public LinkedHashMap<Material, Double> getContainerWorth() {
+    public LinkedHashMap<String, Double> getContainerWorth() {
         return this.landOperationsHelper.getContainerWorth();
     }
 
@@ -328,7 +326,7 @@ public class LandManager {
      *
      * @return double representing its worth
      */
-    public double getContainerWorth(Material material) {
+    public double getContainerWorth(String material) {
         return this.landOperationsHelper.getContainerWorth(material);
     }
 }

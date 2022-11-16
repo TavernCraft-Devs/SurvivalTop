@@ -1,25 +1,25 @@
 package tk.taverncraft.survivaltop.land.operations.holders;
 
+import tk.taverncraft.survivaltop.utils.MutableInt;
+
 import java.util.HashMap;
 import java.util.Set;
-
-import org.bukkit.entity.EntityType;
 
 /**
  * Holder for tracking count of spawners.
  */
 public class SpawnerHolder {
-    private HashMap<EntityType, Integer> counter;
+    private HashMap<String, MutableInt> counter;
 
     /**
      * Constructor for SpawnerHolder.
      *
      * @param entityTypes list of spawner types
      */
-    public SpawnerHolder(Set<EntityType> entityTypes) {
+    public SpawnerHolder(Set<String> entityTypes) {
         counter = new HashMap<>();
-        for (EntityType entityType : entityTypes) {
-            counter.put(entityType, 0);
+        for (String entityType : entityTypes) {
+            counter.put(entityType, new MutableInt());
         }
     }
 
@@ -28,7 +28,7 @@ public class SpawnerHolder {
      *
      * @return counter map
      */
-    public HashMap<EntityType, Integer> getCounter() {
+    public HashMap<String, MutableInt> getCounter() {
         return this.counter;
     }
 
@@ -37,7 +37,7 @@ public class SpawnerHolder {
      *
      * @param entityType entity type to add count for
      */
-    public void addToHolder(EntityType entityType) {
-        counter.merge(entityType, 1, Integer::sum);
+    public void addToHolder(String entityType) {
+        counter.get(entityType).increment();
     }
 }

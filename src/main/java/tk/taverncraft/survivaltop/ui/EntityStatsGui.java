@@ -6,10 +6,10 @@ import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
@@ -45,18 +45,18 @@ public class EntityStatsGui extends GuiHelper {
         setUpMainPage(name);
 
         // todo: cleanup this entire mess during the ui update
-        HashMap<Material, Integer> blockList = main.getEntityStatsManager().getBlocksForGuiStats(uuid);
-        HashMap<EntityType, Integer> spawnerList =
+        HashMap<String, MutableInt> blockList = main.getEntityStatsManager().getBlocksForGuiStats(uuid);
+        HashMap<String, MutableInt> spawnerList =
                 main.getEntityStatsManager().getSpawnersForGuiStats(uuid);
-        HashMap<Material, Integer> containerList =
+        HashMap<String, MutableInt> containerList =
                 main.getEntityStatsManager().getContainersForGuiStats(uuid);
-        HashMap<Material, Integer> inventoryList =
+        HashMap<String, MutableInt> inventoryList =
                 main.getEntityStatsManager().getInventoriesForGuiStats(uuid);
 
-        blockViews = prepareMaterialViews(blockList, name, "Block Stats");
-        spawnerViews = prepareEntityTypeViews(spawnerList, name, "Spawner Stats");
-        containerViews = prepareMaterialViews(containerList, name, "Container Stats");
-        inventoryViews = prepareMaterialViews(inventoryList, name, "Inventory Stats");
+        blockViews = prepareViews(blockList, name, "Block Stats");
+        spawnerViews = prepareViews(spawnerList, name, "Spawner Stats");
+        containerViews = prepareViews(containerList, name, "Container Stats");
+        inventoryViews = prepareViews(inventoryList, name, "Inventory Stats");
     }
 
     /**
@@ -220,7 +220,7 @@ public class EntityStatsGui extends GuiHelper {
     }
 
     /**
-     * Prepares the inventory views for block, container and inventory.
+     * Prepares the inventory views for block, spawner and container.
      *
      * @param materialList list of materials to show in gui
      * @param entityName name of entity whose stats is shown
@@ -228,8 +228,8 @@ public class EntityStatsGui extends GuiHelper {
      *
      * @return An array list representing pages of inventory for the view type
      */
-    private ArrayList<Inventory> prepareMaterialViews(HashMap<Material, Integer> materialList,
-            String entityName, String viewType) {
+    private ArrayList<Inventory> prepareViews(HashMap<String, MutableInt> materialList,
+                                              String entityName, String viewType) {
         ArrayList<Inventory> entityViews = new ArrayList<>();
         int pageNum = 1;
         Inventory entityView = initializeSubPageTemplate(entityName, pageNum, viewType);
@@ -241,84 +241,31 @@ public class EntityStatsGui extends GuiHelper {
         }
 
         int slot = 10;
-        for (Map.Entry<Material, Integer> map : materialList.entrySet()) {
-            Material material = map.getKey();
-            String name = material.name();
-            int quantity = map.getValue();
-            if (quantity == 0) {
-                continue;
-            }
+        for (Map.Entry<String, MutableInt> map : materialList.entrySet()) {
+            String name = map.getKey();
+            int quantity = map.getValue().get();
             double value;
             if (viewType.equals("Block Stats")) {
-                value = main.getLandManager().getBlockWorth(material);
+                value = main.getLandManager().getBlockWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
-                        false, "Quantity: " + quantity,
-                        "Item Worth: " + value, "Total Value: " + value * quantity));
+                    false, "Quantity: " + quantity,
+                    "Item Worth: " + value, "Total Value: " + value * quantity));
+            } else if (viewType.equals("Spawner Stats")) {
+                value = main.getLandManager().getSpawnerWorth(name);
+                entityView.setItem(slot, createGuiItem(Material.SPAWNER, name,
+                    false, "Quantity: " + quantity,
+                    "Item Worth: " + value, "Total Value: " + value * quantity));
             } else if (viewType.equals("Container Stats")) {
-                value = main.getLandManager().getContainerWorth(material);
+                value = main.getLandManager().getContainerWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
                     false, "Quantity: " + quantity,
                     "Item Worth: " + value, "Total Value: " + value * quantity));
             } else {
-                value = main.getInventoryManager().getInventoryItemWorth(material);
+                value = main.getInventoryManager().getInventoryItemWorth(name);
                 entityView.setItem(slot, createGuiItem(Material.getMaterial(name), name,
-                        false, "Quantity: " + quantity,
-                        "Item Worth: " + value, "Total Value: " + value * quantity));
+                    false, "Quantity: " + quantity,
+                    "Item Worth: " + value, "Total Value: " + value * quantity));
             }
-
-            slot++;
-
-            // next line
-            if (slot == 17 || slot == 26) {
-                slot += 2;
-            }
-
-            // next page
-            if (slot == 35) {
-                entityViews.add(entityView);
-                pageNum++;
-                slot = 10;
-                entityView = initializeSubPageTemplate(entityName, pageNum, viewType);
-            }
-        }
-        entityViews.add(entityView);
-
-        return entityViews;
-    }
-
-    /**
-     * Prepares the inventory views for spawners.
-     *
-     * @param materialList list of materials to show in gui
-     * @param entityName name of entity whose stats is shown
-     * @param viewType type of view (block, spawner or container)
-     *
-     * @return An array list representing pages of inventory for the view type
-     */
-    private ArrayList<Inventory> prepareEntityTypeViews(HashMap<EntityType, Integer> materialList,
-                                                      String entityName, String viewType) {
-        ArrayList<Inventory> entityViews = new ArrayList<>();
-        int pageNum = 1;
-        Inventory entityView = initializeSubPageTemplate(entityName, pageNum, viewType);
-
-        // if no entity, return empty inventory
-        if (materialList == null ) {
-            entityViews.add(entityView);
-            return entityViews;
-        }
-
-        int slot = 10;
-        for (Map.Entry<EntityType, Integer> map : materialList.entrySet()) {
-            EntityType entityType = map.getKey();
-            String name = entityType.getName().toUpperCase();
-            int quantity = map.getValue();
-            if (quantity == 0) {
-                continue;
-            }
-            double value = main.getLandManager().getSpawnerWorth(entityType);
-            entityView.setItem(slot, createGuiItem(Material.SPAWNER, name,
-                false, "Quantity: " + quantity,
-                "Item Worth: " + value, "Total Value: " + value * quantity));
 
             slot++;
 

@@ -39,14 +39,14 @@ public class InfoGui extends GuiHelper {
      */
     public InfoGui(Main main) {
         // todo: cleanup this entire mess during the ui update
-        HashMap<Material, Double> blockList = main.getLandManager().getBlockWorth();
-        HashMap<EntityType, Double> spawnerList = main.getLandManager().getSpawnerWorth();
-        HashMap<Material, Double> containerList = main.getLandManager().getContainerWorth();
-        HashMap<Material, Double> inventoryList = main.getInventoryManager().getInventoryItemWorth();
-        InfoGui.blockList = changeMaterialDoubleToString(blockList);
-        InfoGui.spawnerList = changeEntityTypeDoubleToString(spawnerList);
-        InfoGui.containerList = changeMaterialDoubleToString(containerList);
-        InfoGui.inventoryList = changeMaterialDoubleToString(inventoryList);
+        LinkedHashMap<String, Double> blockList = main.getLandManager().getBlockWorth();
+        LinkedHashMap<String, Double> spawnerList = main.getLandManager().getSpawnerWorth();
+        LinkedHashMap<String, Double> containerList = main.getLandManager().getContainerWorth();
+        LinkedHashMap<String, Double> inventoryList = main.getInventoryManager().getInventoryItemWorth();
+        InfoGui.blockList = blockList;
+        InfoGui.spawnerList = spawnerList;
+        InfoGui.containerList = containerList;
+        InfoGui.inventoryList = inventoryList;
         initializeAllPages();
     }
 

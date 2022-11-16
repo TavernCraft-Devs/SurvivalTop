@@ -3,23 +3,23 @@ package tk.taverncraft.survivaltop.inventory.holders;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.bukkit.Material;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Holder for tracking count of inventory items.
  */
 public class InventoryHolder {
-    private HashMap<Material, Integer> counter;
+    private HashMap<String, MutableInt> counter;
 
     /**
      * Constructor for InventoryHolder.
      *
      * @param materials list of inventory materials
      */
-    public InventoryHolder(Set<Material> materials) {
+    public InventoryHolder(Set<String> materials) {
         counter = new HashMap<>();
-        for (Material material : materials) {
-            counter.put(material, 0);
+        for (String material : materials) {
+            counter.put(material, new MutableInt());
         }
     }
 
@@ -28,7 +28,7 @@ public class InventoryHolder {
      *
      * @return counter map
      */
-    public HashMap<Material, Integer> getCounter() {
+    public HashMap<String, MutableInt> getCounter() {
         return this.counter;
     }
 
@@ -38,7 +38,7 @@ public class InventoryHolder {
      * @param material material to add count for
      * @param amount amount to add
      */
-    public void addToHolder(Material material, int amount) {
-        counter.merge(material, amount, Integer::sum);
+    public void addToHolder(String material, int amount) {
+        counter.get(material).increment(amount);
     }
 }

@@ -7,20 +7,22 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import tk.taverncraft.survivaltop.land.operations.holders.BlockHolder;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Handles the logic for performing block operations when scanning locations.
  */
 public class BlockOperations {
-    private LinkedHashMap<Material, Double> blockWorth;
-    private Set<Material> blockMaterial;
+    private LinkedHashMap<String, Double> blockWorth;
+    private Set<String> blockMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, BlockHolder> blockHolderMapForLeaderboard = new HashMap<>();
+
+    // todo: check concurrency for this
     private HashMap<UUID, BlockHolder> blockHolderMapForStats = new HashMap<>();
 
     /**
@@ -28,7 +30,7 @@ public class BlockOperations {
      *
      * @param blockWorth map of block materials to their values
      */
-    public BlockOperations(LinkedHashMap<Material, Double> blockWorth) {
+    public BlockOperations(LinkedHashMap<String, Double> blockWorth) {
         this.blockWorth = blockWorth;
         this.blockMaterial = blockWorth.keySet();
     }
@@ -130,10 +132,10 @@ public class BlockOperations {
      */
     public double getAllBlocksWorth(BlockHolder blockHolder) {
         double totalBlockWorth = 0;
-        HashMap<Material, Integer> counter = blockHolder.getCounter();
-        for (Map.Entry<Material, Integer> map : counter.entrySet()) {
+        HashMap<String, MutableInt> counter = blockHolder.getCounter();
+        for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total
-            totalBlockWorth += map.getValue() * blockWorth.get(map.getKey());
+            totalBlockWorth += map.getValue().get() * blockWorth.get(map.getKey());
         }
         return totalBlockWorth;
     }
@@ -142,8 +144,8 @@ public class BlockOperations {
      * Process blocks immediately (and asynchronously) for leaderboard.
      */
     private BiFunction<UUID, Block, Boolean> processBlockForLeaderboard = (uuid, block) -> {
-        Material material = block.getType();
-        if (blockWorth.containsKey(material)) {
+        String material = block.getType().name();
+        if (blockMaterial.contains(material)) {
             blockHolderMapForLeaderboard.get(uuid).addToHolder(material);
             return true;
         }
@@ -154,8 +156,8 @@ public class BlockOperations {
      * Process blocks immediately (and asynchronously) for stats.
      */
     private BiFunction<UUID, Block, Boolean> processBlockForStats = (uuid, block) -> {
-        Material material = block.getType();
-        if (blockWorth.containsKey(material)) {
+        String material = block.getType().name();
+        if (blockMaterial.contains(material)) {
             blockHolderMapForStats.get(uuid).addToHolder(material);
             return true;
         }

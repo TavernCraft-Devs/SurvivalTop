@@ -9,15 +9,14 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
 import tk.taverncraft.survivaltop.utils.MessageManager;
@@ -307,7 +306,7 @@ public class EntityStatsManager {
      *
      * @return hashmap of block name to its worth
      */
-    public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getBlocksForGuiStats(UUID uuid) {
         return main.getLandManager().getBlocksForGuiStats(uuid);
     }
 
@@ -316,7 +315,7 @@ public class EntityStatsManager {
      *
      * @return hashmap of spawner name to its worth
      */
-    public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getSpawnersForGuiStats(UUID uuid) {
         return main.getLandManager().getSpawnersForGuiStats(uuid);
     }
 
@@ -325,7 +324,7 @@ public class EntityStatsManager {
      *
      * @return hashmap of container item name to its worth
      */
-    public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getContainersForGuiStats(UUID uuid) {
         return main.getLandManager().getContainersForGuiStats(uuid);
     }
 
@@ -334,7 +333,7 @@ public class EntityStatsManager {
      *
      * @return hashmap of inventory item name to its worth
      */
-    public HashMap<Material, Integer> getInventoriesForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getInventoriesForGuiStats(UUID uuid) {
         return main.getInventoryManager().getInventoriesForGuiStats(uuid);
     }
 

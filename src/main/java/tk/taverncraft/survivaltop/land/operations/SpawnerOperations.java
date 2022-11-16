@@ -11,20 +11,20 @@ import java.util.function.BiFunction;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.EntityType;
 
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.holders.SpawnerHolder;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Handles the logic for performing spawner operations when scanning locations.
  */
 public class SpawnerOperations {
     private Main main;
-    private LinkedHashMap<EntityType, Double> spawnerWorth;
-    private Set<EntityType> spawnerEntityType;
+    private LinkedHashMap<String, Double> spawnerWorth;
+    private Set<String> spawnerEntityType;
     private RoseStackerAPI rApi;
 
     // holders containing count of each material mapped to uuid
@@ -41,7 +41,7 @@ public class SpawnerOperations {
      * @param main plugin class
      * @param spawnerWorth map of spawner names to their values
      */
-    public SpawnerOperations(Main main, LinkedHashMap<EntityType, Double> spawnerWorth) {
+    public SpawnerOperations(Main main, LinkedHashMap<String, Double> spawnerWorth) {
         this.main = main;
         this.spawnerWorth = spawnerWorth;
         this.spawnerEntityType = spawnerWorth.keySet();
@@ -161,10 +161,10 @@ public class SpawnerOperations {
      */
     public double getAllSpawnersWorth(SpawnerHolder spawnerHolder) {
         double totalSpawnerWorth = 0;
-        HashMap<EntityType, Integer> counter = spawnerHolder.getCounter();
-        for (Map.Entry<EntityType, Integer> map : counter.entrySet()) {
+        HashMap<String, MutableInt> counter = spawnerHolder.getCounter();
+        for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total
-            totalSpawnerWorth += map.getValue() * spawnerWorth.get(map.getKey());
+            totalSpawnerWorth += map.getValue().get() * spawnerWorth.get(map.getKey());
         }
         return totalSpawnerWorth;
     }
@@ -181,8 +181,8 @@ public class SpawnerOperations {
                 Block block = blocks.get(i);
                 try {
                     CreatureSpawner spawner = (CreatureSpawner) block.getState();
-                    EntityType mobType = spawner.getSpawnedType();
-                    if (spawnerWorth.containsKey(mobType)) {
+                    String mobType = spawner.getSpawnedType().name();
+                    if (spawnerEntityType.contains(mobType)) {
                         spawnerHolderMapForLeaderboard.get(uuid).addToHolder(mobType);
                     }
                 } catch (ClassCastException e) {
@@ -206,8 +206,8 @@ public class SpawnerOperations {
             Block block = blocks.get(i);
             try {
                 CreatureSpawner spawner = (CreatureSpawner) block.getState();
-                EntityType mobType = spawner.getSpawnedType();
-                if (spawnerWorth.containsKey(mobType)) {
+                String mobType = spawner.getSpawnedType().getName();
+                if (spawnerEntityType.contains(mobType)) {
                     spawnerHolderMapForStats.get(uuid).addToHolder(mobType);
                 }
             } catch (ClassCastException e) {

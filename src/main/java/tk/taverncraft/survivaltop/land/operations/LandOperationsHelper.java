@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Helper function for loading the logic of calculations.
@@ -31,9 +32,9 @@ public class LandOperationsHelper {
     ArrayList<BiFunction<UUID, Block, Boolean>> landOperationsForStats = new ArrayList<>();
 
     // worth of blocks, spawners and containers
-    private LinkedHashMap<Material, Double> blockWorth = new LinkedHashMap<>();
-    private LinkedHashMap<EntityType, Double> spawnerWorth = new LinkedHashMap<>();
-    private LinkedHashMap<Material, Double> containerWorth = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> blockWorth = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> spawnerWorth = new LinkedHashMap<>();
+    private LinkedHashMap<String, Double> containerWorth = new LinkedHashMap<>();
 
     /**
      * Constructor for LandOperationsHelper.
@@ -101,7 +102,7 @@ public class LandOperationsHelper {
                 if (material == null || !material.isBlock() || !material.isSolid()) {
                     continue;
                 }
-                blockWorth.put(material, main.getBlocksConfig().getDouble(key));
+                blockWorth.put(key.toUpperCase(), main.getBlocksConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
@@ -120,7 +121,7 @@ public class LandOperationsHelper {
                 if (entityType == null) {
                     continue;
                 }
-                spawnerWorth.put(entityType, main.getSpawnersConfig().getDouble(key));
+                spawnerWorth.put(key.toUpperCase(), main.getSpawnersConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
@@ -139,7 +140,7 @@ public class LandOperationsHelper {
                 if (material == null) {
                     continue;
                 }
-                containerWorth.put(material, main.getContainersConfig().getDouble(key));
+                containerWorth.put(key.toUpperCase(), main.getContainersConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
@@ -264,7 +265,7 @@ public class LandOperationsHelper {
      *
      * @return map of block material to value
      */
-    public LinkedHashMap<Material, Double> getBlockWorth() {
+    public LinkedHashMap<String, Double> getBlockWorth() {
         return this.blockWorth;
     }
 
@@ -275,7 +276,7 @@ public class LandOperationsHelper {
      *
      * @return double representing its worth
      */
-    public double getBlockWorth(Material material) {
+    public double getBlockWorth(String material) {
         Double value = this.blockWorth.get(material);
         if (value == null) {
             return 0;
@@ -288,7 +289,7 @@ public class LandOperationsHelper {
      *
      * @return map of spawner entity type to value
      */
-    public LinkedHashMap<EntityType, Double> getSpawnerWorth() {
+    public LinkedHashMap<String, Double> getSpawnerWorth() {
         return this.spawnerWorth;
     }
 
@@ -299,7 +300,7 @@ public class LandOperationsHelper {
      *
      * @return double representing its worth
      */
-    public double getSpawnerWorth(EntityType entityType) {
+    public double getSpawnerWorth(String entityType) {
         Double value = this.spawnerWorth.get(entityType);
         if (value == null) {
             return 0;
@@ -312,7 +313,7 @@ public class LandOperationsHelper {
      *
      * @return map of container item material to value
      */
-    public LinkedHashMap<Material, Double> getContainerWorth() {
+    public LinkedHashMap<String, Double> getContainerWorth() {
         return this.containerWorth;
     }
 
@@ -323,7 +324,7 @@ public class LandOperationsHelper {
      *
      * @return double representing its worth
      */
-    public double getContainerWorth(Material material) {
+    public double getContainerWorth(String material) {
         Double value = this.containerWorth.get(material);
         if (value == null) {
             return 0;
@@ -336,7 +337,7 @@ public class LandOperationsHelper {
      *
      * @return hashmap of block material to its worth
      */
-    public HashMap<Material, Integer> getBlocksForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getBlocksForGuiStats(UUID uuid) {
         return blockOperations.getBlockHolderForStats(uuid).getCounter();
     }
 
@@ -345,7 +346,7 @@ public class LandOperationsHelper {
      *
      * @return hashmap of spawner entity type to its worth
      */
-    public HashMap<EntityType, Integer> getSpawnersForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getSpawnersForGuiStats(UUID uuid) {
         return spawnerOperations.getSpawnerHolderForStats(uuid).getCounter();
     }
 
@@ -354,7 +355,7 @@ public class LandOperationsHelper {
      *
      * @return hashmap of container item material to its worth
      */
-    public HashMap<Material, Integer> getContainersForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getContainersForGuiStats(UUID uuid) {
         return containerOperations.getContainerHolderForStats(uuid).getCounter();
     }
 

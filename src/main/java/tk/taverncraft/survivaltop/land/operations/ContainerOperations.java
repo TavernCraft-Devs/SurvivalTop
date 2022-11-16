@@ -21,14 +21,15 @@ import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.holders.ContainerHolder;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Handles the logic for performing container operations when scanning locations.
  */
 public class ContainerOperations {
     private Main main;
-    private LinkedHashMap<Material, Double> containerWorth;
-    private Set<Material> containerMaterial;
+    private LinkedHashMap<String, Double> containerWorth;
+    private Set<String> containerMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, ContainerHolder> containerHolderMapForLeaderboard = new HashMap<>();
@@ -65,7 +66,7 @@ public class ContainerOperations {
         Material.BLACK_SHULKER_BOX
     );
 
-    private Set<Material> containerTypes;
+    private Set<String> containerTypes;
 
     /**
      * Constructor for ContainerOperations.
@@ -73,7 +74,7 @@ public class ContainerOperations {
      * @param main plugin class
      * @param containerWorth map of container item names to their values
      */
-    public ContainerOperations(Main main, LinkedHashMap<Material, Double> containerWorth) {
+    public ContainerOperations(Main main, LinkedHashMap<String, Double> containerWorth) {
         this.main = main;
         this.containerWorth = containerWorth;
         this.containerTypes = new HashSet<>();
@@ -87,7 +88,7 @@ public class ContainerOperations {
     private void setUpContainerType() {
         List<String> chosenContainers = main.getConfig().getStringList("container-type");
         for (String container : chosenContainers) {
-            Material material = Material.valueOf(container);
+            String material = Material.valueOf(container).name();
             if (allowedTypes.contains(material)) {
                 containerTypes.add(material);
             }
@@ -199,10 +200,10 @@ public class ContainerOperations {
      */
     public double getAllContainersWorth(ContainerHolder containerHolder) {
         double totalContainerWorth = 0;
-        HashMap<Material, Integer> counter = containerHolder.getCounter();
-        for (Map.Entry<Material, Integer> map : counter.entrySet()) {
+        HashMap<String, MutableInt> counter = containerHolder.getCounter();
+        for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total
-            totalContainerWorth += map.getValue() * containerWorth.get(map.getKey());
+            totalContainerWorth += map.getValue().get() * containerWorth.get(map.getKey());
         }
         return totalContainerWorth;
     }
@@ -221,8 +222,8 @@ public class ContainerOperations {
                     if (itemStack == null) {
                         continue;
                     }
-                    Material material = itemStack.getType();
-                    if (containerWorth.containsKey(material)) {
+                    String material = itemStack.getType().name();
+                    if (containerMaterial.contains(material)) {
                         containerHolderMapForLeaderboard.get(uuid).addToHolder(material);
                     }
                 }
@@ -244,8 +245,8 @@ public class ContainerOperations {
                 if (itemStack == null) {
                     continue;
                 }
-                Material material = itemStack.getType();
-                if (containerWorth.containsKey(material)) {
+                String material = itemStack.getType().name();
+                if (containerMaterial.contains(material)) {
                     containerHolderMapForStats.get(uuid).addToHolder(material);
                 }
             }

@@ -16,14 +16,15 @@ import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.inventory.holders.InventoryHolder;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Handles logic for calculating the worth of entity inventory.
  */
 public class InventoryManager {
     private Main main;
-    private LinkedHashMap<Material, Double> inventoryWorth;
-    private Set<Material> inventoryMaterial;
+    private LinkedHashMap<String, Double> inventoryWorth;
+    private Set<String> inventoryMaterial;
 
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, InventoryHolder> inventoryHolderMapForLeaderboard = new HashMap<>();
@@ -92,7 +93,7 @@ public class InventoryManager {
                 if (material == null) {
                     continue;
                 }
-                inventoryWorth.put(material, main.getInventoriesConfig().getDouble(key));
+                inventoryWorth.put(key.toUpperCase(), main.getInventoriesConfig().getDouble(key));
             } catch (Exception e) {
                 Bukkit.getLogger().info(e.getMessage());
             }
@@ -105,7 +106,7 @@ public class InventoryManager {
      *
      * @return map of inventory item name to value
      */
-    public HashMap<Material, Double> getInventoryItemWorth() {
+    public LinkedHashMap<String, Double> getInventoryItemWorth() {
         return this.inventoryWorth;
     }
 
@@ -116,7 +117,7 @@ public class InventoryManager {
      *
      * @return double representing its worth
      */
-    public double getInventoryItemWorth(Material material) {
+    public double getInventoryItemWorth(String material) {
         return this.inventoryWorth.get(material);
     }
 
@@ -205,7 +206,7 @@ public class InventoryManager {
             }
             Material material = itemStack.getType();
             if (inventoryWorth.containsKey(material)) {
-                inventoryHolderMapForLeaderboard.get(uuid).addToHolder(material,
+                inventoryHolderMapForLeaderboard.get(uuid).addToHolder(material.name(),
                     itemStack.getAmount());
             }
         }
@@ -224,7 +225,7 @@ public class InventoryManager {
             }
             Material material = itemStack.getType();
             if (inventoryWorth.containsKey(material)) {
-                inventoryHolderMapForStats.get(uuid).addToHolder(material,
+                inventoryHolderMapForStats.get(uuid).addToHolder(material.name(),
                         itemStack.getAmount());
             }
         }
@@ -264,10 +265,10 @@ public class InventoryManager {
      */
     public double getAllInventoriesWorth(InventoryHolder inventoryHolder) {
         double totalInventoryWorth = 0;
-        HashMap<Material, Integer> counter = inventoryHolder.getCounter();
-        for (Map.Entry<Material, Integer> map : counter.entrySet()) {
+        HashMap<String, MutableInt> counter = inventoryHolder.getCounter();
+        for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total
-            totalInventoryWorth += map.getValue() * inventoryWorth.get(map.getKey());
+            totalInventoryWorth += map.getValue().get() * inventoryWorth.get(map.getKey());
         }
         return totalInventoryWorth;
     }
@@ -279,7 +280,7 @@ public class InventoryManager {
      *
      * @return inventory counter
      */
-    public HashMap<Material, Integer> getInventoriesForGuiStats(UUID uuid) {
+    public HashMap<String, MutableInt> getInventoriesForGuiStats(UUID uuid) {
         return inventoryHolderMapForStats.get(uuid).getCounter();
     }
 }

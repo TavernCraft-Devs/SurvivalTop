@@ -3,23 +3,23 @@ package tk.taverncraft.survivaltop.land.operations.holders;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.bukkit.Material;
+import tk.taverncraft.survivaltop.utils.MutableInt;
 
 /**
  * Holder for tracking count of blocks.
  */
 public class BlockHolder {
-    private HashMap<Material, Integer> counter;
+    private HashMap<String, MutableInt> counter;
 
     /**
      * Constructor for BlockHolder.
      *
      * @param materials list of block materials
      */
-    public BlockHolder(Set<Material> materials) {
+    public BlockHolder(Set<String> materials) {
         counter = new HashMap<>();
-        for (Material material : materials) {
-            counter.put(material, 0);
+        for (String material : materials) {
+            counter.put(material, new MutableInt());
         }
     }
 
@@ -28,7 +28,7 @@ public class BlockHolder {
      *
      * @return counter map
      */
-    public HashMap<Material, Integer> getCounter() {
+    public HashMap<String, MutableInt> getCounter() {
         return this.counter;
     }
 
@@ -37,7 +37,7 @@ public class BlockHolder {
      *
      * @param material material to add count for
      */
-    public void addToHolder(Material material) {
-        counter.merge(material, 1, Integer::sum);
+    public void addToHolder(String material) {
+        counter.get(material).increment();
     }
 }
