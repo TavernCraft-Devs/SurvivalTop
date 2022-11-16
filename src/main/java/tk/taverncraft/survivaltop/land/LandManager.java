@@ -298,5 +298,16 @@ public class LandManager {
     public double getContainerWorth(String material) {
         return this.landOperationsHelper.getContainerWorth(material);
     }
+
+    /**
+     * Gets the claim info for an entity.
+     *
+     * @param name name of entity to get claim info for
+     *
+     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     */
+    public Long[] getClaimsInfo(String name) {
+        return this.landClaimPluginHandler.getClaimsInfo(name);
+    }
 }
 

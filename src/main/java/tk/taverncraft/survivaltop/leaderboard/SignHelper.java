@@ -17,7 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * SignHelper handles all the operations required to update/remove a leaderboard sign.

@@ -71,6 +71,10 @@ public class CommandParser implements CommandExecutor {
         case "RELOAD":
             return new ReloadCommand(this.main).execute(sender);
 
+        // command to dump logs for debugging
+        case "DUMP":
+            return new DumpCommand(this.main).execute(sender);
+
         // special command for stats inventory view
         case "OPENSTATSINV":
             main.getEntityStatsManager().openMainStatsPage(this.main.getSenderUuid(sender));

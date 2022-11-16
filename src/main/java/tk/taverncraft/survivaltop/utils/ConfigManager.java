@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogFile;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * ConfigManager handles the loading of all configuration files.
@@ -129,5 +132,28 @@ public class ConfigManager {
         }
 
         return config;
+    }
+
+    /**
+     * Dumps details into a log file, triggered by the dump command.
+     */
+    public void dumpToLogFile(LogFile logFile) {
+        String fileName = "dump-" + Instant.now().getEpochSecond();
+        File configFile = new File(main.getDataFolder() + "/dumps", fileName);
+        FileConfiguration config = new YamlConfiguration();
+        configFile.getParentFile().mkdirs();
+        main.saveResource(fileName, false);
+
+        config.set("Minecraft-version", logFile.getMinecraftVersion());
+        config.set("SurvivalTop-version", logFile.getMinecraftVersion());
+        config.set("World-size", logFile.getWorldRadius());
+        config.set("Num-entities", logFile.getNumEntities());
+        config.set("Num-claims", logFile.getNumClaims());
+        config.set("Num-blocks", logFile.getNumBlocks());
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

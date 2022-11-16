@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.utils;
+package tk.taverncraft.survivaltop.messages;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

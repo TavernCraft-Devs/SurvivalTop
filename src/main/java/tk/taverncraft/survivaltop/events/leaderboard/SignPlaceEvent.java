@@ -10,7 +10,7 @@ import org.bukkit.event.block.SignChangeEvent;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.leaderboard.SignHelper;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * SignPlaceEvent checks for when a leaderboard sign is placed.

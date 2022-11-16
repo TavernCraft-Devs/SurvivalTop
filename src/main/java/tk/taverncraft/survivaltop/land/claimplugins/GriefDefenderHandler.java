@@ -35,6 +35,30 @@ public class GriefDefenderHandler implements LandClaimPluginHandler {
     }
 
     /**
+     * Gets the claim info for an entity.
+     *
+     * @param name name of entity to get claim info for
+     *
+     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     */
+    public Long[] getClaimsInfo(String name) {
+        long numBlocks = 0;
+        List<Claim> claims = getClaims(name);
+        for (Claim claim : claims) {
+            Vector3i greaterBoundary = claim.getGreaterBoundaryCorner();
+            Vector3i lesserBoundary = claim.getLesserBoundaryCorner();
+            double minX = Math.min(greaterBoundary.getX(), lesserBoundary.getX());
+            double minY = Math.min(greaterBoundary.getY(), lesserBoundary.getY());
+            double minZ = Math.min(greaterBoundary.getZ(), lesserBoundary.getZ());
+            double maxX = Math.max(greaterBoundary.getX(), lesserBoundary.getX()) + 1;
+            double maxY = Math.max(greaterBoundary.getY(), lesserBoundary.getY()) + 1;
+            double maxZ = Math.max(greaterBoundary.getZ(), lesserBoundary.getZ()) + 1;
+            numBlocks += (maxX - minX) * (maxY - minY) * (maxZ - minZ);
+        }
+        return new Long[]{(long) claims.size(), numBlocks};
+    }
+
+    /**
      * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
@@ -43,12 +67,7 @@ public class GriefDefenderHandler implements LandClaimPluginHandler {
      */
     public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
-            List<Claim> claims;
-            if (this.main.groupIsEnabled()) {
-                claims = getClaimsByGroup(name);
-            } else {
-                claims = getClaimsByPlayer(name);
-            }
+            List<Claim> claims = getClaims(name);
             for (Claim claim : claims) {
                 Vector3i greaterBoundary = claim.getGreaterBoundaryCorner();
                 Vector3i lesserBoundary = claim.getLesserBoundaryCorner();
@@ -82,6 +101,19 @@ public class GriefDefenderHandler implements LandClaimPluginHandler {
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
         landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
+    }
+
+    /**
+     * Gets the claim for entity.
+     *
+     * @param name name of entity
+     */
+    private List<Claim> getClaims(String name) {
+        if (this.main.groupIsEnabled()) {
+            return getClaimsByGroup(name);
+        } else {
+            return getClaimsByPlayer(name);
+        }
     }
 
     /**

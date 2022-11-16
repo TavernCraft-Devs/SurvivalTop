@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.utils;
 import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * ValidationManager performs basic validation operations.

@@ -36,6 +36,20 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
     }
 
     /**
+     * Gets the claim info for an entity.
+     *
+     * @param name name of entity to get claim info for
+     *
+     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     */
+    public Long[] getClaimsInfo(String name) {
+        Set<FLocation> claims = getClaims(name);
+        double height = main.getMaxLandHeight() - main.getMinLandHeight();
+        long numBlocks = claims.size() * 16L * 16L * Double.valueOf(height).longValue();
+        return new Long[]{(long) claims.size(), numBlocks};
+    }
+
+    /**
      * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
@@ -44,17 +58,25 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
      */
     public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
-            Set<FLocation> claims;
-            if (this.main.groupIsEnabled()) {
-                claims = getClaimsByGroup(name);
-            } else {
-                claims = getClaimsByPlayer(name);
-            }
+            Set<FLocation> claims = getClaims(name);
             for (FLocation claim : claims) {
                 landOperationsHelper.processEntityChunk(uuid, claim.getChunk(), claim.getWorld(),
                         isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
+        }
+    }
+
+    /**
+     * Gets the claim for entity.
+     *
+     * @param name name of entity
+     */
+    private Set<FLocation> getClaims(String name) {
+        if (this.main.groupIsEnabled()) {
+            return getClaimsByGroup(name);
+        } else {
+            return getClaimsByPlayer(name);
         }
     }
 

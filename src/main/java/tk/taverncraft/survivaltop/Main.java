@@ -24,6 +24,7 @@ import tk.taverncraft.survivaltop.commands.CommandParser;
 import tk.taverncraft.survivaltop.commands.CommandTabCompleter;
 import tk.taverncraft.survivaltop.events.DependencyLoadEvent;
 import tk.taverncraft.survivaltop.leaderboard.LeaderboardManager;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.stats.EntityStatsManager;
 import tk.taverncraft.survivaltop.stats.ServerStatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
@@ -64,6 +65,7 @@ public class Main extends JavaPlugin {
     private ServerStatsManager serverStatsManager;
     private LeaderboardManager leaderboardManager;
     private StorageManager storageManager;
+    private LogManager logManager;
 
     // options
     // todo: move this into an options manager
@@ -76,9 +78,11 @@ public class Main extends JavaPlugin {
     private boolean useGuiStats;
     private boolean useRealTimeStats;
     private boolean useGuiLeaderboard;
+    private int maxLandHeight;
+    private int minLandHeight;
 
     // console uuid
-    private UUID consoleUuid = UUID.randomUUID();
+    private final UUID consoleUuid = UUID.randomUUID();
 
     @Override
     public void onDisable() {
@@ -119,6 +123,7 @@ public class Main extends JavaPlugin {
             // load worth values into info gui
             new InfoGui(this);
             this.groupManager = new GroupManager(this);
+            this.logManager = new LogManager(this);
         } catch (NullPointerException e) {
             Bukkit.getLogger().severe(
                     "[SurvivalTop] Is your config.yml updated/set up correctly?");
@@ -174,6 +179,8 @@ public class Main extends JavaPlugin {
         this.useGuiStats = this.getConfig().getBoolean("use-gui-stats", true);
         this.useRealTimeStats = this.getConfig().getBoolean("use-realtime-stats", false);
         this.useGuiLeaderboard = this.getConfig().getBoolean("use-gui-leaderboard", false);
+        setMaxLandHeight();
+        setMinLandHeight();
     }
 
     /**
@@ -222,19 +229,37 @@ public class Main extends JavaPlugin {
         perms = rsp.getProvider();
     }
 
-    public double getMaxHeight() {
+    public double getMaxLandHeight() {
+        return this.maxLandHeight;
+    }
+
+    public double getMinLandHeight() {
+        return this.minLandHeight;
+    }
+
+    private void setMaxLandHeight() {
         if (Bukkit.getVersion().contains("1.18") || Bukkit.getVersion().contains("1.19")) {
-            return 320;
+            this.maxLandHeight = 320;
         } else {
-            return 256;
+            this.maxLandHeight = 256;
+        }
+
+        if (!getConfig().getString("max-land-height", "default")
+            .equalsIgnoreCase("default")) {
+            this.maxLandHeight = getConfig().getInt("max-land-height", this.maxLandHeight);
         }
     }
 
-    public double getMinHeight() {
+    private void setMinLandHeight() {
         if (Bukkit.getVersion().contains("1.18") || Bukkit.getVersion().contains("1.19")) {
-            return -64;
+            this.minLandHeight = -64;
         } else {
-            return 0;
+            this.minLandHeight = 0;
+        }
+
+        if (!getConfig().getString("min-land-height", "default")
+            .equalsIgnoreCase("default")) {
+            this.minLandHeight = getConfig().getInt("min-land-height", this.minLandHeight);
         }
     }
 
@@ -384,5 +409,9 @@ public class Main extends JavaPlugin {
 
     public StorageManager getStorageManager() {
         return this.storageManager;
+    }
+
+    public LogManager getLogManager() {
+        return this.logManager;
     }
 }

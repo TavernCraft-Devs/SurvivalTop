@@ -3,7 +3,7 @@ package tk.taverncraft.survivaltop.commands;
 import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**

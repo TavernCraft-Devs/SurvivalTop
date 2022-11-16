@@ -10,7 +10,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * LeaderboardManager contains the main logic related to updating the leaderboard.

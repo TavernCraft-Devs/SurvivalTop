@@ -11,6 +11,9 @@ no-permission: '&cYou do not have the permission to run this command!'
 entity-not-exist: '&cThe name you entered does not exist!' # %entity%
 player-only-command: '&cThis command may only be executed by an in-game player!'
 unexpected-error: '&cAn unexpected error has occurred, please contact the plugin author.'
+log-started: '&aStarted log dump. This may take a while depending on your server size.'
+log-in-progress: '&cThere is already a log dump in progress, please try again later!'
+log-complete: '&aLog dump complete! You may find the latest output inside the plugin &bdumps &afolder!'
 
 # leaderboard/stats messages
 update-started: '&aStarted leaderboard update. This may take a while depending on the player-base size.'
@@ -34,6 +37,7 @@ help-text: |
   &a/st update &b- manually trigger leaderboard update
   &a/st help &b- list available commands
   &a/st reload &b- reload the plugin
+  &a/st dump &b- dump logs for debugging
 
 # format for leaderboard sign message (line 1 and 2 are fixed, only line 3 and 4 are customizable)
 # supports the following placeholders:

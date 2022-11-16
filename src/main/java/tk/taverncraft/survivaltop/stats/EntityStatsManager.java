@@ -19,7 +19,7 @@ import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.utils.MutableInt;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * EntityStatsManager handles all logic for getting entity (player/group) stats but does not

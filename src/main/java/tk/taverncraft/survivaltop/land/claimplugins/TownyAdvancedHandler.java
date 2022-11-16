@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 
@@ -41,6 +40,28 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
     }
 
     /**
+     * Gets the claim info for an entity.
+     *
+     * @param name name of entity to get claim info for
+     *
+     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     */
+    public Long[] getClaimsInfo(String name) {
+        long numBlocks = 0;
+        Collection<TownBlock> claims = getClaims(name);
+        int townSize = this.main.getConfig().getInt("town-block-size", 16);
+        for (TownBlock claim : claims) {
+            double minX = claim.getX() * townSize;
+            double minZ = claim.getZ() * townSize;
+            double maxX = minX + townSize;
+            double maxZ = minZ + townSize;
+            numBlocks += (maxX - minX) * (maxZ - minZ) *
+                (this.main.getMaxLandHeight() - this.main.getMinLandHeight());
+        }
+        return new Long[]{(long) claims.size(), numBlocks};
+    }
+
+    /**
      * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
@@ -49,20 +70,15 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      */
     public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
-            Collection<TownBlock> claims;
-            if (this.main.groupIsEnabled()) {
-                claims = getClaimsByGroup(name);
-            } else {
-                claims = getClaimsByPlayer(name);
-            }
+            Collection<TownBlock> claims = getClaims(name);
             int townSize = this.main.getConfig().getInt("town-block-size", 16);
             for (TownBlock claim : claims) {
                 World world = claim.getWorldCoord().getBukkitWorld();
-                int x = claim.getX() * townSize;
-                int z = claim.getZ() * townSize;
-                Location loc1 = new Location(world, x, 0, z);
-                Location loc2 = new Location(world, x + 15, 0, z + 15);
-                processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                double minX = claim.getX() * townSize;
+                double minZ = claim.getZ() * townSize;
+                double maxX = minX + townSize;
+                double maxZ = minZ + townSize;
+                processEntityClaim(uuid, maxX, maxZ, minX, minZ, world, isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
@@ -72,21 +88,32 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      * Processes the worth of a claim identified between 2 locations.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
-     * @param l1 location 1
-     * @param l2 location 2
+     * @param maxX max value of x
+     * @param maxZ max value of z
+     * @param minX min value of x
+     * @param minZ min value of z
      * @param world world that the claim is in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
-            boolean isLeaderboardUpdate) {
-        double minX = Math.min(l1.getX(), l2.getX());
-        double minY = this.main.getMinHeight();
-        double minZ = Math.min(l1.getZ(), l2.getZ());
-        double maxX = Math.max(l1.getX(), l2.getX()) + 1;
-        double maxY = this.main.getMaxHeight();
-        double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
+    public void processEntityClaim(UUID uuid, double maxX, double maxZ, double minX, double minZ,
+            World world, boolean isLeaderboardUpdate) {
+        double minY = this.main.getMinLandHeight();
+        double maxY = this.main.getMaxLandHeight();
         landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
+    }
+
+    /**
+     * Gets the claim for entity.
+     *
+     * @param name name of entity
+     */
+    private Collection<TownBlock> getClaims(String name) {
+        if (this.main.groupIsEnabled()) {
+            return getClaimsByGroup(name);
+        } else {
+            return getClaimsByPlayer(name);
+        }
     }
 
     /**

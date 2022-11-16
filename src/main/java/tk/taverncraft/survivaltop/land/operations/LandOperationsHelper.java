@@ -244,8 +244,8 @@ public class LandOperationsHelper {
 
         int x = chunk.getX() << 4;
         int z = chunk.getZ() << 4;
-        int maxHeight = (int) main.getMaxHeight();
-        int minHeight = (int) main.getMinHeight();
+        int maxHeight = (int) main.getMaxLandHeight();
+        int minHeight = (int) main.getMinLandHeight();
         for (int i = x; i < x + 16; ++i) {
             for (int j = z; j < z + 16; ++j) {
                 for (int k = minHeight; k < maxHeight; ++k) {

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**

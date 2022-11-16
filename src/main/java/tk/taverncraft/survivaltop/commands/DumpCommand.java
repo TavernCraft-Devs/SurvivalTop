@@ -3,48 +3,50 @@ package tk.taverncraft.survivaltop.commands;
 import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 import tk.taverncraft.survivaltop.utils.ValidationManager;
 
 /**
- * UpdateCommand contains the execute method for when a user wishes to manually trigger a
- * leaderboard update.
+ * DumpCommand contains the execute method for when a user dumps logs for debugging.
  */
-public class UpdateCommand {
-
-    private final String updatePerm = "survtop.update";
+public class DumpCommand {
     private final Main main;
+    private final String dumpPerm = "survtop.dump";
     private final ValidationManager validationManager;
 
     /**
-     * Constructor for UpdateCommand.
+     * Constructor for DumpCommand.
      *
      * @param main plugin class
      */
-    public UpdateCommand(Main main) {
+    public DumpCommand(Main main) {
         this.main = main;
         this.validationManager = new ValidationManager(main);
     }
 
     /**
-     * Updates the leaderboard.
+     * Prepares debugging logs for user.
      *
      * @param sender user who sent the command
      *
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender) {
-        if (!validationManager.hasPermission(updatePerm, sender)) {
+        if (!validationManager.hasPermission(dumpPerm, sender)) {
             return true;
         }
 
-        // check if there is an existing update ongoing (guard against spam)
-        if (main.getLeaderboardManager().isUpdating()) {
-            MessageManager.sendMessage(sender, "update-in-progress");
+        LogManager logManager = main.getLogManager();
+        if (logManager.isLogging()) {
+            MessageManager.sendMessage(sender, "log-in-progress");
             return true;
         }
 
-        main.getLeaderboardManager().doManualLeaderboardUpdate(sender);
+        logManager.startLogDump(sender);
+
+        MessageManager.sendMessage(sender, "log-started");
         return true;
     }
 }
+

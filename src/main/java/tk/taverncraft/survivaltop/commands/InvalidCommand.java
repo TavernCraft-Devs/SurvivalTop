@@ -2,7 +2,7 @@ package tk.taverncraft.survivaltop.commands;
 
 import org.bukkit.command.CommandSender;
 
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * InvalidCommand contains the execute method for when a user inputs an unrecognised command.

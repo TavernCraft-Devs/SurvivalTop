@@ -35,6 +35,26 @@ public class RedProtectHandler implements LandClaimPluginHandler  {
     }
 
     /**
+     * Gets the claim info for an entity.
+     *
+     * @param name name of entity to get claim info for
+     *
+     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     */
+    public Long[] getClaimsInfo(String name) {
+        long numBlocks = 0;
+        Set<Region> claims = getClaims(name);
+        for (Region claim : claims) {
+            Location loc1 = claim.getMaxLocation();
+            Location loc2 = claim.getMinLocation();
+            double minY = Math.min(loc1.getY(), loc2.getY());
+            double maxY = Math.min(loc1.getY(), loc2.getY());
+            numBlocks += claim.getArea() * (maxY - minY);
+        }
+        return new Long[]{(long) claims.size(), numBlocks};
+    }
+
+    /**
      * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
@@ -43,12 +63,7 @@ public class RedProtectHandler implements LandClaimPluginHandler  {
      */
     public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
-            Set<Region> claims;
-            if (this.main.groupIsEnabled()) {
-                claims = getClaimsByGroup(name);
-            } else {
-                claims = getClaimsByPlayer(name);
-            }
+            Set<Region> claims = getClaims(name);
             for (Region claim : claims) {
                 World world = Bukkit.getWorld(claim.getWorld());
                 Location loc1 = claim.getMaxLocation();
@@ -78,6 +93,19 @@ public class RedProtectHandler implements LandClaimPluginHandler  {
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
         landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
+    }
+
+    /**
+     * Gets the claim for entity.
+     *
+     * @param name name of entity
+     */
+    private Set<Region> getClaims(String name) {
+        if (this.main.groupIsEnabled()) {
+            return getClaimsByGroup(name);
+        } else {
+            return getClaimsByPlayer(name);
+        }
     }
 
     /**

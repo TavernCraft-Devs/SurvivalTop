@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.LeaderboardGui;
-import tk.taverncraft.survivaltop.utils.MessageManager;
+import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
  * ServerStatsManager handles all logic for updating of server-wide stats.

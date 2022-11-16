@@ -6,9 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 
 import org.kingdoms.constants.group.Kingdom;
 import org.kingdoms.constants.land.location.SimpleChunkLocation;
@@ -37,6 +35,20 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
     }
 
     /**
+     * Gets the claim info for an entity.
+     *
+     * @param name name of entity to get claim info for
+     *
+     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     */
+    public Long[] getClaimsInfo(String name) {
+        Set<SimpleChunkLocation> claims = getClaims(name);
+        double height = main.getMaxLandHeight() - main.getMinLandHeight();
+        long numBlocks = claims.size() * 16L * 16L * Double.valueOf(height).longValue();
+        return new Long[]{(long) claims.size(), numBlocks};
+    }
+
+    /**
      * Processes the worth of a land.
      *
      * @param uuid uuid of sender if this is run through stats command; otherwise entities
@@ -45,43 +57,26 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      */
     public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
         try {
-            Set<SimpleChunkLocation> claims;
-            if (this.main.groupIsEnabled()) {
-                claims = getClaimsByGroup(name);
-            } else {
-                claims = getClaimsByPlayer(name);
-            }
+            Set<SimpleChunkLocation> claims = getClaims(name);
             for (SimpleChunkLocation claim : claims) {
-                World world = claim.getBukkitWorld();
-                int x = claim.getX() * 16;
-                int z = claim.getZ() * 16;
-                Location loc1 = new Location(world, x, 0, z);
-                Location loc2 = new Location(world, x + 15, 0, z + 15);
-                processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                landOperationsHelper.processEntityChunk(uuid, claim.toChunk(),
+                        claim.getBukkitWorld(), isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
     }
 
     /**
-     * Processes the worth of a claim identified between 2 locations.
+     * Gets the claim for entity.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
-     * @param l1 location 1
-     * @param l2 location 2
-     * @param world world that the claim is in
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
+     * @param name name of entity
      */
-    public void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
-            boolean isLeaderboardUpdate) {
-        double minX = Math.min(l1.getX(), l2.getX());
-        double minY = this.main.getMinHeight();
-        double minZ = Math.min(l1.getZ(), l2.getZ());
-        double maxX = Math.max(l1.getX(), l2.getX()) + 1;
-        double maxY = this.main.getMaxHeight();
-        double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
-                isLeaderboardUpdate);
+    private Set<SimpleChunkLocation> getClaims(String name) {
+        if (this.main.groupIsEnabled()) {
+            return getClaimsByGroup(name);
+        } else {
+            return getClaimsByPlayer(name);
+        }
     }
 
     /**
