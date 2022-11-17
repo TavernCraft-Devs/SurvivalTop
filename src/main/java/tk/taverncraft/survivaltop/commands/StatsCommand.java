@@ -81,7 +81,7 @@ public class StatsCommand {
 
         MessageManager.sendMessage(sender, "start-calculating-stats");
         if (main.getOptions().isUseRealTimeStats()) {
-            main.getEntityStatsManager().getRealTimeEntityStats(sender, uuid, name);
+            main.getEntityStatsManager().getRealTimeEntityStats(sender, name);
         } else {
             main.getEntityStatsManager().getCachedEntityStats(sender, uuid, name);
         }
@@ -120,7 +120,7 @@ public class StatsCommand {
 
         MessageManager.sendMessage(sender, "start-calculating-stats");
         if (main.getOptions().isUseRealTimeStats()) {
-            main.getEntityStatsManager().getRealTimeEntityStats(sender, uuid, name);
+            main.getEntityStatsManager().getRealTimeEntityStats(sender, name);
         } else {
             main.getEntityStatsManager().getCachedEntityStats(sender, uuid, name);
         }

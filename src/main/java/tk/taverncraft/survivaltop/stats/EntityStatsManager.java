@@ -14,9 +14,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
@@ -34,9 +34,6 @@ public class EntityStatsManager {
 
     // prevent stats command spam by tracking stats tasks
     private final HashMap<UUID, Long> calculationStartTime = new HashMap<>();
-    private final HashMap<UUID, BukkitTask> statsInitialTask = new HashMap<>();
-    private final HashMap<UUID, BukkitTask> mainThreadCalculationTask = new HashMap<>();
-    private final HashMap<UUID, BukkitTask> statsUiTask = new HashMap<>();
 
     // map of sender uuid to the gui to show sender
     private final HashMap<UUID, EntityStatsGui> senderGui = new HashMap<>();
@@ -54,18 +51,16 @@ public class EntityStatsManager {
      * Entry point for getting the real time stats of an entity.
      *
      * @param sender sender who requested for stats
-     * @param uuid uuid of sender
      * @param name name of entity
      */
-    public void getRealTimeEntityStats(CommandSender sender, UUID uuid, String name) {
+    public void getRealTimeEntityStats(CommandSender sender, String name) {
         setCalculatingStats(sender);
-        BukkitTask task = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 calculateEntityStats(sender, name);
             }
         }.runTaskAsynchronously(main);
-        statsInitialTask.put(uuid, task);
     }
 
     /**
@@ -80,7 +75,7 @@ public class EntityStatsManager {
         EntityCache eCache = main.getServerStatsManager().getEntityCache(name);
         // default to real time values if cache not found i.e. leaderboard not updated
         if (eCache == null) {
-            getRealTimeEntityStats(sender, uuid, name);
+            getRealTimeEntityStats(sender, name);
             return;
         }
 
@@ -101,7 +96,7 @@ public class EntityStatsManager {
      */
     private void handleCachedStatsInGui(CommandSender sender, String name, EntityCache eCache) {
         UUID uuid = this.main.getSenderUuid(sender);
-        BukkitTask task = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 EntityStatsGui gui = new EntityStatsGui(main, name, eCache);
@@ -109,7 +104,6 @@ public class EntityStatsManager {
                 showEntityStatsToUser(sender);
             }
         }.runTaskAsynchronously(main);
-        this.statsUiTask.put(uuid, task);
     }
 
     /**
@@ -160,6 +154,7 @@ public class EntityStatsManager {
             }
             executePostCalculationActions(sender, uuid, name, balWealth, blockValue, inventoryValue);
         } catch (Exception ignored) {
+            interruptStatsCalculations(sender);
             // sometimes exception is thrown when reloading is done in the middle of calculations
         }
     }
@@ -217,7 +212,7 @@ public class EntityStatsManager {
      */
     private void processStatsGui(CommandSender sender, String name, double... values) {
         UUID uuid = this.main.getSenderUuid(sender);
-        BukkitTask task = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 EntityStatsGui gui = new EntityStatsGui(main, uuid, name, values);
@@ -225,7 +220,6 @@ public class EntityStatsManager {
                 showEntityStatsToUser(sender);
             }
         }.runTaskAsynchronously(main);
-        this.statsUiTask.put(uuid, task);
     }
 
     /**
@@ -314,7 +308,6 @@ public class EntityStatsManager {
         main.getLandManager().doCleanUpForStats(uuid);
         main.getInventoryManager().doCleanUpForStats(uuid);
         calculationStartTime.remove(uuid);
-        statsInitialTask.remove(uuid);
     }
 
     /**
@@ -415,21 +408,6 @@ public class EntityStatsManager {
     public void stopEntityStatsCalculations() {
         for (UUID uuid : calculationStartTime.keySet()) {
             calculationStartTime.remove(uuid);
-            BukkitTask initialTask = statsInitialTask.get(uuid);
-            if (initialTask != null) {
-                initialTask.cancel();
-            }
-            statsInitialTask.remove(uuid);
-            BukkitTask mainThreadTask = mainThreadCalculationTask.get(uuid);
-            if (mainThreadTask != null) {
-                mainThreadTask.cancel();
-            }
-            mainThreadCalculationTask.remove(uuid);
-            BukkitTask finalTask = statsUiTask.get(uuid);
-            if (finalTask != null) {
-                finalTask.cancel();
-            }
-            statsUiTask.remove(uuid);
         }
     }
 
@@ -444,7 +422,7 @@ public class EntityStatsManager {
         try {
             Bukkit.getPlayer(uuid).openInventory(senderGui.get(uuid).getMainStatsPage());
         } catch (Exception e) {
-            Bukkit.getLogger().warning(e.getMessage());
+            LogManager.error(e.getMessage());
         }
     }
 

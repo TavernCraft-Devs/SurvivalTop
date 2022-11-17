@@ -181,11 +181,29 @@ public class LogManager {
     }
 
     /**
+     * Logs warnings for the plugin.
+     *
+     * @param message warning message
+     */
+    public static void warn(String message) {
+        Bukkit.getLogger().info("[SurvivalTop] WARNING: " + message);
+    }
+
+    /**
      * Logs information for the plugin.
      *
-     * @param message message to log
+     * @param message info message
      */
-    public static void log(String message) {
-        Bukkit.getLogger().info("[SurvivalTop] " + message);
+    public static void info(String message) {
+        Bukkit.getLogger().info("[SurvivalTop] INFO: " + message);
+    }
+
+    /**
+     * Logs errors for the plugin.
+     *
+     * @param message error message
+     */
+    public static void error(String message) {
+        Bukkit.getLogger().info("[SurvivalTop] ERROR: " + message);
     }
 }

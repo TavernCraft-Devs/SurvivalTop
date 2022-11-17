@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogManager;
 
 /**
  * DependencyManager handles the checking for dependencies.
@@ -84,7 +85,7 @@ public class DependencyManager {
             Bukkit.getServer().getPluginManager().getPlugin(plugin).isEnabled()) {
             return true;
         }
-        Bukkit.getLogger().severe("[SurvivalTop] There appears to be a missing dependency: "
+        LogManager.error("There appears to be a missing dependency: "
                 + plugin + ". Have you installed it correctly?");
         return false;
     }
@@ -101,9 +102,9 @@ public class DependencyManager {
             enabled = isDependencyEnabled(depPlugin);
 
             if (enabled) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with Vault!");
+                LogManager.info("Successfully integrated with Vault!");
             } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with Vault!");
+                LogManager.error("Failed to integrate with Vault!");
                 main.getOptions().disableBal();
                 return false;
             }
@@ -123,7 +124,7 @@ public class DependencyManager {
                 "griefprevention").toLowerCase();
             String depPlugin = pluginMap.get(landType);
             if (depPlugin == null) {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
+                LogManager.error("Failed to find a dependency for "
                     + landType + ", did you make a typo in the config?");
                 main.getOptions().disableLand();
                 return false;
@@ -131,10 +132,10 @@ public class DependencyManager {
             enabled = isDependencyEnabled(depPlugin);
 
             if (enabled) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with "
+                LogManager.info("Successfully integrated with "
                     + depPlugin + " for land type!");
             } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with "
+                LogManager.error("Failed to integrate with "
                     + depPlugin + " for land type!");
                 main.getOptions().disableLand();
                 return false;
@@ -155,7 +156,7 @@ public class DependencyManager {
                 "factionsuuid").toLowerCase();
             String depPlugin = pluginMap.get(groupType);
             if (depPlugin == null) {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to find a dependency for "
+                LogManager.error("Failed to find a dependency for "
                     + groupType + ", did you make a typo in the config?");
                 main.getOptions().disableGroup();
                 return false;
@@ -163,10 +164,10 @@ public class DependencyManager {
             enabled = isDependencyEnabled(depPlugin);
 
             if (enabled) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with "
+                LogManager.info("Successfully integrated with "
                     + depPlugin + " for group type!");
             } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with "
+                LogManager.error("Failed to integrate with "
                     + depPlugin + " for group type!");
                 main.getOptions().disableGroup();
                 return false;

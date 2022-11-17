@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.inventory.holders.InventoryHolder;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
@@ -100,7 +101,7 @@ public class InventoryManager {
                 }
                 inventoryWorth.put(key.toUpperCase(), main.getInventoriesConfig().getDouble(key));
             } catch (Exception e) {
-                Bukkit.getLogger().info(e.getMessage());
+                LogManager.warn(e.getMessage());
             }
         }
         inventoryMaterial = inventoryWorth.keySet();

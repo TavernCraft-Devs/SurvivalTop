@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
@@ -107,7 +108,7 @@ public class LandOperationsHelper {
                 }
                 blockWorth.put(key.toUpperCase(), main.getBlocksConfig().getDouble(key));
             } catch (Exception e) {
-                Bukkit.getLogger().info(e.getMessage());
+                LogManager.warn(e.getMessage());
             }
         }
     }
@@ -126,7 +127,7 @@ public class LandOperationsHelper {
                 }
                 spawnerWorth.put(key.toUpperCase(), main.getSpawnersConfig().getDouble(key));
             } catch (Exception e) {
-                Bukkit.getLogger().info(e.getMessage());
+                LogManager.warn(e.getMessage());
             }
         }
     }
@@ -145,7 +146,7 @@ public class LandOperationsHelper {
                 }
                 containerWorth.put(key.toUpperCase(), main.getContainersConfig().getDouble(key));
             } catch (Exception e) {
-                Bukkit.getLogger().info(e.getMessage());
+                LogManager.warn(e.getMessage());
             }
         }
     }

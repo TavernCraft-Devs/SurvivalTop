@@ -15,9 +15,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.LeaderboardGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
@@ -43,10 +43,6 @@ public class ServerStatsManager {
     // leaderboard gui, for upcoming update
     private final HashMap<UUID, LeaderboardGui> leaderboardGui = new HashMap<>();
 
-    // leaderboard update tasks
-    BukkitTask spawnerAndContainerTask;
-    BukkitTask postUpdateActionsTask;
-
     /**
      * Constructor for ServerStatsManager.
      *
@@ -61,7 +57,6 @@ public class ServerStatsManager {
      * Initializes all values to default.
      */
     public void initializeValues() throws NullPointerException {
-        stopExistingTasks();
         entityPositionCache = new ConcurrentHashMap<>();
         uuidToEntityCacheMap = new ConcurrentHashMap<>();
         entityCacheList = new ArrayList<>();
@@ -87,7 +82,7 @@ public class ServerStatsManager {
             }
             processSpawnersAndContainers(sender);
         } catch (Exception e) {
-            Bukkit.getLogger().info(e.getMessage());
+            LogManager.error(e.getMessage());
             this.main.getLeaderboardManager().stopExistingTasks();
         }
     }
@@ -103,7 +98,7 @@ public class ServerStatsManager {
             main.getLeaderboardManager().interruptLeaderboardUpdate(sender);
             return;
         }
-        spawnerAndContainerTask = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 main.getLandManager().processSpawnerTypesForLeaderboard();
@@ -195,7 +190,7 @@ public class ServerStatsManager {
             main.getLeaderboardManager().interruptLeaderboardUpdate(sender);
             return;
         }
-        postUpdateActionsTask = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 if (main.getOptions().landIsIncluded()) {
@@ -483,20 +478,6 @@ public class ServerStatsManager {
      */
     public HashMap<String, UUID> getGroupNameToUuidMap() {
         return this.groupNameToUuidMap;
-    }
-
-    /**
-     * Stops all existing leaderboard related tasks.
-     */
-    public void stopExistingTasks() {
-        if (spawnerAndContainerTask != null) {
-            spawnerAndContainerTask.cancel();
-            spawnerAndContainerTask = null;
-        }
-        if (postUpdateActionsTask != null) {
-            postUpdateActionsTask.cancel();
-            postUpdateActionsTask = null;
-        }
     }
 
     /**

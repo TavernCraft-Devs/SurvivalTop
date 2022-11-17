@@ -53,7 +53,6 @@ public class PapiManager extends PlaceholderExpansion {
                 int index = Integer.parseInt(args[2]) - 1;
                 return main.getServerStatsManager().getEntityNameAtPosition(index);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                Bukkit.getConsoleSender().sendMessage(e.getMessage());
                 return "None";
             }
         }

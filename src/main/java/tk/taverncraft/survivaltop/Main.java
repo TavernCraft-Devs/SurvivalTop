@@ -119,8 +119,7 @@ public class Main extends JavaPlugin {
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
         } catch (NullPointerException e) {
-            Bukkit.getLogger().severe(
-                    "[SurvivalTop] Is your config.yml updated/set up correctly?");
+            LogManager.error("Is your config.yml updated/set up correctly?");
             getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -175,7 +174,7 @@ public class Main extends JavaPlugin {
         checkPlaceholderAPI();
 
         if (!this.dependencyManager.checkAllDependencies()) {
-            Bukkit.getLogger().severe("[SurvivalTop] Some options were disabled on startup " +
+            LogManager.error("Some options were disabled on startup " +
                     "to prevent errors, please check your config file!");
         }
     }
@@ -185,7 +184,7 @@ public class Main extends JavaPlugin {
      */
     private void checkPlaceholderAPI() {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            getLogger().info(String.format("[%s] - PlaceholderAPI found, integrated with plugin!",
+            LogManager.info(String.format("[%s] - PlaceholderAPI found, integrated with plugin!",
                     getDescription().getName()));
             new PapiManager(this).register();
         }

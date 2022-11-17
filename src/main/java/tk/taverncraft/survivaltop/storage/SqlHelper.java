@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
@@ -86,7 +87,7 @@ public class SqlHelper implements StorageHelper {
                 stmt.executeUpdate();
             }
         } catch (NullPointerException | SQLException e) {
-            Bukkit.getLogger().severe(e.getMessage());
+            LogManager.error(e.getMessage());
         }
     }
 
@@ -124,7 +125,7 @@ public class SqlHelper implements StorageHelper {
             return conn;
 
         } catch (SQLException e){
-            Bukkit.getLogger().warning(e.getMessage());
+            LogManager.warn(e.getMessage());
             return null;
         }
     }
@@ -152,7 +153,7 @@ public class SqlHelper implements StorageHelper {
             }
 
         } else {
-            Bukkit.getLogger().severe("Unable to connect to database.");
+            LogManager.error("Unable to connect to database.");
         }
         return false;
     }
