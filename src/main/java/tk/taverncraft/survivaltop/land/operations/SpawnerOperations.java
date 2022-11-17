@@ -24,6 +24,7 @@ import tk.taverncraft.survivaltop.utils.types.MutableInt;
  */
 public class SpawnerOperations {
     private final Main main;
+    private final LandOperationsHelper landOperationsHelper;
     private final LinkedHashMap<String, Double> spawnerWorth;
     private final Set<String> spawnerEntityType;
     private RoseStackerAPI rApi;
@@ -42,10 +43,13 @@ public class SpawnerOperations {
      * Constructor for SpawnerOperations.
      *
      * @param main plugin class
+     * @param landOperationsHelper helper for land operations
      * @param spawnerWorth map of spawner names to their values
      */
-    public SpawnerOperations(Main main, LinkedHashMap<String, Double> spawnerWorth) {
+    public SpawnerOperations(Main main, LandOperationsHelper landOperationsHelper,
+            LinkedHashMap<String, Double> spawnerWorth) {
         this.main = main;
+        this.landOperationsHelper = landOperationsHelper;
         this.spawnerWorth = spawnerWorth;
         this.spawnerEntityType = spawnerWorth.keySet();
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
@@ -181,6 +185,9 @@ public class SpawnerOperations {
             ArrayList<Block> blocks = map.getValue();
             int numBlocks = blocks.size();
             for (int i = 0; i < numBlocks; i++) {
+                if (landOperationsHelper.getStopOperations()) {
+                    return;
+                }
                 Block block = blocks.get(i);
                 try {
                     CreatureSpawner spawner = (CreatureSpawner) block.getState();
@@ -204,6 +211,9 @@ public class SpawnerOperations {
         ArrayList<Block> blocks = preprocessedSpawnersForStats.get(uuid);
         int numBlocks = blocks.size();
         for (int i = 0; i < numBlocks; i++) {
+            if (landOperationsHelper.getStopOperations()) {
+                return;
+            }
             Block block = blocks.get(i);
             try {
                 CreatureSpawner spawner = (CreatureSpawner) block.getState();

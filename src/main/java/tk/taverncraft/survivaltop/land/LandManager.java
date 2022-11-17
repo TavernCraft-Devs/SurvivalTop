@@ -309,5 +309,14 @@ public class LandManager {
     public Long[] getClaimsInfo(String name) {
         return this.landClaimPluginHandler.getClaimsInfo(name);
     }
+
+    /**
+     * Sets the state for operations to stop or continue.
+     *
+     * @param state state to set operations to
+     */
+    public void setStopOperations(boolean state) {
+        landOperationsHelper.setStopOperations(state);
+    }
 }
 

@@ -10,6 +10,9 @@ public class LogFile {
     private final int numEntities;
     private final long numClaims;
     private final long numBlocks;
+    private final long leaderboardUpdateStartTime;
+    private final long lastUpdateDuration;
+    private final long estimatedBlockProcessingRate;
 
     /**
      * Constructor for LogFile.
@@ -22,13 +25,17 @@ public class LogFile {
      * @param numBlocks number of blocks
      */
     public LogFile(String minecraftVersion, String survivalTopVersion, String worldSize,
-            int numEntities, long numClaims, long numBlocks) {
+            int numEntities, long numClaims, long numBlocks, long leaderboardUpdateStartTime,
+            long lastUpdateDuration, long estimatedBlockProcessingRate) {
         this.minecraftVersion = minecraftVersion;
         this.survivalTopVersion = survivalTopVersion;
         this.worldSize = worldSize;
         this.numEntities = numEntities;
         this.numClaims = numClaims;
         this.numBlocks = numBlocks;
+        this.leaderboardUpdateStartTime = leaderboardUpdateStartTime;
+        this.lastUpdateDuration = lastUpdateDuration;
+        this.estimatedBlockProcessingRate = estimatedBlockProcessingRate;
     }
 
     /**
@@ -83,5 +90,32 @@ public class LogFile {
      */
     public long getNumBlocks() {
         return this.numBlocks;
+    }
+
+    /**
+     * Gets the start time of the last leaderboard update.
+     *
+     * @return start time of last leaderboard update
+     */
+    public long getLeaderboardUpdateStartTime() {
+        return this.leaderboardUpdateStartTime;
+    }
+
+    /**
+     * Gets the duration of the last leaderboard update.
+     *
+     * @return duration of last leaderboard update
+     */
+    public long getLastUpdateDuration() {
+        return this.lastUpdateDuration;
+    }
+
+    /**
+     * Gets the estimated block processing rate based on the last update (in seconds).
+     *
+     * @return estimated block processing rate
+     */
+    public long getEstimatedBlockProcessingRate() {
+        return this.estimatedBlockProcessingRate;
     }
 }

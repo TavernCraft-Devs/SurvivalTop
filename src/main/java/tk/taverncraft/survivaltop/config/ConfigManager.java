@@ -149,6 +149,9 @@ public class ConfigManager {
         config.set("num-entities", logFile.getNumEntities());
         config.set("num-claims", logFile.getNumClaims());
         config.set("num-blocks", logFile.getNumBlocks());
+        config.set("leaderboard-update-start-time", logFile.getLeaderboardUpdateStartTime());
+        config.set("last-update-duration", logFile.getLastUpdateDuration());
+        config.set("estimated-block-processing-rate", logFile.getEstimatedBlockProcessingRate());
         config.set("use-gui-stats", main.getOptions().isUseGuiStats());
         config.set("use-realtime-stats", main.getOptions().isUseRealTimeStats());
         config.set("filter-last-join", main.getOptions().filterLastJoin());
@@ -166,9 +169,6 @@ public class ConfigManager {
         config.set("update-interval", main.getOptions().getUpdateInterval());
         config.set("update-on-start", main.getOptions().updateOnStart());
         config.set("minimum-wealth", main.getOptions().getMinimumWealth());
-        config.set("leaderboard-update-start-time",
-                main.getLeaderboardManager().getLeaderboardUpdateStartTime());
-        config.set("last-update-duration", main.getLeaderboardManager().getLastUpdateDuration());
         config.set("storage-type", main.getOptions().getStorageType());
         config.set("last-load-time", main.getOptions().getLastLoadTime());
 

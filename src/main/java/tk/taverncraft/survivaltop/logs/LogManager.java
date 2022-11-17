@@ -26,6 +26,9 @@ public class LogManager {
     private String worldRadius;
     private String minecraftVersion;
     private String survivalTopVersion;
+    private long leaderboardUpdateStartTime = -1;
+    private long lastUpdateDuration = -1;
+    private long estimatedBlockProcessingRate = -1;
 
     private BukkitTask logTask;
     private boolean isLogging;
@@ -81,7 +84,8 @@ public class LogManager {
      */
     private void executeClaimsProcessedAction(CommandSender sender) {
         LogFile logFile = new LogFile(minecraftVersion, survivalTopVersion, worldRadius,
-                numEntities, numClaims, numBlocks);
+                numEntities, numClaims, numBlocks, leaderboardUpdateStartTime, lastUpdateDuration,
+                estimatedBlockProcessingRate);
         main.getConfigManager().dumpToLogFile(logFile);
         MessageManager.sendMessage(sender, "log-complete");
         this.isLogging = false;
@@ -146,6 +150,13 @@ public class LogManager {
             this.worldRadius = props.getProperty("max-world-size");
         } catch (IOException e) {
             this.worldRadius = "not found";
+        }
+
+        leaderboardUpdateStartTime = main.getLeaderboardManager().getLeaderboardUpdateStartTime();
+        lastUpdateDuration = main.getLeaderboardManager().getLastUpdateDuration();
+
+        if (leaderboardUpdateStartTime != -1 && lastUpdateDuration != -1) {
+            estimatedBlockProcessingRate = lastUpdateDuration / numBlocks;
         }
     }
 

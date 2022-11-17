@@ -27,6 +27,9 @@ public class InventoryManager {
     private LinkedHashMap<String, Double> inventoryWorth;
     private Set<String> inventoryMaterial;
 
+    // boolean to allow reloads to stop current operations
+    private boolean stopOperations = false;
+
     // holders containing count of each material mapped to uuid
     private HashMap<UUID, InventoryHolder> inventoryHolderMapForLeaderboard = new HashMap<>();
     private final ConcurrentHashMap<UUID, InventoryHolder> inventoryHolderMapForStats =
@@ -150,9 +153,15 @@ public class InventoryManager {
         if (this.main.getOptions().groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             for (OfflinePlayer player : players) {
+                if (stopOperations) {
+                    return;
+                }
                 processPlayerForStats(uuid, player.getName());
             }
         } else {
+            if (stopOperations) {
+                return;
+            }
             processPlayerForStats(uuid, name);
         }
     }
@@ -275,5 +284,14 @@ public class InventoryManager {
      */
     public HashMap<String, MutableInt> getInventoriesForGuiStats(UUID uuid) {
         return inventoryHolderMapForStats.get(uuid).getCounter();
+    }
+
+    /**
+     * Sets the state for operations to stop or continue.
+     *
+     * @param state state to set operations to
+     */
+    public void setStopOperations(boolean state) {
+        this.stopOperations = state;
     }
 }

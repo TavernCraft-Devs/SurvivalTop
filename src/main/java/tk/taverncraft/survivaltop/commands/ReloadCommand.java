@@ -54,10 +54,14 @@ public class ReloadCommand {
 
             // reinitialize manager values
             main.getStorageManager().initializeValues();
+            main.getEntityStatsManager().setStopCalculations(true);
+            main.getServerStatsManager().setStopCalculations(true);
             main.getServerStatsManager().initializeValues();
+            main.getLandManager().setStopOperations(true);
             main.getLandManager().initializeLandOperations();
             main.getLandManager().initializeLandType();
             main.getLandManager().doCleanUpForLeaderboard();
+            main.getInventoryManager().setStopOperations(true);
             main.getInventoryManager().initializeWorth();
             main.getInventoryManager().doCleanUpForLeaderboard();
             new InfoGui(main);

@@ -29,6 +29,7 @@ import tk.taverncraft.survivaltop.utils.types.MutableInt;
  */
 public class ContainerOperations {
     private final Main main;
+    private final LandOperationsHelper landOperationsHelper;
     private final LinkedHashMap<String, Double> containerWorth;
     private final Set<String> containerMaterial;
 
@@ -75,10 +76,13 @@ public class ContainerOperations {
      * Constructor for ContainerOperations.
      *
      * @param main plugin class
+     * @param landOperationsHelper helper for land operations
      * @param containerWorth map of container item names to their values
      */
-    public ContainerOperations(Main main, LinkedHashMap<String, Double> containerWorth) {
+    public ContainerOperations(Main main, LandOperationsHelper landOperationsHelper,
+            LinkedHashMap<String, Double> containerWorth) {
         this.main = main;
+        this.landOperationsHelper = landOperationsHelper;
         this.containerWorth = containerWorth;
         this.containerTypes = new HashSet<>();
         this.containerMaterial = containerWorth.keySet();
@@ -220,6 +224,9 @@ public class ContainerOperations {
             ArrayList<Block> blocks = map.getValue();
             int numBlocks = blocks.size();
             for (int i = 0; i < numBlocks; i++) {
+                if (landOperationsHelper.getStopOperations()) {
+                    return;
+                }
                 Inventory inventory = getBlockInventory(blocks.get(i));
                 for (ItemStack itemStack : inventory) {
                     if (itemStack == null) {
@@ -243,6 +250,9 @@ public class ContainerOperations {
         ArrayList<Block> blocks = preprocessedContainersForStats.get(uuid);
         int numBlocks = blocks.size();
         for (int i = 0; i < numBlocks; i++) {
+            if (landOperationsHelper.getStopOperations()) {
+                return;
+            }
             Inventory inventory = getBlockInventory(blocks.get(i));
             for (ItemStack itemStack : inventory) {
                 if (itemStack == null) {

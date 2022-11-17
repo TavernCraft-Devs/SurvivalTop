@@ -168,4 +168,15 @@ public class LeaderboardManager {
     public long getLastUpdateDuration() {
         return this.lastUpdateDuration;
     }
+
+    /**
+     * Handles interruption of leaderboard update.
+     *
+     * @param sender sender who initiated the leaderboard update
+     */
+    public void interruptLeaderboardUpdate(CommandSender sender) {
+        MessageManager.sendMessage(sender, "update-interrupted");
+        lastUpdateDuration = -1;
+        this.isUpdating = false;
+    }
 }

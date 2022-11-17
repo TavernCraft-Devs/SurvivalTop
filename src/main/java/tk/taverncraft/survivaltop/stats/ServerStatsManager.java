@@ -28,6 +28,9 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
 public class ServerStatsManager {
     private final Main main;
 
+    // boolean to allow reloads to stop current calculations
+    private boolean stopCalculations = false;
+
     // cache values used for leaderboard/papi
     private ConcurrentHashMap<UUID, Integer> entityPositionCache;
     private ConcurrentHashMap<UUID, EntityCache> uuidToEntityCacheMap;
@@ -72,6 +75,9 @@ public class ServerStatsManager {
      * @param sender user executing the update
      */
     public void updateWealthStats(CommandSender sender) {
+        main.getLandManager().setStopOperations(false);
+        main.getInventoryManager().setStopOperations(false);
+        stopCalculations = false;
         try {
             MessageManager.sendMessage(sender, "update-started");
             if (this.main.getOptions().groupIsEnabled()) {
@@ -93,6 +99,10 @@ public class ServerStatsManager {
      * @param sender user executing the update
      */
     private void processSpawnersAndContainers(CommandSender sender) {
+        if (stopCalculations) {
+            main.getLeaderboardManager().interruptLeaderboardUpdate(sender);
+            return;
+        }
         spawnerAndContainerTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -181,6 +191,10 @@ public class ServerStatsManager {
      * @param sender sender who initiated the leaderboard update
      */
     private void executePostUpdateActions(CommandSender sender) {
+        if (stopCalculations) {
+            main.getLeaderboardManager().interruptLeaderboardUpdate(sender);
+            return;
+        }
         postUpdateActionsTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -483,6 +497,15 @@ public class ServerStatsManager {
             postUpdateActionsTask.cancel();
             postUpdateActionsTask = null;
         }
+    }
+
+    /**
+     * Sets the state for calculations to stop or continue.
+     *
+     * @param state state to set calculations to
+     */
+    public void setStopCalculations(boolean state) {
+        this.stopCalculations = state;
     }
 }
 

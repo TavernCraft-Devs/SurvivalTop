@@ -29,6 +29,9 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
 public class EntityStatsManager {
     private final Main main;
 
+    // boolean to allow reloads to stop current calculations
+    private boolean stopCalculations = false;
+
     // prevent stats command spam by tracking stats tasks
     private final HashMap<UUID, Long> calculationStartTime = new HashMap<>();
     private final HashMap<UUID, BukkitTask> statsInitialTask = new HashMap<>();
@@ -135,23 +138,30 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      */
     private void calculateEntityStats(CommandSender sender, String name) {
-        UUID uuid = main.getSenderUuid(sender);
-        double balWealth = 0;
-        double blockValue = 0;
-        double inventoryValue = 0;
-        if (main.getOptions().landIsIncluded()) {
-            // land calculations are done async and will be retrieved later
-            processEntityLandWealth(sender, name);
-            blockValue = main.getLandManager().calculateBlockWorthForStats(uuid);
+        try {
+            main.getLandManager().setStopOperations(false);
+            main.getInventoryManager().setStopOperations(false);
+            stopCalculations = false;
+            UUID uuid = main.getSenderUuid(sender);
+            double balWealth = 0;
+            double blockValue = 0;
+            double inventoryValue = 0;
+            if (main.getOptions().landIsIncluded()) {
+                // land calculations are done async and will be retrieved later
+                processEntityLandWealth(sender, name);
+                blockValue = main.getLandManager().calculateBlockWorthForStats(uuid);
+            }
+            if (main.getOptions().balIsIncluded()) {
+                balWealth = getEntityBalWealth(name);
+            }
+            if (main.getOptions().inventoryIsIncluded()) {
+                processEntityInvWealth(sender, name);
+                inventoryValue = main.getInventoryManager().calculateInventoryWorthForStats(uuid);
+            }
+            executePostCalculationActions(sender, uuid, name, balWealth, blockValue, inventoryValue);
+        } catch (Exception ignored) {
+            // sometimes exception is thrown when reloading is done in the middle of calculations
         }
-        if (main.getOptions().balIsIncluded()) {
-            balWealth = getEntityBalWealth(name);
-        }
-        if (main.getOptions().inventoryIsIncluded()) {
-            processEntityInvWealth(sender, name);
-            inventoryValue = main.getInventoryManager().calculateInventoryWorthForStats(uuid);
-        }
-        executePostCalculationActions(sender, uuid, name, balWealth, blockValue, inventoryValue);
     }
 
     /**
@@ -164,7 +174,11 @@ public class EntityStatsManager {
      */
     private void executePostCalculationActions(CommandSender sender, UUID uuid, String name,
             double balWealth, double blockWealth, double inventoryWealth) {
-        BukkitTask task = new BukkitRunnable() {
+        if (stopCalculations) {
+            interruptStatsCalculations(sender);
+            return;
+        }
+         new BukkitRunnable() {
             @Override
             public void run() {
                 if (main.getOptions().spawnerIsIncluded()) {
@@ -175,6 +189,11 @@ public class EntityStatsManager {
                 }
                 double spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
                 double containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
+
+                if (stopCalculations) {
+                    interruptStatsCalculations(sender);
+                    return;
+                }
 
                 // handle gui or non-gui results
                 if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
@@ -187,7 +206,6 @@ public class EntityStatsManager {
                         containerValue, inventoryWealth);
             }
         }.runTask(main);
-        mainThreadCalculationTask.put(uuid, task);
     }
 
     /**
@@ -476,6 +494,25 @@ public class EntityStatsManager {
      */
     public Inventory getInventoryStatsPage(UUID uuid, int pageNum) {
         return senderGui.get(uuid).getInventoryStatsPage(pageNum);
+    }
+
+    /**
+     * Sets the state for calculations to stop or continue.
+     *
+     * @param state state to set calculations to
+     */
+    public void setStopCalculations(boolean state) {
+        this.stopCalculations = state;
+    }
+
+    /**
+     * Handles interruption of leaderboard update.
+     *
+     * @param sender sender who initiated the leaderboard update
+     */
+    public void interruptStatsCalculations(CommandSender sender) {
+        MessageManager.sendMessage(sender, "calculation-interrupted");
+        calculationStartTime.remove(main.getSenderUuid(sender));
     }
 }
 

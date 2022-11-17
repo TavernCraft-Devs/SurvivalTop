@@ -25,6 +25,9 @@ public class LandOperationsHelper {
     private SpawnerOperations spawnerOperations;
     private ContainerOperations containerOperations;
 
+    // boolean to allow reloads to stop current operations
+    private boolean stopOperations = false;
+
     // list of operations to perform for calculating land wealth
     // leaderboard and stats uses different calculations because of gui setups and
     // different tracking mechanisms (i.e. for stats, inventory needs to be shown to sender)
@@ -62,8 +65,8 @@ public class LandOperationsHelper {
      */
     private void initializeLandSubOperations() {
         blockOperations = new BlockOperations(blockWorth);
-        spawnerOperations = new SpawnerOperations(main, spawnerWorth);
-        containerOperations = new ContainerOperations(main, containerWorth);
+        spawnerOperations = new SpawnerOperations(main, this, spawnerWorth);
+        containerOperations = new ContainerOperations(main, this, containerWorth);
     }
 
     /**
@@ -214,6 +217,9 @@ public class LandOperationsHelper {
         for (int i = (int) minX; i < maxX; i++) {
             for (int j = (int) minY; j < maxY; j++) {
                 for (int k = (int) minZ; k < maxZ; k++) {
+                    if (stopOperations) {
+                        return;
+                    }
                     Block block = world.getBlockAt(i, j, k);
                     for (BiFunction<UUID, Block, Boolean> f : blockOperations) {
                         if (f.apply(uuid, block)) {
@@ -249,6 +255,9 @@ public class LandOperationsHelper {
         for (int i = x; i < x + 16; ++i) {
             for (int j = z; j < z + 16; ++j) {
                 for (int k = minHeight; k < maxHeight; ++k) {
+                    if (stopOperations) {
+                        return;
+                    }
                     Block block = world.getBlockAt(i, k, j);
                     for (BiFunction<UUID, Block, Boolean> f : blockOperations) {
                         if (f.apply(uuid, block)) {
@@ -449,5 +458,24 @@ public class LandOperationsHelper {
      */
     public double calculateContainerWorthForStats(UUID uuid) {
         return containerOperations.calculateContainerWorthForStats(uuid);
+    }
+
+    /**
+     * Gets the state for operations to stop or continue. Mainly used for spawner and container
+     * operations.
+     *
+     * @return state of operations
+     */
+    public boolean getStopOperations() {
+        return stopOperations;
+    }
+
+    /**
+     * Sets the state for operations to stop or continue.
+     *
+     * @param state state to set operations to
+     */
+    public void setStopOperations(boolean state) {
+        this.stopOperations = state;
     }
 }
