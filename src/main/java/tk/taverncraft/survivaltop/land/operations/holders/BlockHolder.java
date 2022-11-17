@@ -3,7 +3,7 @@ package tk.taverncraft.survivaltop.land.operations.holders;
 import java.util.HashMap;
 import java.util.Set;
 
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Holder for tracking count of blocks.
@@ -33,7 +33,7 @@ public class BlockHolder {
     }
 
     /**
-     * Add 1 count to holder.
+     * Adds 1 count to holder.
      *
      * @param material material to add count for
      */

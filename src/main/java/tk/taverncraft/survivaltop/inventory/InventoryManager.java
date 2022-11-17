@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.inventory.holders.InventoryHolder;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles logic for calculating the worth of entity inventory.
@@ -250,7 +250,7 @@ public class InventoryManager {
     }
 
     /**
-     * Process the worth of inventories.
+     * Gets the total worth of inventories.
      *
      * @param inventoryHolder holder containing inventory item count
      *

@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 import org.bukkit.block.Block;
 
 import tk.taverncraft.survivaltop.land.operations.holders.BlockHolder;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles the logic for performing block operations when scanning locations.

@@ -1,6 +1,6 @@
 package tk.taverncraft.survivaltop.land.operations.holders;
 
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class ContainerHolder {
     }
 
     /**
-     * Add 1 count to holder.
+     * Adds 1 count to holder.
      *
      * @param material material to add count for
      */

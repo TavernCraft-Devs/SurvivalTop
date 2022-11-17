@@ -1,10 +1,10 @@
-package tk.taverncraft.survivaltop.utils;
+package tk.taverncraft.survivaltop.utils.services;
 
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-
 import org.bukkit.plugin.Plugin;
+
 import tk.taverncraft.survivaltop.Main;
 
 /**
@@ -131,10 +131,10 @@ public class DependencyManager {
             enabled = isDependencyEnabled(depPlugin);
 
             if (enabled) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: "
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with "
                     + depPlugin + " for land type!");
             } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with "
                     + depPlugin + " for land type!");
                 main.getOptions().disableLand();
                 return false;
@@ -163,10 +163,10 @@ public class DependencyManager {
             enabled = isDependencyEnabled(depPlugin);
 
             if (enabled) {
-                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with: "
+                Bukkit.getLogger().info("[SurvivalTop] Successfully integrated with "
                     + depPlugin + " for group type!");
             } else {
-                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with: "
+                Bukkit.getLogger().severe("[SurvivalTop] Failed to integrate with "
                     + depPlugin + " for group type!");
                 main.getOptions().disableGroup();
                 return false;

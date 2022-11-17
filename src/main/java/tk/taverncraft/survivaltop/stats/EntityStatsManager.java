@@ -1,6 +1,7 @@
 package tk.taverncraft.survivaltop.stats;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
@@ -29,9 +30,10 @@ public class EntityStatsManager {
     private final Main main;
 
     // prevent stats command spam by tracking stats tasks
-    public final HashMap<UUID, Boolean> isCalculatingStats = new HashMap<>();
-    public final HashMap<UUID, BukkitTask> statsInitialTask = new HashMap<>();
-    public final HashMap<UUID, BukkitTask> statsUiTask = new HashMap<>();
+    private final HashMap<UUID, Long> calculationStartTime = new HashMap<>();
+    private final HashMap<UUID, BukkitTask> statsInitialTask = new HashMap<>();
+    private final HashMap<UUID, BukkitTask> mainThreadCalculationTask = new HashMap<>();
+    private final HashMap<UUID, BukkitTask> statsUiTask = new HashMap<>();
 
     // map of sender uuid to the gui to show sender
     private final HashMap<UUID, EntityStatsGui> senderGui = new HashMap<>();
@@ -84,7 +86,7 @@ public class EntityStatsManager {
         } else {
             handleCachedStatsInChat(sender, name, eCache);
         }
-        isCalculatingStats.remove(uuid);
+        calculationStartTime.remove(uuid);
     }
 
     /**
@@ -162,7 +164,7 @@ public class EntityStatsManager {
      */
     private void executePostCalculationActions(CommandSender sender, UUID uuid, String name,
             double balWealth, double blockWealth, double inventoryWealth) {
-        new BukkitRunnable() {
+        BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 if (main.getOptions().spawnerIsIncluded()) {
@@ -181,15 +183,11 @@ public class EntityStatsManager {
                     return;
                 }
 
-                // check again to make sure reloads stop any stats calculations from continuing
-                if (!senderHasCalculationInProgress(uuid)) {
-                    return;
-                }
-
                 showEntityStatsToUser(sender, name, balWealth, blockWealth, spawnerValue,
                         containerValue, inventoryWealth);
             }
         }.runTask(main);
+        mainThreadCalculationTask.put(uuid, task);
     }
 
     /**
@@ -297,7 +295,7 @@ public class EntityStatsManager {
         UUID uuid = this.main.getSenderUuid(sender);
         main.getLandManager().doCleanUpForStats(uuid);
         main.getInventoryManager().doCleanUpForStats(uuid);
-        isCalculatingStats.remove(uuid);
+        calculationStartTime.remove(uuid);
         statsInitialTask.remove(uuid);
     }
 
@@ -379,7 +377,7 @@ public class EntityStatsManager {
      */
     public void setCalculatingStats(CommandSender sender) {
         UUID uuid = this.main.getSenderUuid(sender);
-        isCalculatingStats.put(uuid, true);
+        calculationStartTime.put(uuid, Instant.now().getEpochSecond());
     }
 
     /**
@@ -390,24 +388,25 @@ public class EntityStatsManager {
      * @return true if there is an ongoing calculation for the sender, false otherwise
      */
     public boolean senderHasCalculationInProgress(UUID uuid) {
-        if (isCalculatingStats.get(uuid) == null) {
-            return false;
-        } else {
-            return isCalculatingStats.get(uuid);
-        }
+        return calculationStartTime.containsKey(uuid);
     }
 
     /**
      * Disable any existing entity stats calculations.
      */
     public void stopEntityStatsCalculations() {
-        for (UUID uuid : isCalculatingStats.keySet()) {
-            isCalculatingStats.remove(uuid);
+        for (UUID uuid : calculationStartTime.keySet()) {
+            calculationStartTime.remove(uuid);
             BukkitTask initialTask = statsInitialTask.get(uuid);
             if (initialTask != null) {
                 initialTask.cancel();
             }
             statsInitialTask.remove(uuid);
+            BukkitTask mainThreadTask = mainThreadCalculationTask.get(uuid);
+            if (mainThreadTask != null) {
+                mainThreadTask.cancel();
+            }
+            mainThreadCalculationTask.remove(uuid);
             BukkitTask finalTask = statsUiTask.get(uuid);
             if (finalTask != null) {
                 finalTask.cancel();

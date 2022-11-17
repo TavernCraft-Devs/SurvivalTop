@@ -20,8 +20,8 @@ public class LeaderboardManager {
     private final Main main;
     private boolean isUpdating;
     private BukkitTask leaderboardTask;
-    private long leaderboardUpdateStartTime;
-    private long lastUpdateDuration;
+    private long leaderboardUpdateStartTime = -1;
+    private long lastUpdateDuration = -1;
 
     /**
      * Constructor for LeaderboardManager.
@@ -85,8 +85,7 @@ public class LeaderboardManager {
      * @param sender user executing the update
      */
     public void doManualLeaderboardUpdate(CommandSender sender) {
-        new BukkitRunnable() {
-
+        leaderboardTask = new BukkitRunnable() {
             @Override
             public void run() {
                 isUpdating = true;
@@ -116,7 +115,7 @@ public class LeaderboardManager {
             HashMap<UUID, EntityCache> tempSortedCache) {
         MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
                 "minimum-wealth", 0.0), main.getOptions().groupIsEnabled(),
-                this.main.getServerStatsManager().getGroupUuidToNameMap());
+                main.getServerStatsManager().getGroupUuidToNameMap());
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
         MessageManager.sendMessage(sender, "update-complete",
                 new String[]{"%time%"},
@@ -135,6 +134,7 @@ public class LeaderboardManager {
      * Stops all existing leaderboard tasks.
      */
     public void stopExistingTasks() {
+        this.leaderboardUpdateStartTime = -1;
         if (leaderboardTask != null) {
             leaderboardTask.cancel();
             leaderboardTask = null;
@@ -149,6 +149,15 @@ public class LeaderboardManager {
      */
     public boolean isUpdating() {
         return this.isUpdating;
+    }
+
+    /**
+     * Gets the start time of the last leaderboard update.
+     *
+     * @return time since epoch for when the last leaderboard update was started
+     */
+    public long getLeaderboardUpdateStartTime() {
+        return this.leaderboardUpdateStartTime;
     }
 
     /**

@@ -39,6 +39,7 @@ public class LogManager {
         this.main = main;
         this.minecraftVersion = Bukkit.getVersion();
         this.survivalTopVersion = main.getDescription().getVersion();
+        stopExistingTasks();
     }
 
     /**
@@ -168,7 +169,12 @@ public class LogManager {
         return this.isLogging;
     }
 
-    public static void log() {
-
+    /**
+     * Logs information for the plugin.
+     *
+     * @param message message to log
+     */
+    public static void log(String message) {
+        Bukkit.getLogger().info("[SurvivalTop] " + message);
     }
 }

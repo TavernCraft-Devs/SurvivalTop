@@ -49,35 +49,35 @@ public class CommandParser implements CommandExecutor {
 
         // command to view own or others' stats
         case "STATS":
-            return new StatsCommand(this.main).execute(sender, args);
+            return new StatsCommand(main).execute(sender, args);
 
         // command to view wealth leaderboard
         case "TOP":
-            return new TopCommand(this.main).execute(sender, args);
+            return new TopCommand(main).execute(sender, args);
 
         // command to view item info
         case "ITEMINFO":
-            return new ItemInfoCommand(this.main).execute(sender);
+            return new ItemInfoCommand(main).execute(sender);
 
         // command to manually trigger leaderboard update
         case "UPDATE":
-            return new UpdateCommand(this.main).execute(sender);
+            return new UpdateCommand(main).execute(sender);
 
         // command to view all commands
         case "HELP":
-            return new HelpCommand(this.main).execute(sender);
+            return new HelpCommand(main).execute(sender);
 
         // command to reload plugin
         case "RELOAD":
-            return new ReloadCommand(this.main).execute(sender);
+            return new ReloadCommand(main).execute(sender);
 
         // command to dump logs for debugging
         case "DUMP":
-            return new DumpCommand(this.main).execute(sender);
+            return new DumpCommand(main).execute(sender);
 
         // special command for stats inventory view
         case "OPENSTATSINV":
-            main.getEntityStatsManager().openMainStatsPage(this.main.getSenderUuid(sender));
+            main.getEntityStatsManager().openMainStatsPage(main.getSenderUuid(sender));
             return true;
 
         // all other cases treated as invalid

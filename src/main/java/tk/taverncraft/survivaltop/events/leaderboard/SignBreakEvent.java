@@ -17,7 +17,6 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
  * SignBreakEvent checks for when a leaderboard sign is broken.
  */
 public class SignBreakEvent implements Listener {
-
     private final String signRemovePerm = "survtop.sign.remove";
     private final Main main;
 

@@ -3,7 +3,7 @@ package tk.taverncraft.survivaltop.inventory.holders;
 import java.util.HashMap;
 import java.util.Set;
 
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Holder for tracking count of inventory items.
@@ -33,7 +33,7 @@ public class InventoryHolder {
     }
 
     /**
-     * Add count to holder.
+     * Adds count to holder.
      *
      * @param material material to add count for
      * @param amount amount to add

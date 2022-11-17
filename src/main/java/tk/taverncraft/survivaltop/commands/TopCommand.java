@@ -4,7 +4,7 @@ import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.ValidationManager;
+import tk.taverncraft.survivaltop.utils.services.ValidationManager;
 
 /**
  * TopCommand contains the execute method for when a user views the leaderboard.

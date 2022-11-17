@@ -17,7 +17,7 @@ import dev.rosewood.rosestacker.api.RoseStackerAPI;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.holders.SpawnerHolder;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles the logic for performing spawner operations when scanning locations.

@@ -25,16 +25,16 @@ import tk.taverncraft.survivaltop.commands.CommandTabCompleter;
 import tk.taverncraft.survivaltop.events.DependencyLoadEvent;
 import tk.taverncraft.survivaltop.leaderboard.LeaderboardManager;
 import tk.taverncraft.survivaltop.logs.LogManager;
-import tk.taverncraft.survivaltop.options.Options;
+import tk.taverncraft.survivaltop.config.Options;
 import tk.taverncraft.survivaltop.stats.EntityStatsManager;
 import tk.taverncraft.survivaltop.stats.ServerStatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
 import tk.taverncraft.survivaltop.ui.InfoGui;
-import tk.taverncraft.survivaltop.utils.ConfigManager;
-import tk.taverncraft.survivaltop.utils.DependencyManager;
-import tk.taverncraft.survivaltop.utils.PapiManager;
-import tk.taverncraft.survivaltop.utils.PluginUpdateManager;
-import tk.taverncraft.survivaltop.utils.Metrics;
+import tk.taverncraft.survivaltop.config.ConfigManager;
+import tk.taverncraft.survivaltop.utils.services.DependencyManager;
+import tk.taverncraft.survivaltop.utils.services.PapiManager;
+import tk.taverncraft.survivaltop.utils.services.PluginUpdateManager;
+import tk.taverncraft.survivaltop.utils.services.Metrics;
 
 /**
  * The plugin class.

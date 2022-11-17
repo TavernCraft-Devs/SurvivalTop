@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.holders.ContainerHolder;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles the logic for performing container operations when scanning locations.

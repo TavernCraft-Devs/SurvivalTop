@@ -17,7 +17,7 @@ lang-file: 'en.yml'
 # if realtime stats are used as well, then this includes individual item/block breakdowns
 # if false, will provide only basic entity stats in chat without detailed breakdown
 # for servers very worried about lags, consider setting this to false
-use-gui-stats: true
+use-gui-stats: false
 
 # if true, will provide realtime values when the stats command is executed
 # realtime calculations take a longer time depending on the claim size, spawner count etc

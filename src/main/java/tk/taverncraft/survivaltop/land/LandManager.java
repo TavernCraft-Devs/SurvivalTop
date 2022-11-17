@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * LandManager is responsible for all land value calculations.

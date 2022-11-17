@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.utils;
+package tk.taverncraft.survivaltop.utils.services;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

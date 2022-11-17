@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.ValidationManager;
+import tk.taverncraft.survivaltop.utils.services.ValidationManager;
 
 /**
  * StatsCommand contains the execute method for when a user views stats of self or others.
@@ -66,9 +66,9 @@ public class StatsCommand {
         String name = player.getName();
 
         // if group is enabled, get name of the group the player belongs to instead
-        if (this.main.getOptions().groupIsEnabled()) {
-            name = this.main.getGroupManager().getGroupOfPlayer(name);
-            if (!this.validationManager.groupExist(name, sender)) {
+        if (main.getOptions().groupIsEnabled()) {
+            name = main.getGroupManager().getGroupOfPlayer(name);
+            if (!validationManager.groupExist(name, sender)) {
                 return;
             }
         }
@@ -101,11 +101,11 @@ public class StatsCommand {
 
         // check if group/player provided exist
         if (this.main.getOptions().groupIsEnabled()) {
-            if (!this.validationManager.groupExist(args[1], sender)) {
+            if (!validationManager.groupExist(args[1], sender)) {
                 return;
             }
         } else {
-            if (!this.validationManager.playerExist(args[1], sender)) {
+            if (!validationManager.playerExist(args[1], sender)) {
                 return;
             }
         }

@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.ui.InfoGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.ValidationManager;
+import tk.taverncraft.survivaltop.utils.services.ValidationManager;
 
 /**
  * ReloadCommand contains the execute method for when a user inputs command to reload plugin.
@@ -38,11 +38,6 @@ public class ReloadCommand {
             return true;
         }
 
-        if (main.getLeaderboardManager().isUpdating()) {
-            MessageManager.sendMessage(sender, "update-in-progress");
-            return true;
-        }
-
         try {
             // stop existing player stats calculations
             main.getEntityStatsManager().stopEntityStatsCalculations();
@@ -62,9 +57,12 @@ public class ReloadCommand {
             main.getServerStatsManager().initializeValues();
             main.getLandManager().initializeLandOperations();
             main.getLandManager().initializeLandType();
+            main.getLandManager().doCleanUpForLeaderboard();
             main.getInventoryManager().initializeWorth();
+            main.getInventoryManager().doCleanUpForLeaderboard();
             new InfoGui(main);
             main.getGroupManager().initializeLandType();
+            main.getLogManager().stopExistingTasks();
             main.getLeaderboardManager().stopExistingTasks();
             main.getLeaderboardManager().scheduleLeaderboardUpdate(
                     main.getConfig().getInt("update-interval"),

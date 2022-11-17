@@ -7,7 +7,7 @@ import org.bukkit.inventory.Inventory;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.ui.InfoGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.ValidationManager;
+import tk.taverncraft.survivaltop.utils.services.ValidationManager;
 
 /**
  * ItemInfoCommand contains the execute method for when a user inputs command to view the value of

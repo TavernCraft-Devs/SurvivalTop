@@ -23,7 +23,7 @@ public class BalanceManager {
     }
 
     /**
-     * Get the balance of an entity based on name.
+     * Gets the balance of an entity based on name.
      *
      * @param name name of entity to get balance for
      *

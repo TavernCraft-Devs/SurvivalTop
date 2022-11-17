@@ -14,7 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.utils.MutableInt;
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Helper function for loading the logic of calculations.

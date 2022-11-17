@@ -16,7 +16,6 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
  * SignPlaceEvent checks for when a leaderboard sign is placed.
  */
 public class SignPlaceEvent implements Listener {
-
     private final String signAddPerm = "survtop.sign.add";
     private final Main main;
 

@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.utils;
+package tk.taverncraft.survivaltop.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
  * ConfigManager handles the loading of all configuration files.
  */
 public class ConfigManager {
-    Main main;
+    private final Main main;
 
     /**
      * Constructor for ConfigManager.
@@ -166,8 +166,11 @@ public class ConfigManager {
         config.set("update-interval", main.getOptions().getUpdateInterval());
         config.set("update-on-start", main.getOptions().updateOnStart());
         config.set("minimum-wealth", main.getOptions().getMinimumWealth());
+        config.set("leaderboard-update-start-time",
+                main.getLeaderboardManager().getLeaderboardUpdateStartTime());
         config.set("last-update-duration", main.getLeaderboardManager().getLastUpdateDuration());
         config.set("storage-type", main.getOptions().getStorageType());
+        config.set("last-load-time", main.getOptions().getLastLoadTime());
 
         try {
             config.save(configFile);

@@ -16,14 +16,13 @@ import org.bukkit.util.ChatPaginator;
 
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
-import static org.bukkit.util.ChatPaginator.*;
+import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
 
 /**
  * MessageManager handles all formatting and sending of messages to the command sender.
  */
 public class MessageManager {
     private static final HashMap<String, String> messageKeysMap = new HashMap<>();
-
     private static String completeLeaderboard;
 
     /**

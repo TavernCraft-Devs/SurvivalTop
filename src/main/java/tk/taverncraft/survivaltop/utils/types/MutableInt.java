@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.utils;
+package tk.taverncraft.survivaltop.utils.types;
 
 /**
  * Provides faster performance for tracking count of blocks.

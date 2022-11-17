@@ -1,4 +1,6 @@
-package tk.taverncraft.survivaltop.options;
+package tk.taverncraft.survivaltop.config;
+
+import java.time.Instant;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -7,7 +9,7 @@ import tk.taverncraft.survivaltop.Main;
 
 /**
  * Handles and stores all options loaded from configuration files. Explanations for each field
- * may be found on the wiki.
+ * may be found on the wiki and won't be repeated here.
  */
 public class Options {
     private final Main main;
@@ -30,6 +32,7 @@ public class Options {
     private String storageType;
     private int maxLandHeight;
     private int minLandHeight;
+    private long lastLoadTime;
 
     public Options(Main main) {
         this.main = main;
@@ -55,6 +58,7 @@ public class Options {
         this.minimumWealth = config.getInt("minimum-wealth", 0);
         this.useGuiLeaderboard = config.getBoolean("use-gui-leaderboard", false);
         this.storageType = config.getString("storage-type", "None");
+        this.lastLoadTime = Instant.now().getEpochSecond();
         setMaxLandHeight();
         setMinLandHeight();
     }
@@ -134,7 +138,11 @@ public class Options {
     }
 
     public String getStorageType() {
-        return this.storageType;
+        return storageType;
+    }
+
+    public long getLastLoadTime() {
+        return lastLoadTime;
     }
 
     // setters below
