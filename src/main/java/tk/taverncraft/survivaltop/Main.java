@@ -40,9 +40,6 @@ import tk.taverncraft.survivaltop.utils.services.Metrics;
  * The plugin class.
  */
 public class Main extends JavaPlugin {
-
-    private static final Logger log = Logger.getLogger("Minecraft");
-
     // vault
     private static Economy econ = null;
     private static Permission perms = null;
@@ -77,8 +74,11 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        log.info(String.format("[%s] Disabled Version %s", getDescription().getName(),
-                getDescription().getVersion()));
+        entityStatsManager.setStopCalculations(true);
+        serverStatsManager.setStopCalculations(true);
+        landManager.setStopOperations(true);
+        inventoryManager.setStopOperations(true);
+        LogManager.info(String.format("Disabled Version %s", getDescription().getVersion()));
     }
 
     @Override
@@ -91,10 +91,9 @@ public class Main extends JavaPlugin {
             }
         });
 
-        this.configManager = new ConfigManager(this);
-
         // config setup
-        createConfigs();
+        this.configManager = new ConfigManager(this);
+        configManager.createConfigs();
 
         // set options
         this.options = new Options(this);
@@ -150,16 +149,6 @@ public class Main extends JavaPlugin {
                 new SignBreakEvent(this), this);
         this.getServer().getPluginManager().registerEvents(
                 new ViewPageEvent(this), this);
-    }
-
-    public void createConfigs() {
-        configManager.createConfig();
-        configManager.createMessageFile();
-        configManager.createBlocksConfig();
-        configManager.createSpawnersConfig();
-        configManager.createContainersConfig();
-        configManager.createInventoriesConfig();
-        configManager.createSignsConfig();
     }
 
     /**

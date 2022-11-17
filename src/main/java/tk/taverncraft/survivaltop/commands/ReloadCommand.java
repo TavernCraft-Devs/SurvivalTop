@@ -43,7 +43,7 @@ public class ReloadCommand {
             main.getEntityStatsManager().stopEntityStatsCalculations();
 
             // reload configs and reinitialize options
-            main.createConfigs();
+            main.getConfigManager().createConfigs();
             main.getOptions().initializeOptions();
 
             // check dependencies

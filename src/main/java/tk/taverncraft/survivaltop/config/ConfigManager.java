@@ -31,6 +31,19 @@ public class ConfigManager {
     }
 
     /**
+     * Creates all configuration files from the plugin.
+     */
+    public void createConfigs() {
+        createConfig();
+        createMessageFile();
+        createBlocksConfig();
+        createSpawnersConfig();
+        createContainersConfig();
+        createInventoriesConfig();
+        createSignsConfig();
+    }
+
+    /**
      * Creates config file.
      */
     public void createConfig() {
