@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 import tk.taverncraft.survivaltop.ui.LeaderboardGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 
@@ -33,8 +33,8 @@ public class ServerStatsManager {
 
     // cache values used for leaderboard/papi
     private ConcurrentHashMap<UUID, Integer> entityPositionCache;
-    private ConcurrentHashMap<UUID, EntityCache> uuidToEntityCacheMap;
-    private ArrayList<EntityCache> entityCacheList;
+    private ConcurrentHashMap<UUID, EntityLeaderboardCache> uuidToEntityCacheMap;
+    private ArrayList<EntityLeaderboardCache> entityLeaderboardCacheList;
 
     // temp hashmaps with pseudo uuids used only when entity is set to group
     private HashMap<UUID, String> groupUuidToNameMap;
@@ -59,7 +59,7 @@ public class ServerStatsManager {
     public void initializeValues() throws NullPointerException {
         entityPositionCache = new ConcurrentHashMap<>();
         uuidToEntityCacheMap = new ConcurrentHashMap<>();
-        entityCacheList = new ArrayList<>();
+        entityLeaderboardCacheList = new ArrayList<>();
         groupUuidToNameMap = new HashMap<>();
         groupNameToUuidMap = new HashMap<>();
     }
@@ -175,7 +175,7 @@ public class ServerStatsManager {
             main.getInventoryManager().createHolderForLeaderboard(uuid);
             main.getInventoryManager().processInvWorthForLeaderboard(uuid, name);
         }
-        EntityCache eCache = new EntityCache(uuid, entityBalWorth);
+        EntityLeaderboardCache eCache = new EntityLeaderboardCache(uuid, entityBalWorth);
         uuidToEntityCacheMap.put(uuid, eCache);
     }
 
@@ -205,12 +205,12 @@ public class ServerStatsManager {
                 if (main.getOptions().inventoryIsIncluded()) {
                     executePostUpdateInventories(main.getInventoryManager().calculateInventoryWorthForLeaderboard());
                 }
-                HashMap<UUID, EntityCache> tempSortedCache = sortEntitiesByTotalWealth(uuidToEntityCacheMap);
+                HashMap<UUID, EntityLeaderboardCache> tempSortedCache = sortEntitiesByTotalWealth(uuidToEntityCacheMap);
                 setUpEntityCache(tempSortedCache);
                 main.getLandManager().doCleanUpForLeaderboard();
                 main.getInventoryManager().doCleanUpForLeaderboard();
                 main.getLeaderboardManager().completeLeaderboardUpdate(sender, tempSortedCache);
-                main.getStorageManager().saveToStorage(entityCacheList);
+                main.getStorageManager().saveToStorage(entityLeaderboardCacheList);
             }
         }.runTaskLaterAsynchronously(main, 0);
     }
@@ -266,16 +266,16 @@ public class ServerStatsManager {
      *
      * @return sorted total wealth hashmap
      */
-    private HashMap<UUID, EntityCache> sortEntitiesByTotalWealth(ConcurrentHashMap<UUID,
-            EntityCache> hm) {
-        List<Map.Entry<UUID, EntityCache> > list =
+    private HashMap<UUID, EntityLeaderboardCache> sortEntitiesByTotalWealth(ConcurrentHashMap<UUID,
+        EntityLeaderboardCache> hm) {
+        List<Map.Entry<UUID, EntityLeaderboardCache> > list =
                 new LinkedList<>(hm.entrySet());
 
         list.sort((o1, o2) -> (o2.getValue().getTotalWealth())
                 .compareTo(o1.getValue().getTotalWealth()));
 
-        HashMap<UUID, EntityCache> temp = new LinkedHashMap<>();
-        for (Map.Entry<UUID, EntityCache> aa : list) {
+        HashMap<UUID, EntityLeaderboardCache> temp = new LinkedHashMap<>();
+        for (Map.Entry<UUID, EntityLeaderboardCache> aa : list) {
             temp.put(aa.getKey(), aa.getValue());
         }
         return temp;
@@ -286,14 +286,14 @@ public class ServerStatsManager {
      *
      * @param tempSortedCache hashmap to use to generate cache for
      */
-    private void setUpEntityCache(HashMap<UUID, EntityCache> tempSortedCache) {
+    private void setUpEntityCache(HashMap<UUID, EntityLeaderboardCache> tempSortedCache) {
         this.entityPositionCache = new ConcurrentHashMap<>();
         int i = 0;
         for (UUID uuid : tempSortedCache.keySet()) {
             this.entityPositionCache.put(uuid, i);
             i++;
         }
-        this.entityCacheList = new ArrayList<>(tempSortedCache.values());
+        this.entityLeaderboardCacheList = new ArrayList<>(tempSortedCache.values());
     }
 
     /**
@@ -303,7 +303,7 @@ public class ServerStatsManager {
      *
      * @return entity cache for the given name
      */
-    public EntityCache getEntityCache(String name) {
+    public EntityLeaderboardCache getEntityCache(String name) {
         UUID uuid;
         if (main.getOptions().groupIsEnabled()) {
             uuid = this.groupNameToUuidMap.get(name);
@@ -328,7 +328,7 @@ public class ServerStatsManager {
      * @return name of entity at specified position
      */
     public String getEntityNameAtPosition(int index) {
-        EntityCache eCache = this.entityCacheList.get(index);
+        EntityLeaderboardCache eCache = this.entityLeaderboardCacheList.get(index);
         UUID uuid = eCache.getUuid();
 
         if (uuid == null) {
@@ -351,7 +351,7 @@ public class ServerStatsManager {
      * @return wealth of entity at specified position
      */
     public String getEntityWealthAtPosition(int index) {
-        EntityCache eCache = this.entityCacheList.get(index);
+        EntityLeaderboardCache eCache = this.entityLeaderboardCacheList.get(index);
         Double value = eCache.getTotalWealth();
 
         if (value != null) {
@@ -386,7 +386,7 @@ public class ServerStatsManager {
      * @return balance wealth of given entity
      */
     public String getEntityBalWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getBalWealth());
     }
 
@@ -398,7 +398,7 @@ public class ServerStatsManager {
      * @return land wealth of given entity
      */
     public String getEntityLandWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getLandWealth());
     }
 
@@ -410,7 +410,7 @@ public class ServerStatsManager {
      * @return block wealth of given entity
      */
     public String getEntityBlockWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getBlockWealth());
     }
 
@@ -422,7 +422,7 @@ public class ServerStatsManager {
      * @return spawner wealth of given entity
      */
     public String getEntitySpawnerWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getSpawnerWealth());
     }
 
@@ -434,7 +434,7 @@ public class ServerStatsManager {
      * @return container wealth of given entity
      */
     public String getEntityContainerWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getContainerWealth());
     }
 
@@ -446,7 +446,7 @@ public class ServerStatsManager {
      * @return inventory wealth of given entity
      */
     public String getEntityInvWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getInventoryWealth());
     }
 
@@ -458,7 +458,7 @@ public class ServerStatsManager {
      * @return total wealth of given entity
      */
     public String getEntityTotalWealth(UUID uuid) {
-        EntityCache eCache = uuidToEntityCacheMap.get(uuid);
+        EntityLeaderboardCache eCache = uuidToEntityCacheMap.get(uuid);
         return String.format("%.02f", eCache.getTotalWealth());
     }
 

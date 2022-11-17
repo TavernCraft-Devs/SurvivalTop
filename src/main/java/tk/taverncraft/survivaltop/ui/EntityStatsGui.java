@@ -12,7 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
@@ -69,7 +69,7 @@ public class EntityStatsGui extends GuiHelper {
      * @param name name of entity to get stats for
      * @param eCache cache of entity
      */
-    public EntityStatsGui(Main main, String name, EntityCache eCache) {
+    public EntityStatsGui(Main main, String name, EntityLeaderboardCache eCache) {
         this.main = main;
         name = name + " ";
         double balValue = eCache.getBalWealth();

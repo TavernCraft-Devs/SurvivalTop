@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 
@@ -72,7 +72,7 @@ public class EntityStatsManager {
      */
     public void getCachedEntityStats(CommandSender sender, UUID uuid, String name) {
         setCalculatingStats(sender);
-        EntityCache eCache = main.getServerStatsManager().getEntityCache(name);
+        EntityLeaderboardCache eCache = main.getServerStatsManager().getEntityCache(name);
         // default to real time values if cache not found i.e. leaderboard not updated
         if (eCache == null) {
             getRealTimeEntityStats(sender, name);
@@ -94,7 +94,7 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      * @param eCache cache for the entity
      */
-    private void handleCachedStatsInGui(CommandSender sender, String name, EntityCache eCache) {
+    private void handleCachedStatsInGui(CommandSender sender, String name, EntityLeaderboardCache eCache) {
         UUID uuid = this.main.getSenderUuid(sender);
         new BukkitRunnable() {
             @Override
@@ -113,7 +113,7 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      * @param eCache cache for the entity
      */
-    private void handleCachedStatsInChat(CommandSender sender, String name, EntityCache eCache) {
+    private void handleCachedStatsInChat(CommandSender sender, String name, EntityLeaderboardCache eCache) {
         double balValue = eCache.getBalWealth();
         double landValue = eCache.getLandWealth();
         double blockValue = eCache.getBlockWealth();
@@ -189,6 +189,11 @@ public class EntityStatsManager {
                     interruptStatsCalculations(sender);
                     return;
                 }
+
+                long timeTaken = Instant.now().getEpochSecond() - calculationStartTime.get(uuid);
+                MessageManager.sendMessage(sender, "calculation-complete",
+                    new String[]{"%time%"},
+                    new String[]{String.valueOf(timeTaken)});
 
                 // handle gui or non-gui results
                 if (main.getOptions().isUseGuiStats() && sender instanceof Player) {

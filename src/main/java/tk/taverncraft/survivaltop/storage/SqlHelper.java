@@ -14,7 +14,7 @@ import org.bukkit.OfflinePlayer;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 
 /**
  * SqlHelper is responsible for reading/writing from MySQL database.
@@ -54,16 +54,16 @@ public class SqlHelper implements StorageHelper {
     /**
      * Saves information to mysql database.
      *
-     * @param entityCacheList list of entities to store
+     * @param entityLeaderboardCacheList list of entities to store
      */
-    public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
+    public void saveToStorage(ArrayList<EntityLeaderboardCache> entityLeaderboardCacheList) {
         String header = "INSERT INTO " + tableName + "(UUID, ENTITY_NAME, ENTITY_TYPE, " +
                 "BALANCE_WEALTH, LAND_WEALTH, BLOCK_WEALTH, SPAWNER_WEALTH, CONTAINER_WEALTH, " +
                 "INVENTORY_WEALTH, TOTAL_WEALTH) VALUES ";
         StringBuilder body = new StringBuilder();
-        int cacheSize = entityCacheList.size();
+        int cacheSize = entityLeaderboardCacheList.size();
         for (int i = 0; i < cacheSize; i++) {
-            EntityCache eCache = entityCacheList.get(i);
+            EntityLeaderboardCache eCache = entityLeaderboardCacheList.get(i);
             body.append(getEntityQuery(eCache));
         }
 
@@ -186,7 +186,7 @@ public class SqlHelper implements StorageHelper {
      *
      * @param eCache entity to append
      */
-    public String getEntityQuery(EntityCache eCache) {
+    public String getEntityQuery(EntityLeaderboardCache eCache) {
         UUID uuid = eCache.getUuid();
         String entityName = "None";
         String entityType = "player";

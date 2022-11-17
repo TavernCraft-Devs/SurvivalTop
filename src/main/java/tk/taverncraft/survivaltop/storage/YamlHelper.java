@@ -12,7 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 
 /**
  * YamlHelper is responsible for reading/writing from yml files.
@@ -32,12 +32,12 @@ public class YamlHelper implements StorageHelper {
     /**
      * Saves information to yaml file.
      *
-     * @param entityCacheList list of entities to store
+     * @param entityLeaderboardCacheList list of entities to store
      */
-    public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
-        int cacheSize = entityCacheList.size();
+    public void saveToStorage(ArrayList<EntityLeaderboardCache> entityLeaderboardCacheList) {
+        int cacheSize = entityLeaderboardCacheList.size();
         for (int i = 0; i < cacheSize; i++) {
-            EntityCache eCache = entityCacheList.get(i);
+            EntityLeaderboardCache eCache = entityLeaderboardCacheList.get(i);
             saveToFile(eCache);
         }
     }
@@ -47,7 +47,7 @@ public class YamlHelper implements StorageHelper {
      *
      * @param eCache entity to save
      */
-    private void saveToFile(EntityCache eCache) {
+    private void saveToFile(EntityLeaderboardCache eCache) {
         UUID uuid = eCache.getUuid();
         String entityFileName;
         String entityName = "None";

@@ -3,7 +3,7 @@ package tk.taverncraft.survivaltop.storage;
 import java.util.ArrayList;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 
 /**
  * StorageManager decides the storage helper to use.
@@ -38,13 +38,13 @@ public class StorageManager {
     /**
      * Calls the helper to save information to storage.
      *
-     * @param entityCacheList list of entities to store
+     * @param entityLeaderboardCacheList list of entities to store
      */
-    public void saveToStorage(ArrayList<EntityCache> entityCacheList) {
+    public void saveToStorage(ArrayList<EntityLeaderboardCache> entityLeaderboardCacheList) {
         // if null means no storage was initialized, so no need to save
         if (this.storageHelper == null) {
             return;
         }
-        this.storageHelper.saveToStorage(entityCacheList);
+        this.storageHelper.saveToStorage(entityLeaderboardCacheList);
     }
 }

@@ -2,7 +2,7 @@ package tk.taverncraft.survivaltop.storage;
 
 import java.util.ArrayList;
 
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 
 /**
  * Interface to determine what type of storage to use. Used to shift work to compile
@@ -13,7 +13,7 @@ public interface StorageHelper {
     /**
      * Saves information to storage.
      *
-     * @param entityCacheList list of entities to store
+     * @param entityLeaderboardCacheList list of entities to store
      */
-    void saveToStorage(ArrayList<EntityCache> entityCacheList);
+    void saveToStorage(ArrayList<EntityLeaderboardCache> entityLeaderboardCacheList);
 }

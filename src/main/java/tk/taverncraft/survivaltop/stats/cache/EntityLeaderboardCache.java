@@ -3,10 +3,10 @@ package tk.taverncraft.survivaltop.stats.cache;
 import java.util.UUID;
 
 /**
- * EntityCache holds all entity information stored after a leaderboard update. It is mainly
+ * EntityLeaderboardCache holds all entity information stored after a leaderboard update. It is mainly
  * used for updating the leaderboard, non-realtime stats retrieval and papi placeholders.
  */
-public class EntityCache {
+public class EntityLeaderboardCache {
     private final UUID UUID;
     private double balWealth = 0;
     private double blockWealth = 0;
@@ -15,12 +15,12 @@ public class EntityCache {
     private double inventoryWealth = 0;
 
     /**
-     * Constructor for EntityCache.
+     * Constructor for EntityLeaderboardCache.
      *
      * @param uuid uuid of entity
      * @param balWealth balance wealth of entity
      */
-    public EntityCache(UUID uuid, double balWealth) {
+    public EntityLeaderboardCache(UUID uuid, double balWealth) {
         this.UUID = uuid;
         this.balWealth = balWealth;
     }
