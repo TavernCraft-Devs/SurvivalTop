@@ -83,7 +83,7 @@ public class StatsCommand {
         if (main.getOptions().isUseRealTimeStats()) {
             main.getEntityStatsManager().getRealTimeEntityStats(sender, name);
         } else {
-            main.getEntityStatsManager().getCachedEntityStats(sender, uuid, name);
+            main.getEntityStatsManager().getCachedEntityStats(sender, name);
         }
     }
 
@@ -122,7 +122,7 @@ public class StatsCommand {
         if (main.getOptions().isUseRealTimeStats()) {
             main.getEntityStatsManager().getRealTimeEntityStats(sender, name);
         } else {
-            main.getEntityStatsManager().getCachedEntityStats(sender, uuid, name);
+            main.getEntityStatsManager().getCachedEntityStats(sender, name);
         }
     }
 }

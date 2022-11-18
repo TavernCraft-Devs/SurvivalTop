@@ -156,6 +156,7 @@ public class ConfigManager {
         FileConfiguration config = new YamlConfiguration();
         configFile.getParentFile().mkdirs();
 
+        // logs from plugin
         config.set("minecraft-version", logFile.getMinecraftVersion());
         config.set("survivalTop-version", logFile.getSurvivalTopVersion());
         config.set("world-size", logFile.getWorldSize());
@@ -165,6 +166,8 @@ public class ConfigManager {
         config.set("leaderboard-update-start-time", logFile.getLeaderboardUpdateStartTime());
         config.set("last-update-duration", logFile.getLastUpdateDuration());
         config.set("estimated-block-processing-rate", logFile.getEstimatedBlockProcessingRate());
+
+        // config options
         config.set("use-gui-stats", main.getOptions().isUseGuiStats());
         config.set("use-realtime-stats", main.getOptions().isUseRealTimeStats());
         config.set("filter-last-join", main.getOptions().filterLastJoin());

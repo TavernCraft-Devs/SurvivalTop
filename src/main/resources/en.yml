@@ -22,7 +22,8 @@ update-complete: '&aThe leaderboard update completed in &b%time% &aseconds!' #%t
 update-interrupted: '&cThe leaderboard update was interrupted!'
 start-calculating-stats: '&aPlease give a few moments for calculating stats...'
 calculation-in-progress: '&cYour previous stats request is still in progress!'
-calculation-complete: '&aStats calculation completed in &b%time% &aseconds!' #%time%
+calculation-complete-realtime: '&aStats calculation completed in &b%time% &aseconds!' #%time%
+calculation-complete-cache: '&aA cached calculation from &b%time% &aseconds ago was found!' #%time%
 calculation-interrupted: '&cThe stats calculation was interrupted!'
 no-updated-leaderboard: '&cThere is no updated leaderboard yet!'
 survtop-sign-placed: '&aLeaderboard sign for rank %rank% has been placed!' #%rank%

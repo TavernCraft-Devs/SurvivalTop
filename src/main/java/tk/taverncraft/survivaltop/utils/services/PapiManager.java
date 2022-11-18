@@ -37,7 +37,7 @@ public class PapiManager extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "2.2.2";
+        return main.getDescription().getVersion();
     }
 
     @Override

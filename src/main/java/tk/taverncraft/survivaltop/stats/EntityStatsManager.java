@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -17,8 +18,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
+import tk.taverncraft.survivaltop.stats.cache.EntityStatsCache;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
-import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
 import tk.taverncraft.survivaltop.ui.EntityStatsGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 
@@ -37,6 +38,9 @@ public class EntityStatsManager {
 
     // map of sender uuid to the gui to show sender
     private final HashMap<UUID, EntityStatsGui> senderGui = new HashMap<>();
+
+    // entity cache, used if realtime stats are disabled
+    private ConcurrentHashMap<String, EntityStatsCache> cache = new ConcurrentHashMap<>();
 
     /**
      * Constructor for EntityStatsManager.
@@ -67,43 +71,52 @@ public class EntityStatsManager {
      * Entry point for getting the cached stats of an entity.
      *
      * @param sender sender who requested for stats
-     * @param uuid uuid of sender
      * @param name name of entity
      */
-    public void getCachedEntityStats(CommandSender sender, UUID uuid, String name) {
+    public void getCachedEntityStats(CommandSender sender, String name) {
         setCalculatingStats(sender);
-        EntityLeaderboardCache eCache = main.getServerStatsManager().getEntityCache(name);
-        // default to real time values if cache not found i.e. leaderboard not updated
+        EntityStatsCache eCache = cache.get(name.toUpperCase());
+        // default to real time values if cache not found
         if (eCache == null) {
             getRealTimeEntityStats(sender, name);
             return;
         }
 
-        if (main.getOptions().isUseGuiStats()) {
-            handleCachedStatsInGui(sender, name, eCache);
+        // if cache expire, calculate again
+        long timeElapsed = Instant.now().getEpochSecond() - eCache.getCacheTime();
+        if (timeElapsed >= main.getOptions().getCacheDuration()) {
+            getRealTimeEntityStats(sender, name);
+            return;
+        }
+
+        if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
+            if (eCache.getGui() == null) {
+                getRealTimeEntityStats(sender, name);
+            } else {
+                MessageManager.sendMessage(sender, "calculation-complete-cache",
+                    new String[]{"%time%"},
+                    new String[]{String.valueOf(timeElapsed)});
+                handleCachedStatsInGui(sender, eCache);
+            }
         } else {
+            MessageManager.sendMessage(sender, "calculation-complete-cache",
+                new String[]{"%time%"},
+                new String[]{String.valueOf(timeElapsed)});
             handleCachedStatsInChat(sender, name, eCache);
         }
-        calculationStartTime.remove(uuid);
     }
 
     /**
      * Handles sending cached entity stats in a gui.
      *
      * @param sender sender who checked for stats
-     * @param name name of entity to get stats for
      * @param eCache cache for the entity
      */
-    private void handleCachedStatsInGui(CommandSender sender, String name, EntityLeaderboardCache eCache) {
+    private void handleCachedStatsInGui(CommandSender sender, EntityStatsCache eCache) {
         UUID uuid = this.main.getSenderUuid(sender);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                EntityStatsGui gui = new EntityStatsGui(main, name, eCache);
-                senderGui.put(uuid, gui);
-                showEntityStatsToUser(sender);
-            }
-        }.runTaskAsynchronously(main);
+        senderGui.put(uuid, eCache.getGui());
+        sendGuiInteractiveText(sender);
+        calculationStartTime.remove(uuid);
     }
 
     /**
@@ -113,7 +126,7 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      * @param eCache cache for the entity
      */
-    private void handleCachedStatsInChat(CommandSender sender, String name, EntityLeaderboardCache eCache) {
+    private void handleCachedStatsInChat(CommandSender sender, String name, EntityStatsCache eCache) {
         double balValue = eCache.getBalWealth();
         double landValue = eCache.getLandWealth();
         double blockValue = eCache.getBlockWealth();
@@ -123,6 +136,7 @@ public class EntityStatsManager {
         double totalValue = eCache.getTotalWealth();
         sendStatsAsMessage(sender, name, balValue, landValue, blockValue, spawnerValue,
                 containerValue, inventoryValue, totalValue);
+        calculationStartTime.remove(main.getSenderUuid(sender));
     }
 
     /**
@@ -173,17 +187,19 @@ public class EntityStatsManager {
             interruptStatsCalculations(sender);
             return;
         }
-         new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
+                double spawnerValue = 0;
+                double containerValue = 0;
                 if (main.getOptions().spawnerIsIncluded()) {
                     main.getLandManager().processSpawnerTypesForStats(uuid);
+                    spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
                 }
                 if (main.getOptions().containerIsIncluded()) {
                     main.getLandManager().processContainerItemsForStats(uuid);
+                    containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
                 }
-                double spawnerValue = main.getLandManager().calculateSpawnerWorthForStats(uuid);
-                double containerValue = main.getLandManager().calculateContainerWorthForStats(uuid);
 
                 if (stopCalculations) {
                     interruptStatsCalculations(sender);
@@ -191,7 +207,7 @@ public class EntityStatsManager {
                 }
 
                 long timeTaken = Instant.now().getEpochSecond() - calculationStartTime.get(uuid);
-                MessageManager.sendMessage(sender, "calculation-complete",
+                MessageManager.sendMessage(sender, "calculation-complete-realtime",
                     new String[]{"%time%"},
                     new String[]{String.valueOf(timeTaken)});
 
@@ -202,7 +218,7 @@ public class EntityStatsManager {
                     return;
                 }
 
-                showEntityStatsToUser(sender, name, balWealth, blockWealth, spawnerValue,
+                showChatStatsToUser(sender, name, balWealth, blockWealth, spawnerValue,
                         containerValue, inventoryWealth);
             }
         }.runTask(main);
@@ -222,7 +238,7 @@ public class EntityStatsManager {
             public void run() {
                 EntityStatsGui gui = new EntityStatsGui(main, uuid, name, values);
                 senderGui.put(uuid, gui);
-                showEntityStatsToUser(sender);
+                showGuiStatsToUser(sender, uuid, name, values);
             }
         }.runTaskAsynchronously(main);
     }
@@ -232,12 +248,36 @@ public class EntityStatsManager {
      * values if applicable and sends message for user to access the gui.
      *
      * @param sender user who requested for stats
+     * @param uuid uuid of sender
+     * @param name name of entity
+     * @param values wealth values of the entity
      */
-    private void showEntityStatsToUser(CommandSender sender) {
+    private void showGuiStatsToUser(CommandSender sender, UUID uuid, String name, double... values) {
+        if (!main.getOptions().isUseRealTimeStats()) {
+            double balValue = values[0];
+            double blockValue = values[1];
+            double spawnerValue = values[2];
+            double containerValue = values[3];
+            double inventoryValue = values[4];
+            EntityStatsGui gui = senderGui.get(uuid);
+            EntityStatsCache eCache = new EntityStatsCache(gui, balValue, blockValue,
+                spawnerValue, containerValue, inventoryValue);
+            cache.put(name.toUpperCase(), eCache);
+        }
+
+        sendGuiInteractiveText(sender);
+    }
+
+    /**
+     * Sends text for user to click on to access gui.
+     *
+     * @param sender user who requested for stats
+     */
+    private void sendGuiInteractiveText(CommandSender sender) {
         TextComponent message = new TextComponent("Click here to view stats!");
         message.setColor(ChatColor.GOLD);
         message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                "/st openstatsinv"));
+            "/st openstatsinv"));
         sender.spigot().sendMessage(message);
         doCleanUp(sender);
     }
@@ -250,7 +290,7 @@ public class EntityStatsManager {
      * @param name name of entity to get stats for
      * @param values balance values breakdown
      */
-    private void showEntityStatsToUser(CommandSender sender, String name, double... values) {
+    private void showChatStatsToUser(CommandSender sender, String name, double... values) {
         double balValue = values[0];
         double blockValue = values[1];
         double spawnerValue = values[2];
@@ -262,6 +302,12 @@ public class EntityStatsManager {
         sendStatsAsMessage(sender, name, balValue, landValue, blockValue, spawnerValue,
                 containerValue, inventoryValue, totalValue);
         doCleanUp(sender);
+
+        if (!main.getOptions().isUseRealTimeStats()) {
+            EntityStatsCache eCache = new EntityStatsCache(null, balValue, blockValue,
+                spawnerValue, containerValue, inventoryValue);
+            cache.put(name.toUpperCase(), eCache);
+        }
     }
 
     /**
@@ -496,6 +542,13 @@ public class EntityStatsManager {
     public void interruptStatsCalculations(CommandSender sender) {
         MessageManager.sendMessage(sender, "calculation-interrupted");
         calculationStartTime.remove(main.getSenderUuid(sender));
+    }
+
+    /**
+     * Clears all cached values.
+     */
+    public void clearCache() {
+        this.cache = new ConcurrentHashMap<>();
     }
 }
 

@@ -21,15 +21,17 @@ use-gui-stats: false
 
 # if true, will provide realtime values when the stats command is executed
 # realtime calculations take a longer time depending on the claim size, spawner count etc
-# if false, will provide the last updated/cached values from the leaderboard update
+# if false, will provide the cached value from the previous calculation
 # cached values provide near instant results (very much faster) but are not the latest
+# cache duration specifies in seconds how long cached data is stored
+# cache duration is ignored if realtime stats is used
 # note that if cached values cannot be found, the plugin defaults to getting real time stats
-# note that setting this to false prevents the gui from showing individual item/block breakdowns
 use-realtime-stats: false
+cache-duration: 1800
 
 #####################################################################################
 #                                                                                   #
-#                                  Filter Options                                   #
+#                    Filter Options (not applicable to groups!)                     #
 #                                                                                   #
 #####################################################################################
 

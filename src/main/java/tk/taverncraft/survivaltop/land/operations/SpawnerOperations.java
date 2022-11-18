@@ -217,7 +217,7 @@ public class SpawnerOperations {
             Block block = blocks.get(i);
             try {
                 CreatureSpawner spawner = (CreatureSpawner) block.getState();
-                String mobType = spawner.getSpawnedType().getName();
+                String mobType = spawner.getSpawnedType().name();
                 if (spawnerEntityType.contains(mobType)) {
                     spawnerHolderMapForStats.get(uuid).addToHolder(mobType);
                 }

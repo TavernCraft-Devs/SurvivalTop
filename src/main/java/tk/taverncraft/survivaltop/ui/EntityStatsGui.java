@@ -63,26 +63,6 @@ public class EntityStatsGui extends GuiHelper {
     }
 
     /**
-     * Constructor for EntityStatsGui, used in cached stats.
-     *
-     * @param main plugin class
-     * @param name name of entity to get stats for
-     * @param eCache cache of entity
-     */
-    public EntityStatsGui(Main main, String name, EntityLeaderboardCache eCache) {
-        this.main = main;
-        name = name + " ";
-        double balValue = eCache.getBalWealth();
-        double blockValue = eCache.getBlockWealth();
-        double spawnerValue = eCache.getSpawnerWealth();
-        double containerValue = eCache.getContainerWealth();
-        double inventoryValue = eCache.getInventoryWealth();
-        this.values = new double[]{balValue, blockValue, spawnerValue, containerValue,
-                inventoryValue};
-        setUpMainPage(name);
-    }
-
-    /**
      * Sets up the main page for stats.
      *
      * @param entityName name of entity whose stats is shown
@@ -247,6 +227,9 @@ public class EntityStatsGui extends GuiHelper {
         for (Map.Entry<String, MutableInt> map : materialList.entrySet()) {
             String name = map.getKey();
             int quantity = map.getValue().get();
+            if (quantity == 0) {
+                continue;
+            }
             double value;
             switch (viewType) {
             case "Block Stats":

@@ -101,16 +101,16 @@ public class ViewPageEvent implements Listener {
      */
     private void statsMainPageClickHandler(int slot, InventoryClickEvent e) {
         Inventory inv = null;
-        if (slot == 13 && main.getOptions().isUseRealTimeStats()) {
+        if (slot == 13) {
             inv = main.getEntityStatsManager().getBlockStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
-        } else if (slot == 14 && main.getOptions().isUseRealTimeStats()) {
+        } else if (slot == 14) {
             inv = main.getEntityStatsManager().getSpawnerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
-        } else if (slot == 15 && main.getOptions().isUseRealTimeStats()) {
+        } else if (slot == 15) {
             inv = main.getEntityStatsManager().getContainerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
-        } else if (slot == 16 && main.getOptions().isUseRealTimeStats()) {
+        } else if (slot == 16) {
             inv = main.getEntityStatsManager().getInventoryStatsPage(
                 e.getWhoClicked().getUniqueId(), 0);
         }

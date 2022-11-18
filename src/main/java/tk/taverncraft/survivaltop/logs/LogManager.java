@@ -83,6 +83,12 @@ public class LogManager {
      * @param sender user who requested for dump
      */
     private void executeClaimsProcessedAction(CommandSender sender) {
+        leaderboardUpdateStartTime = main.getLeaderboardManager().getLeaderboardUpdateStartTime();
+        lastUpdateDuration = main.getLeaderboardManager().getLastUpdateDuration();
+
+        if (leaderboardUpdateStartTime != -1 && lastUpdateDuration != -1) {
+            estimatedBlockProcessingRate = numBlocks / lastUpdateDuration;
+        }
         LogFile logFile = new LogFile(minecraftVersion, survivalTopVersion, worldRadius,
                 numEntities, numClaims, numBlocks, leaderboardUpdateStartTime, lastUpdateDuration,
                 estimatedBlockProcessingRate);
@@ -150,13 +156,6 @@ public class LogManager {
             this.worldRadius = props.getProperty("max-world-size");
         } catch (IOException e) {
             this.worldRadius = "not found";
-        }
-
-        leaderboardUpdateStartTime = main.getLeaderboardManager().getLeaderboardUpdateStartTime();
-        lastUpdateDuration = main.getLeaderboardManager().getLastUpdateDuration();
-
-        if (leaderboardUpdateStartTime != -1 && lastUpdateDuration != -1) {
-            estimatedBlockProcessingRate = lastUpdateDuration / numBlocks;
         }
     }
 

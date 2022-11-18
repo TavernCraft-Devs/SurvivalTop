@@ -33,6 +33,7 @@ public class Options {
     private int maxLandHeight;
     private int minLandHeight;
     private long lastLoadTime;
+    private int cacheDuration;
 
     public Options(Main main) {
         this.main = main;
@@ -59,6 +60,7 @@ public class Options {
         this.useGuiLeaderboard = config.getBoolean("use-gui-leaderboard", false);
         this.storageType = config.getString("storage-type", "None");
         this.lastLoadTime = Instant.now().getEpochSecond();
+        this.cacheDuration = config.getInt("cache-duration", 1800);
         setMaxLandHeight();
         setMinLandHeight();
     }
@@ -143,6 +145,10 @@ public class Options {
 
     public long getLastLoadTime() {
         return lastLoadTime;
+    }
+
+    public int getCacheDuration() {
+        return cacheDuration;
     }
 
     // setters below
