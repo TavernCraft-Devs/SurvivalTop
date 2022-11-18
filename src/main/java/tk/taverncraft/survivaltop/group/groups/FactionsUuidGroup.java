@@ -62,9 +62,7 @@ public class FactionsUuidGroup implements GroupHandler {
         Set<FPlayer> fPlayers = faction.getFPlayers();
         for (FPlayer fPlayer : fPlayers) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(fPlayer.getId()));
-            if (player != null) {
-                offlinePlayers.add(player);
-            }
+            offlinePlayers.add(player);
         }
         return offlinePlayers;
     }

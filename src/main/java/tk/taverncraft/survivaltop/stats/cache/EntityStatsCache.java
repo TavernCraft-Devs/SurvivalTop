@@ -16,6 +16,16 @@ public class EntityStatsCache {
     private final double inventoryWealth;
     private final long cacheTime;
 
+    /**
+     * Constructor for EntityStatsCache.
+     *
+     * @param gui gui view
+     * @param balWealth balance wealth of entity
+     * @param blockWealth block wealth of entity
+     * @param spawnerWealth spawner wealth of entity
+     * @param containerWealth container wealth of entity
+     * @param inventoryWealth inventory wealth of entity
+     */
     public EntityStatsCache(EntityStatsGui gui, double balWealth, double blockWealth,
             double spawnerWealth, double containerWealth, double inventoryWealth) {
         this.gui = gui;
@@ -101,6 +111,11 @@ public class EntityStatsCache {
         return balWealth + getLandWealth() + inventoryWealth;
     }
 
+    /**
+     * Gets the time since epoch when the cache was created.
+     *
+     * @return time when cache was created
+     */
     public long getCacheTime() {
         return cacheTime;
     }

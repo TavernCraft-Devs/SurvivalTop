@@ -14,7 +14,6 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * blocks/spawners/containers.
  */
 public class ItemInfoCommand {
-
     private final String itemInfoPerm = "survtop.iteminfo";
     private final ValidationManager validationManager;
 

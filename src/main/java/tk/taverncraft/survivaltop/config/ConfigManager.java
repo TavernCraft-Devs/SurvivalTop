@@ -149,6 +149,8 @@ public class ConfigManager {
 
     /**
      * Dumps details into a log file, triggered by the dump command.
+     *
+     * @param logFile log file containing log details from plugin
      */
     public void dumpToLogFile(LogFile logFile) {
         String fileName = "dump-" + Instant.now().getEpochSecond() + ".yml";

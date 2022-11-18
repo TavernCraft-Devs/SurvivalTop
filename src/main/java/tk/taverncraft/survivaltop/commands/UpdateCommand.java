@@ -11,7 +11,6 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * leaderboard update.
  */
 public class UpdateCommand {
-
     private final String updatePerm = "survtop.update";
     private final Main main;
     private final ValidationManager validationManager;

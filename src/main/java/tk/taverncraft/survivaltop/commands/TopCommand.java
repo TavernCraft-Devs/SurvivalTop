@@ -10,7 +10,6 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * TopCommand contains the execute method for when a user views the leaderboard.
  */
 public class TopCommand {
-
     private final String topPerm = "survtop.top";
     private final ValidationManager validationManager;
 

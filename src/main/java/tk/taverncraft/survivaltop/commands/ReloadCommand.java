@@ -11,7 +11,6 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * ReloadCommand contains the execute method for when a user inputs command to reload plugin.
  */
 public class ReloadCommand {
-
     private final String reloadPerm = "survtop.reload";
     private final Main main;
     private final ValidationManager validationManager;
@@ -55,6 +54,7 @@ public class ReloadCommand {
             // reinitialize manager values
             main.getStorageManager().initializeValues();
             main.getEntityStatsManager().setStopCalculations(true);
+            main.getEntityStatsManager().clearCache();
             main.getServerStatsManager().setStopCalculations(true);
             main.getServerStatsManager().initializeValues();
             main.getLandManager().setStopOperations(true);

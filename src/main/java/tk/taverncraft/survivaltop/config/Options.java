@@ -35,11 +35,19 @@ public class Options {
     private long lastLoadTime;
     private int cacheDuration;
 
+    /**
+     * Constructor for Options.
+     *
+     * @param main plugin class
+     */
     public Options(Main main) {
         this.main = main;
         initializeOptions();
     }
 
+    /**
+     * Initializes options from config file, called during startup and reload.
+     */
     public void initializeOptions() {
         FileConfiguration config = main.getConfig();
         this.useGuiStats = config.getBoolean("use-gui-stats", true);

@@ -28,7 +28,7 @@ public class InventoryManager {
     private LinkedHashMap<String, Double> inventoryWorth;
     private Set<String> inventoryMaterial;
 
-    // boolean to allow reloads to stop current operations
+    // boolean to allow reloads to stop current inventory operations
     private boolean stopOperations = false;
 
     // holders containing count of each material mapped to uuid

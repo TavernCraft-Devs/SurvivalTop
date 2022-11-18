@@ -71,7 +71,7 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Initialize land operations to be included.
+     * Initializes land operations to be included.
      */
     private void initializeLandOperations() {
         landOperationsForLeaderboard = new ArrayList<>();
@@ -280,7 +280,7 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Get the worth of a block.
+     * Gets the worth of a block.
      *
      * @param material material of block
      *
@@ -304,7 +304,7 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Get the worth of a spawner.
+     * Gets the worth of a spawner.
      *
      * @param entityType entity type of spawner
      *
@@ -328,7 +328,7 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Get the worth of a container item.
+     * Gets the worth of a container item.
      *
      * @param material material of container item
      *

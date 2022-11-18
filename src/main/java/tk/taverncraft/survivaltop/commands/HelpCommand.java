@@ -10,7 +10,6 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * HelpCommand contains the execute method for when a user inputs the command to get help for the plugin.
  */
 public class HelpCommand {
-
     private final String helpPerm = "survtop.help";
     private final ValidationManager validationManager;
 

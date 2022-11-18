@@ -114,7 +114,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
     }
 
     /**
-     * Get claims based on player.
+     * Gets claims based on player.
      *
      * @param name name of player to get claims for
      *
@@ -126,7 +126,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
     }
 
     /**
-     * Get claims based on group.
+     * Gets claims based on group.
      *
      * @param name name of group to get claims for
      *

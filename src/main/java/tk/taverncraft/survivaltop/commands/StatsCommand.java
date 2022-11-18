@@ -13,7 +13,6 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * StatsCommand contains the execute method for when a user views stats of self or others.
  */
 public class StatsCommand {
-
     private final String statsSelfPerm = "survtop.stats.self";
     private final String statsOthersPerm = "survtop.stats.others";
     private final Main main;

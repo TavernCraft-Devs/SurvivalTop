@@ -55,7 +55,8 @@ public class KingdomsXGroup implements GroupHandler {
      */
     public List<String> getGroups() {
         List<String> groups = new ArrayList<>();
-        Collection<Kingdom> kingdoms = Kingdoms.get().getDataHandlers().getKingdomManager().getKingdoms();
+        Collection<Kingdom> kingdoms = Kingdoms.get().getDataHandlers().getKingdomManager()
+                .getKingdoms();
         for (Kingdom kingdom : kingdoms) {
             groups.add(kingdom.getName());
         }

@@ -1,9 +1,9 @@
 package tk.taverncraft.survivaltop.land.operations.holders;
 
-import tk.taverncraft.survivaltop.utils.types.MutableInt;
-
 import java.util.HashMap;
 import java.util.Set;
+
+import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Holder for tracking count of spawners.
