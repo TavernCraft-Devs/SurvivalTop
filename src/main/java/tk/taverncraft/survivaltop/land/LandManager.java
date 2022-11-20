@@ -1,6 +1,5 @@
 package tk.taverncraft.survivaltop.land;
 
-import java.util.UUID;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -76,167 +75,116 @@ public class LandManager {
     }
 
     /**
-     * Cleans up holders after leaderboard update.
-     */
-    public void doCleanUpForLeaderboard() {
-        landOperationsHelper.doCleanUpForLeaderboard();
-    }
-
-    /**
      * Cleans up holders after stats update.
      *
-     * @param uuid uuid of sender
+     * @param id key to identify task
      */
-    public void doCleanUpForStats(UUID uuid) {
-        landOperationsHelper.doCleanUpForStats(uuid);
+    public void doCleanUp(int id) {
+        landOperationsHelper.doCleanUp(id);
     }
 
     /**
      * Processes the worth of a land.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
+     * @param id key to identify task
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
-        landClaimPluginHandler.processEntityLand(uuid, name, isLeaderboardUpdate);
-    }
-
-    /**
-     * Creates holders for leaderboard.
-     *
-     * @param uuid uuid of each entity
-     */
-    public void createHoldersForLeaderboard(UUID uuid) {
-        landOperationsHelper.createHoldersForLeaderboard(uuid);
+    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
+        landClaimPluginHandler.processEntityLand(name, id, isLeaderboardUpdate);
     }
 
     /**
      * Creates holders for stats.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      */
-    public void createHoldersForStats(UUID uuid) {
-        landOperationsHelper.createHoldersForStats(uuid);
+    public void createHolder(int id) {
+        landOperationsHelper.createHolder(id);
     }
 
     /**
      * Gets the blocks to show sender in GUI.
      *
+     * @param id key to identify task
+     *
      * @return hashmap of block material to its worth
      */
-    public HashMap<String, MutableInt> getBlocksForGuiStats(UUID uuid) {
-        return landOperationsHelper.getBlocksForGuiStats(uuid);
+    public HashMap<String, MutableInt> getBlocksForGui(int id) {
+        return landOperationsHelper.getBlocksForGui(id);
     }
 
     /**
      * Gets the spawners to show sender in GUI.
      *
+     * @param id key to identify task
+     *
      * @return hashmap of spawner entity type to its worth
      */
-    public HashMap<String, MutableInt> getSpawnersForGuiStats(UUID uuid) {
-        return landOperationsHelper.getSpawnersForGuiStats(uuid);
+    public HashMap<String, MutableInt> getSpawnersForGui(int id) {
+        return landOperationsHelper.getSpawnersForGui(id);
     }
 
     /**
      * Gets the container items to show sender in GUI.
      *
+     * @param id key to identify task
+     *
      * @return hashmap of container item material to its worth
      */
-    public HashMap<String, MutableInt> getContainersForGuiStats(UUID uuid) {
-        return landOperationsHelper.getContainersForGuiStats(uuid);
-    }
-
-    /**
-     * Processes spawner types on the main thread for leaderboard.
-     */
-    public void processSpawnerTypesForLeaderboard() {
-        landOperationsHelper.processSpawnerTypesForLeaderboard();
+    public HashMap<String, MutableInt> getContainersForGui(int id) {
+        return landOperationsHelper.getContainersForGui(id);
     }
 
     /**
      * Processes spawner types on the main thread for stats.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      */
-    public void processSpawnerTypesForStats(UUID uuid) {
-        landOperationsHelper.processSpawnerTypesForStats(uuid);
-    }
-
-    /**
-     * Processes container items on the main thread for leaderboard.
-     */
-    public void processContainerItemsForLeaderboard() {
-        landOperationsHelper.processContainerItemsForLeaderboard();
+    public void processSpawnerTypes(int id) {
+        landOperationsHelper.processSpawnerTypes(id);
     }
 
     /**
      * Processes container items on the main thread for stats.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      */
-    public void processContainerItemsForStats(UUID uuid) {
-        landOperationsHelper.processContainerItemsForStats(uuid);
-    }
-
-    /**
-     * Calculates block worth for all entities.
-     *
-     * @return map of entities uuid to their block worth
-     */
-    public HashMap<UUID, Double> calculateBlockWorthForLeaderboard() {
-        return landOperationsHelper.calculateBlockWorthForLeaderboard();
+    public void processContainerItems(int id) {
+        landOperationsHelper.processContainerItems(id);
     }
 
     /**
      * Calculates block worth for a specified entity.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return map of sender uuid to the calculated block worth
      */
-    public double calculateBlockWorthForStats(UUID uuid) {
-        return landOperationsHelper.calculateBlockWorthForStats(uuid);
-    }
-
-    /**
-     * Calculates spawner worth for all entities.
-     *
-     * @return map of entities uuid to their spawner worth
-     */
-    public HashMap<UUID, Double> calculateSpawnerWorthForLeaderboard() {
-        return landOperationsHelper.calculateSpawnerWorthForLeaderboard();
+    public double calculateBlockWorth(int id) {
+        return landOperationsHelper.calculateBlockWorth(id);
     }
 
     /**
      * Calculates spawner worth for a specified entity.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return map of sender uuid to the calculated spawner worth
      */
-    public double calculateSpawnerWorthForStats(UUID uuid) {
-        return landOperationsHelper.calculateSpawnerWorthForStats(uuid);
-    }
-
-    /**
-     * Calculates container worth for all entities.
-     *
-     * @return map of entities uuid to their container worth
-     */
-    public HashMap<UUID, Double> calculateContainerWorthForLeaderboard() {
-        return landOperationsHelper.calculateContainerWorthForLeaderboard();
+    public double calculateSpawnerWorth(int id) {
+        return landOperationsHelper.calculateSpawnerWorth(id);
     }
 
     /**
      * Calculates container worth for a specified entity.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return map of sender uuid to the calculated container worth
      */
-    public double calculateContainerWorthForStats(UUID uuid) {
-        return landOperationsHelper.calculateContainerWorthForStats(uuid);
+    public double calculateContainerWorth(int id) {
+        return landOperationsHelper.calculateContainerWorth(id);
     }
 
     /**

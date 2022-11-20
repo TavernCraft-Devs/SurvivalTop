@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
@@ -32,8 +31,7 @@ public class InventoryManager {
     private boolean stopOperations = false;
 
     // holders containing count of each material mapped to uuid
-    private HashMap<UUID, InventoryHolder> inventoryHolderMapForLeaderboard = new HashMap<>();
-    private final ConcurrentHashMap<UUID, InventoryHolder> inventoryHolderMapForStats =
+    private final ConcurrentHashMap<Integer, InventoryHolder> inventoryHolderMap =
             new ConcurrentHashMap<>();
 
     /**
@@ -47,37 +45,21 @@ public class InventoryManager {
     }
 
     /**
-     * Cleans up holders after leaderboard update.
-     */
-    public void doCleanUpForLeaderboard() {
-        inventoryHolderMapForLeaderboard = new HashMap<>();
-    }
-
-    /**
      * Cleans up holders after stats update.
      *
-     * @param uuid uuid of sender
+     * @param id key to identify task
      */
-    public void doCleanUpForStats(UUID uuid) {
-        inventoryHolderMapForStats.remove(uuid);
-    }
-
-    /**
-     * Creates holders for leaderboard.
-     *
-     * @param uuid uuid of each entity
-     */
-    public void createHolderForLeaderboard(UUID uuid) {
-        inventoryHolderMapForLeaderboard.put(uuid, new InventoryHolder(inventoryMaterial));
+    public void doCleanUp(int id) {
+        inventoryHolderMap.remove(id);
     }
 
     /**
      * Creates holders for stats.
      *
-     * @param uuid uuid of sender, not to confused with the entity itself!
+     * @param id key to identify task
      */
-    public void createHolderForStats(UUID uuid) {
-        inventoryHolderMapForStats.put(uuid, new InventoryHolder(inventoryMaterial));
+    public void createHolder(int id) {
+        inventoryHolderMap.put(id, new InventoryHolder(inventoryMaterial));
     }
 
     /**
@@ -130,133 +112,69 @@ public class InventoryManager {
     /**
      * Processes the worth of inventories for given entity.
      *
-     * @param uuid uuid of each entity
      * @param name name of entity to get inventory worth for
+     * @param id key to identify task
      */
-    public void processInvWorthForLeaderboard(UUID uuid, String name) {
-        if (this.main.getOptions().groupIsEnabled()) {
-            List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
-            for (OfflinePlayer player : players) {
-                processPlayerForLeaderboard(uuid, player.getName());
-            }
-        } else {
-            processPlayerForLeaderboard(uuid, name);
-        }
-    }
-
-    /**
-     * Processes the worth of inventories for given entity.
-     *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
-     * @param name name of entity to get inventory worth for
-     */
-    public void processInvWorthForStats(UUID uuid, String name) {
+    public void processInvWorth(String name, int id) {
         if (this.main.getOptions().groupIsEnabled()) {
             List<OfflinePlayer> players = this.main.getGroupManager().getPlayers(name);
             for (OfflinePlayer player : players) {
                 if (stopOperations) {
                     return;
                 }
-                processPlayerForStats(uuid, player.getName());
+                processPlayer(player.getName(), id);
             }
         } else {
             if (stopOperations) {
                 return;
             }
-            processPlayerForStats(uuid, name);
+            processPlayer(name, id);
         }
     }
 
     /**
      * Processes the inventory worth for given player name.
      *
-     * @param uuid uuid of each entity
      * @param name name of player to get inventory worth for
+     * @param id key to identify task
      */
-    private void processPlayerForLeaderboard(UUID uuid, String name) {
+    private void processPlayer(String name, int id) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
         if (offlinePlayer.isOnline()) {
             Player player = offlinePlayer.getPlayer();
             Inventory inventory = player.getInventory();
-            processInventoryItemsForLeaderboard(uuid, inventory);
-        }
-    }
-
-    /**
-     * Processes the inventory worth for given player name.
-     *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
-     * @param name name of player to get inventory worth for
-     */
-    private void processPlayerForStats(UUID uuid, String name) {
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-        if (offlinePlayer.isOnline()) {
-            Player player = offlinePlayer.getPlayer();
-            Inventory inventory = player.getInventory();
-            processInventoryItemsForStats(uuid, inventory);
+            processInventoryItems(id, inventory);
         }
     }
 
     /**
      * Processes the worth of inventory items.
      *
-     * @param uuid uuid of each entity
+     * @param id key to identify task
      * @param inventory inventory to process
      */
-    private void processInventoryItemsForLeaderboard(UUID uuid, Inventory inventory) {
+    private void processInventoryItems(int id, Inventory inventory) {
         for (ItemStack itemStack : inventory) {
             if (itemStack == null) {
                 continue;
             }
             String material = itemStack.getType().name();
             if (inventoryMaterial.contains(material)) {
-                inventoryHolderMapForLeaderboard.get(uuid).addToHolder(material,
+                inventoryHolderMap.get(id).addToHolder(material,
                     itemStack.getAmount());
             }
         }
     }
 
     /**
-     * Processes the worth of inventory items.
-     *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
-     * @param inventory inventory to process
-     */
-    private void processInventoryItemsForStats(UUID uuid, Inventory inventory) {
-        for (ItemStack itemStack : inventory) {
-            if (itemStack == null) {
-                continue;
-            }
-            String material = itemStack.getType().name();
-            if (inventoryMaterial.contains(material)) {
-                inventoryHolderMapForStats.get(uuid).addToHolder(material, itemStack.getAmount());
-            }
-        }
-    }
-
-    /**
-     * Calculates inventory worth for all entities.
-     *
-     * @return map of entities uuid to their inventory worth
-     */
-    public HashMap<UUID, Double> calculateInventoryWorthForLeaderboard() {
-        HashMap<UUID, Double> inventoryWorthMap = new HashMap<>();
-        for (Map.Entry<UUID, InventoryHolder> map : inventoryHolderMapForLeaderboard.entrySet()) {
-            double value = getAllInventoriesWorth(map.getValue());
-            inventoryWorthMap.put(map.getKey(), value);
-        }
-        return inventoryWorthMap;
-    }
-
-    /**
      * Calculates inventory worth for a specified entity.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return map of sender uuid to the calculated inventory worth
      */
-    public double calculateInventoryWorthForStats(UUID uuid) {
-        return getAllInventoriesWorth(inventoryHolderMapForStats.get(uuid));
+    public double calculateInventoryWorth(int id) {
+        return getAllInventoriesWorth(inventoryHolderMap.get(id));
     }
 
     /**
@@ -279,12 +197,12 @@ public class InventoryManager {
     /**
      * Gets the inventory counter to show in GUI.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return inventory counter
      */
-    public HashMap<String, MutableInt> getInventoriesForGuiStats(UUID uuid) {
-        return inventoryHolderMapForStats.get(uuid).getCounter();
+    public HashMap<String, MutableInt> getInventoriesForGui(int id) {
+        return inventoryHolderMap.get(id).getCounter();
     }
 
     /**

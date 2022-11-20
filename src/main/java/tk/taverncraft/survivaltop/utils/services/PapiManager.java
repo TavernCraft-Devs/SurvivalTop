@@ -1,7 +1,5 @@
 package tk.taverncraft.survivaltop.utils.services;
 
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -51,7 +49,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 3);
             try {
                 int index = Integer.parseInt(args[2]) - 1;
-                return main.getServerStatsManager().getEntityNameAtPosition(index);
+                return main.getLeaderboardManager().getEntityNameAtPosition(index);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 return "None";
             }
@@ -61,7 +59,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 3);
             try {
                 int index = Integer.parseInt(args[2]) - 1;
-                return main.getServerStatsManager().getEntityWealthAtPosition(index);
+                return main.getLeaderboardManager().getEntityWealthAtPosition(index);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -70,8 +68,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_position")) {
             String[] args = params.split("_", 3);
             try {
-                UUID uuid = getEntityUuid(args, player, 2);
-                return uuid == null ? "None" : main.getServerStatsManager().getPositionOfEntity(uuid);
+                String name = getEntityName(args, player, 2);
+                return name == null ? "None" : main.getLeaderboardManager().getPositionOfEntity(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "None";
             }
@@ -80,8 +78,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_bal_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntityBalWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntityBalWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -90,8 +88,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_inv_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntityInvWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntityInvWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -100,8 +98,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_land_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntityLandWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntityLandWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -110,8 +108,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_block_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntityBlockWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntityBlockWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -120,8 +118,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_spawner_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntitySpawnerWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntitySpawnerWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -130,8 +128,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_container_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntityContainerWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntityContainerWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -140,8 +138,8 @@ public class PapiManager extends PlaceholderExpansion {
         if (params.startsWith("entity_total_wealth")) {
             String[] args = params.split("_", 4);
             try {
-                UUID uuid = getEntityUuid(args, player, 3);
-                return uuid == null ? "0" : main.getServerStatsManager().getEntityTotalWealth(uuid);
+                String name = getEntityName(args, player, 3);
+                return name == null ? "0" : main.getLeaderboardManager().getEntityTotalWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -157,26 +155,20 @@ public class PapiManager extends PlaceholderExpansion {
      * @param player player who sent the command
      * @param length length of input
      *
-     * @return uuid of entity of interest
+     * @return name of entity of interest
      */
-    public UUID getEntityUuid(String[] args, OfflinePlayer player, int length) {
+    public String getEntityName(String[] args, OfflinePlayer player, int length) {
         String entityName;
         if (args.length == length) {
             entityName = player.getName();
             if (this.main.getOptions().groupIsEnabled()) {
                 String group = this.main.getGroupManager().getGroupOfPlayer(entityName);
-                return this.main.getServerStatsManager().getGroupNameToUuidMap().get(group);
+                return group.toUpperCase();
             }
         } else {
             entityName = args[length];
-            if (this.main.getOptions().groupIsEnabled()) {
-                return this.main.getServerStatsManager().getGroupNameToUuidMap().get(entityName);
-            }
         }
-
-        assert entityName != null;
-        OfflinePlayer target = Bukkit.getOfflinePlayer(entityName);
-        return target.getUniqueId();
+        return entityName.toUpperCase();
     }
 }
 

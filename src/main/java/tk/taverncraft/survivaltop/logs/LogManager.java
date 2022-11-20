@@ -1,5 +1,6 @@
 package tk.taverncraft.survivaltop.logs;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -9,6 +10,8 @@ import java.util.Properties;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -20,12 +23,12 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
  */
 public class LogManager {
     private final Main main;
+    private final String minecraftVersion;
+    private final String survivalTopVersion;
+    private String worldSize;
     private long numClaims = 0;
     private long numBlocks = 0;
     private int numEntities = 0;
-    private String worldRadius;
-    private String minecraftVersion;
-    private String survivalTopVersion;
     private long leaderboardUpdateStartTime = -1;
     private long lastUpdateDuration = -1;
     private long estimatedBlockProcessingRate = -1;
@@ -89,10 +92,7 @@ public class LogManager {
         if (leaderboardUpdateStartTime != -1 && lastUpdateDuration != -1) {
             estimatedBlockProcessingRate = numBlocks / lastUpdateDuration;
         }
-        LogFile logFile = new LogFile(minecraftVersion, survivalTopVersion, worldRadius,
-                numEntities, numClaims, numBlocks, leaderboardUpdateStartTime, lastUpdateDuration,
-                estimatedBlockProcessingRate);
-        main.getConfigManager().dumpToLogFile(logFile);
+        dumpToLogFile();
         MessageManager.sendMessage(sender, "log-complete");
         this.isLogging = false;
     }
@@ -153,9 +153,9 @@ public class LogManager {
         Properties props = new Properties();
         try {
             props.load(new FileInputStream("server.properties"));
-            this.worldRadius = props.getProperty("max-world-size");
+            this.worldSize = props.getProperty("max-world-size");
         } catch (IOException e) {
-            this.worldRadius = "not found";
+            this.worldSize = "not found";
         }
     }
 
@@ -177,6 +177,54 @@ public class LogManager {
      */
     public boolean isLogging() {
         return this.isLogging;
+    }
+
+    /**
+     * Dumps details into a log file, triggered by the dump command.
+     */
+    public void dumpToLogFile() {
+        String fileName = "dump-" + Instant.now().getEpochSecond() + ".yml";
+        File configFile = new File(main.getDataFolder() + "/dumps", fileName);
+        FileConfiguration config = new YamlConfiguration();
+        configFile.getParentFile().mkdirs();
+
+        // logs from plugin
+        config.set("minecraft-version", minecraftVersion);
+        config.set("survivalTop-version", survivalTopVersion);
+        config.set("world-size", worldSize);
+        config.set("num-entities", numEntities);
+        config.set("num-claims", numClaims);
+        config.set("num-blocks", numBlocks);
+        config.set("leaderboard-update-start-time", leaderboardUpdateStartTime);
+        config.set("last-update-duration", lastUpdateDuration);
+        config.set("estimated-block-processing-rate", estimatedBlockProcessingRate);
+
+        // config options
+        config.set("use-gui-stats", main.getOptions().isUseGuiStats());
+        config.set("enable-cache", main.getOptions().cacheIsEnabled());
+        config.set("filter-last-join", main.getOptions().filterLastJoin());
+        config.set("filter-player-time", main.getOptions().filterPlayerTime());
+        config.set("enable-group", main.getOptions().groupIsEnabled());
+        config.set("group-type", main.getOptions().getGroupType());
+        config.set("include-bal", main.getOptions().balIsIncluded());
+        config.set("include-land", main.getOptions().landIsIncluded());
+        config.set("land-type", main.getOptions().getLandType());
+        config.set("include-spawners", main.getOptions().spawnerIsIncluded());
+        config.set("include-containers", main.getOptions().containerIsIncluded());
+        config.set("max-land-height", main.getOptions().getMaxLandHeight());
+        config.set("min-land-height", main.getOptions().getMinLandHeight());
+        config.set("include-inventory", main.getOptions().inventoryIsIncluded());
+        config.set("update-interval", main.getOptions().getUpdateInterval());
+        config.set("update-on-start", main.getOptions().updateOnStart());
+        config.set("minimum-wealth", main.getOptions().getMinimumWealth());
+        config.set("storage-type", main.getOptions().getStorageType());
+        config.set("last-load-time", main.getOptions().getLastLoadTime());
+
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

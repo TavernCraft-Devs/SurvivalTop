@@ -65,11 +65,11 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
     /**
      * Processes the worth of a land.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
+     * @param id key to identify task
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
         try {
             Collection<TownBlock> claims = getClaims(name);
             int townSize = this.main.getConfig().getInt("town-block-size", 16);
@@ -79,7 +79,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
                 double minZ = claim.getZ() * townSize;
                 double maxX = minX + townSize;
                 double maxZ = minZ + townSize;
-                processEntityClaim(uuid, maxX, maxZ, minX, minZ, world, isLeaderboardUpdate);
+                processEntityClaim(id, maxX, maxZ, minX, minZ, world, isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
@@ -88,7 +88,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
     /**
      * Processes the worth of a claim identified between 2 locations.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
+     * @param id key to identify task
      * @param maxX max value of x
      * @param maxZ max value of z
      * @param minX min value of x
@@ -96,11 +96,11 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      * @param world world that the claim is in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityClaim(UUID uuid, double maxX, double maxZ, double minX, double minZ,
+    public void processEntityClaim(int id, double maxX, double maxZ, double minX, double minZ,
             World world, boolean isLeaderboardUpdate) {
         double minY = this.main.getOptions().getMinLandHeight();
         double maxY = this.main.getOptions().getMaxLandHeight();
-        landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
+        landOperationsHelper.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
 

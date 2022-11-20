@@ -51,15 +51,15 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
     /**
      * Processes the worth of a land.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
+     * @param id key to identify task
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
         try {
             Set<SimpleChunkLocation> claims = getClaims(name);
             for (SimpleChunkLocation claim : claims) {
-                landOperationsHelper.processEntityChunk(uuid, claim.toChunk(),
+                landOperationsHelper.processEntityChunk(id, claim.toChunk(),
                         claim.getBukkitWorld(), isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {

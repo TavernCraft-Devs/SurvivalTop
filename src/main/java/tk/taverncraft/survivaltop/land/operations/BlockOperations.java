@@ -21,8 +21,7 @@ public class BlockOperations {
     private Set<String> blockMaterial;
 
     // holders containing count of each material mapped to uuid
-    private HashMap<UUID, BlockHolder> blockHolderMapForLeaderboard = new HashMap<>();
-    private final ConcurrentHashMap<UUID, BlockHolder> blockHolderMapForStats = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, BlockHolder> blockHolderMap = new ConcurrentHashMap<>();
 
     /**
      * Constructor for BlockOperations.
@@ -37,21 +36,12 @@ public class BlockOperations {
     /**
      * Returns block holder for given uuid.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return block holder for given uuid
      */
-    public BlockHolder getBlockHolderForStats(UUID uuid) {
-        return blockHolderMapForStats.get(uuid);
-    }
-
-    /**
-     * Returns block operation for leaderboard.
-     *
-     * @return block operation for leaderboard
-     */
-    public BiFunction<UUID, Block, Boolean> getLeaderboardOperation() {
-        return processBlockForLeaderboard;
+    public BlockHolder getBlockHolder(int id) {
+        return blockHolderMap.get(id);
     }
 
     /**
@@ -59,67 +49,37 @@ public class BlockOperations {
      *
      * @return block operation for stats
      */
-    public BiFunction<UUID, Block, Boolean> getStatsOperation() {
-        return processBlockForStats;
-    }
-
-    /**
-     * Cleans up holders after leaderboard update.
-     */
-    public void doCleanUpForLeaderboard() {
-        blockHolderMapForLeaderboard = new HashMap<>();
+    public BiFunction<Integer, Block, Boolean> getOperation() {
+        return processBlock;
     }
 
     /**
      * Cleans up holders after stats update.
      *
-     * @param uuid uuid of sender
+     * @param id key to identify task
      */
-    public void doCleanUpForStats(UUID uuid) {
-        blockHolderMapForStats.remove(uuid);
-    }
-
-    /**
-     * Creates holders for leaderboard.
-     *
-     * @param uuid uuid of each entities
-     */
-    public void createHolderForLeaderboard(UUID uuid) {
-        blockHolderMapForLeaderboard.put(uuid, new BlockHolder(blockMaterial));
+    public void doCleanUp(int id) {
+        blockHolderMap.remove(id);
     }
 
     /**
      * Creates holders for stats.
      *
-     * @param uuid uuid of sender, not to confused with the entity itself!
+     * @param id key to identify task
      */
-    public void createHolderForStats(UUID uuid) {
-        blockHolderMapForStats.put(uuid, new BlockHolder(blockMaterial));
-    }
-
-    /**
-     * Calculates block worth for all entities.
-     *
-     * @return map of entities uuid to their block worth
-     */
-    public HashMap<UUID, Double> calculateBlockWorthForLeaderboard() {
-        HashMap<UUID, Double> blockWorthMap = new HashMap<>();
-        for (Map.Entry<UUID, BlockHolder> map : blockHolderMapForLeaderboard.entrySet()) {
-            double value = getAllBlocksWorth(map.getValue());
-            blockWorthMap.put(map.getKey(), value);
-        }
-        return blockWorthMap;
+    public void createHolder(int id) {
+        blockHolderMap.put(id, new BlockHolder(blockMaterial));
     }
 
     /**
      * Calculates block worth for a specified entity.
      *
-     * @param uuid uuid of sender, not to be confused with the entity itself!
+     * @param id key to identify task
      *
      * @return map of sender uuid to the calculated block worth
      */
-    public double calculateBlockWorthForStats(UUID uuid) {
-        return getAllBlocksWorth(blockHolderMapForStats.get(uuid));
+    public double calculateBlockWorth(int id) {
+        return getAllBlocksWorth(blockHolderMap.get(id));
     }
 
     /**
@@ -140,24 +100,12 @@ public class BlockOperations {
     }
 
     /**
-     * Processes blocks immediately (and asynchronously) for leaderboard.
-     */
-    private final BiFunction<UUID, Block, Boolean> processBlockForLeaderboard = (uuid, block) -> {
-        String material = block.getType().name();
-        if (blockMaterial.contains(material)) {
-            blockHolderMapForLeaderboard.get(uuid).addToHolder(material);
-            return true;
-        }
-        return false;
-    };
-
-    /**
      * Processes blocks immediately (and asynchronously) for stats.
      */
-    private final BiFunction<UUID, Block, Boolean> processBlockForStats = (uuid, block) -> {
+    private final BiFunction<Integer, Block, Boolean> processBlock = (id, block) -> {
         String material = block.getType().name();
         if (blockMaterial.contains(material)) {
-            blockHolderMapForStats.get(uuid).addToHolder(material);
+            blockHolderMap.get(id).addToHolder(material);
             return true;
         }
         return false;

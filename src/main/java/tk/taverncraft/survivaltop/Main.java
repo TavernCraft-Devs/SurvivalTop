@@ -1,7 +1,6 @@
 package tk.taverncraft.survivaltop;
 
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -26,9 +25,9 @@ import tk.taverncraft.survivaltop.events.DependencyLoadEvent;
 import tk.taverncraft.survivaltop.leaderboard.LeaderboardManager;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.config.Options;
-import tk.taverncraft.survivaltop.stats.EntityStatsManager;
-import tk.taverncraft.survivaltop.stats.ServerStatsManager;
+import tk.taverncraft.survivaltop.stats.StatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
+import tk.taverncraft.survivaltop.ui.GuiManager;
 import tk.taverncraft.survivaltop.ui.InfoGui;
 import tk.taverncraft.survivaltop.config.ConfigManager;
 import tk.taverncraft.survivaltop.utils.services.DependencyManager;
@@ -50,6 +49,7 @@ public class Main extends JavaPlugin {
     private FileConfiguration spawnersConfig;
     private FileConfiguration containersConfig;
     private FileConfiguration inventoriesConfig;
+    private FileConfiguration menuConfig;
     private FileConfiguration signsConfig;
 
     // managers
@@ -59,11 +59,11 @@ public class Main extends JavaPlugin {
     private LandManager landManager;
     private InventoryManager inventoryManager;
     private GroupManager groupManager;
-    private EntityStatsManager entityStatsManager;
-    private ServerStatsManager serverStatsManager;
+    private StatsManager statsManager;
     private LeaderboardManager leaderboardManager;
     private StorageManager storageManager;
     private LogManager logManager;
+    private GuiManager guiManager;
 
     // options
     // todo: move this into an options manager
@@ -74,8 +74,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        entityStatsManager.setStopCalculations(true);
-        serverStatsManager.setStopCalculations(true);
+        statsManager.stopAllCalculations(Bukkit.getConsoleSender());
         landManager.setStopOperations(true);
         inventoryManager.setStopOperations(true);
         LogManager.info(String.format("Disabled Version %s", getDescription().getVersion()));
@@ -106,8 +105,7 @@ public class Main extends JavaPlugin {
         try {
             this.dependencyManager = new DependencyManager(this);
             this.storageManager = new StorageManager(this);
-            this.entityStatsManager = new EntityStatsManager(this);
-            this.serverStatsManager = new ServerStatsManager(this);
+            this.statsManager = new StatsManager(this);
             this.leaderboardManager = new LeaderboardManager(this);
             this.balanceManager = new BalanceManager(this);
             this.landManager = new LandManager(this);
@@ -117,8 +115,10 @@ public class Main extends JavaPlugin {
             new InfoGui(this);
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
+            this.guiManager = new GuiManager(this);
         } catch (NullPointerException e) {
             LogManager.error("Is your config.yml updated/set up correctly?");
+            LogManager.error(e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -245,6 +245,14 @@ public class Main extends JavaPlugin {
         this.inventoriesConfig = inventoriesConfig;
     }
 
+    public FileConfiguration getMenuConfig() {
+        return this.menuConfig;
+    }
+
+    public void setMenuConfig(FileConfiguration menuConfig) {
+        this.menuConfig = menuConfig;
+    }
+
     public FileConfiguration getSignsConfig() {
         return this.signsConfig;
     }
@@ -281,12 +289,8 @@ public class Main extends JavaPlugin {
         return this.groupManager;
     }
 
-    public EntityStatsManager getEntityStatsManager() {
-        return this.entityStatsManager;
-    }
-
-    public ServerStatsManager getServerStatsManager() {
-        return this.serverStatsManager;
+    public StatsManager getStatsManager() {
+        return this.statsManager;
     }
 
     public LeaderboardManager getLeaderboardManager() {
@@ -299,6 +303,10 @@ public class Main extends JavaPlugin {
 
     public LogManager getLogManager() {
         return this.logManager;
+    }
+
+    public GuiManager getGuiManager() {
+        return this.guiManager;
     }
 
     public Options getOptions() {

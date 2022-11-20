@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.ChatPaginator;
 
-import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
 
@@ -110,11 +110,8 @@ public class MessageManager {
      *
      * @param leaderboard hashmap of leaderboard positions
      * @param minimumWealth minimum wealth to show on leaderboard
-     * @param useGroup whether group is enabled
-     * @param groupUuidToNameMap map of temporary uuid to name for groups
      */
-    public static void setUpLeaderboard(HashMap<UUID, EntityLeaderboardCache> leaderboard, double minimumWealth,
-                                        boolean useGroup, HashMap<UUID, String> groupUuidToNameMap) {
+    public static void setUpLeaderboard(HashMap<String, EntityCache> leaderboard, double minimumWealth) {
         int positionsPerPage = 10;
 
         String header = getMessage("leaderboard-header");
@@ -123,16 +120,9 @@ public class MessageManager {
         StringBuilder message = new StringBuilder(header);
         int position = 1;
         int currentPage = 1;
-        for (Map.Entry<UUID, EntityLeaderboardCache> entry : leaderboard.entrySet()) {
-            UUID uuid = entry.getKey();
-            String name;
+        for (Map.Entry<String, EntityCache> entry : leaderboard.entrySet()) {
+            String name = entry.getKey();
 
-            if (useGroup) {
-                name = groupUuidToNameMap.get(uuid);
-            } else {
-                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                name = player.getName();
-            }
             // handle null player names (can happen if world folder is deleted)
             if (name == null) {
                 continue;

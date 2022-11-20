@@ -10,7 +10,7 @@
 # the plugin also comes with placeholder api support that can be found here:
 # https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#placeholderapi-support
 
-# language file to use (feel free to add your own lang file within the lang folder of the plugin and put the name here)
+# language file to use (feel free to add your own lang file within the lang folder)
 lang-file: 'en.yml'
 
 # if true, will provide a detailed gui for viewing entity stats
@@ -26,12 +26,12 @@ use-gui-stats: false
 # cache duration specifies in seconds how long cached data is stored
 # cache duration is ignored if realtime stats is used
 # note that if cached values cannot be found, the plugin defaults to getting real time stats
-use-realtime-stats: false
+enable-cache: true
 cache-duration: 1800
 
 #####################################################################################
 #                                                                                   #
-#                    Filter Options (not applicable to groups!)                     #
+#                  Filter Configurations (not applicable to groups!)                #
 #                                                                                   #
 #####################################################################################
 
@@ -63,7 +63,7 @@ group-type: FactionsUuid
 
 #####################################################################################
 #                                                                                   #
-#                               Balance Integration                                 #
+#                               Balance Configurations                              #
 #                                                                                   #
 #####################################################################################
 
@@ -72,7 +72,7 @@ include-bal: false
 
 #####################################################################################
 #                                                                                   #
-#                            Land Claim Plugin Integration                          #
+#                          Land Claim Plugin Configurations                         #
 #                                                                                   #
 #####################################################################################
 
@@ -109,7 +109,7 @@ min-land-height: default
 
 #####################################################################################
 #                                                                                   #
-#                              Inventory Integration                                #
+#                              Inventory Configurations                             #
 #                                                                                   #
 #####################################################################################
 
@@ -118,7 +118,7 @@ include-inventory: false
 
 #####################################################################################
 #                                                                                   #
-#                             Leaderboard Configuration                             #
+#                             Leaderboard Configurations                            #
 #                                                                                   #
 #####################################################################################
 

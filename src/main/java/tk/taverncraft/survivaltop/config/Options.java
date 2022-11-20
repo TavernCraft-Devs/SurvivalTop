@@ -14,7 +14,7 @@ import tk.taverncraft.survivaltop.Main;
 public class Options {
     private final Main main;
     private boolean useGuiStats;
-    private boolean useRealtimeStats;
+    private boolean cacheIsEnabled;
     private boolean filterLastJoin;
     private long filterPlayerTime;
     private boolean enableGroup;
@@ -51,7 +51,7 @@ public class Options {
     public void initializeOptions() {
         FileConfiguration config = main.getConfig();
         this.useGuiStats = config.getBoolean("use-gui-stats", true);
-        this.useRealtimeStats = config.getBoolean("use-realtime-stats", false);
+        this.cacheIsEnabled = config.getBoolean("enable-cache", true);
         this.filterLastJoin = config.getBoolean("filter-last-join", false);
         this.filterPlayerTime = config.getLong("filter-player-time", 2592000);
         this.enableGroup = config.getBoolean("enable-group", false);
@@ -103,8 +103,8 @@ public class Options {
         return useGuiStats;
     }
 
-    public boolean isUseRealTimeStats() {
-        return useRealtimeStats;
+    public boolean cacheIsEnabled() {
+        return cacheIsEnabled;
     }
 
     public boolean isUseGuiLeaderboard() {

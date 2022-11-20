@@ -5,14 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.logs.LogFile;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
@@ -40,6 +38,7 @@ public class ConfigManager {
         createSpawnersConfig();
         createContainersConfig();
         createInventoriesConfig();
+        createMenuConfig();
         createSignsConfig();
     }
 
@@ -81,6 +80,14 @@ public class ConfigManager {
     public void createInventoriesConfig() {
         FileConfiguration config = getConfig("inventories.yml");
         main.setInventoriesConfig(config);
+    }
+
+    /**
+     * Creates menu config file.
+     */
+    public void createMenuConfig() {
+        FileConfiguration config = getConfig("menu.yml");
+        main.setMenuConfig(config);
     }
 
     /**
@@ -145,55 +152,5 @@ public class ConfigManager {
         }
 
         return config;
-    }
-
-    /**
-     * Dumps details into a log file, triggered by the dump command.
-     *
-     * @param logFile log file containing log details from plugin
-     */
-    public void dumpToLogFile(LogFile logFile) {
-        String fileName = "dump-" + Instant.now().getEpochSecond() + ".yml";
-        File configFile = new File(main.getDataFolder() + "/dumps", fileName);
-        FileConfiguration config = new YamlConfiguration();
-        configFile.getParentFile().mkdirs();
-
-        // logs from plugin
-        config.set("minecraft-version", logFile.getMinecraftVersion());
-        config.set("survivalTop-version", logFile.getSurvivalTopVersion());
-        config.set("world-size", logFile.getWorldSize());
-        config.set("num-entities", logFile.getNumEntities());
-        config.set("num-claims", logFile.getNumClaims());
-        config.set("num-blocks", logFile.getNumBlocks());
-        config.set("leaderboard-update-start-time", logFile.getLeaderboardUpdateStartTime());
-        config.set("last-update-duration", logFile.getLastUpdateDuration());
-        config.set("estimated-block-processing-rate", logFile.getEstimatedBlockProcessingRate());
-
-        // config options
-        config.set("use-gui-stats", main.getOptions().isUseGuiStats());
-        config.set("use-realtime-stats", main.getOptions().isUseRealTimeStats());
-        config.set("filter-last-join", main.getOptions().filterLastJoin());
-        config.set("filter-player-time", main.getOptions().filterPlayerTime());
-        config.set("enable-group", main.getOptions().groupIsEnabled());
-        config.set("group-type", main.getOptions().getGroupType());
-        config.set("include-bal", main.getOptions().balIsIncluded());
-        config.set("include-land", main.getOptions().landIsIncluded());
-        config.set("land-type", main.getOptions().getLandType());
-        config.set("include-spawners", main.getOptions().spawnerIsIncluded());
-        config.set("include-containers", main.getOptions().containerIsIncluded());
-        config.set("max-land-height", main.getOptions().getMaxLandHeight());
-        config.set("min-land-height", main.getOptions().getMinLandHeight());
-        config.set("include-inventory", main.getOptions().inventoryIsIncluded());
-        config.set("update-interval", main.getOptions().getUpdateInterval());
-        config.set("update-on-start", main.getOptions().updateOnStart());
-        config.set("minimum-wealth", main.getOptions().getMinimumWealth());
-        config.set("storage-type", main.getOptions().getStorageType());
-        config.set("last-load-time", main.getOptions().getLastLoadTime());
-
-        try {
-            config.save(configFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

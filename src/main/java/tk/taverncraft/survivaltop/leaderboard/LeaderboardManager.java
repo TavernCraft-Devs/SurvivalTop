@@ -1,8 +1,14 @@
 package tk.taverncraft.survivaltop.leaderboard;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.UUID;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -10,8 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
+import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.messages.MessageManager;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
  * LeaderboardManager contains the main logic related to updating the leaderboard.
@@ -22,6 +29,13 @@ public class LeaderboardManager {
     private BukkitTask leaderboardTask;
     private long leaderboardUpdateStartTime = -1;
     private long lastUpdateDuration = -1;
+    private long leaderboardUpdateTracker = -1;
+    CommandSender leaderboardSender;
+
+    // cache values used for leaderboard/papi
+    private ConcurrentHashMap<String, Integer> positionCacheMap;
+    private ConcurrentHashMap<String, EntityCache> entityCacheMap;
+    private ArrayList<EntityCache> entityCacheList;
 
     /**
      * Constructor for LeaderboardManager.
@@ -31,6 +45,16 @@ public class LeaderboardManager {
     public LeaderboardManager(Main main) {
         this.main = main;
         stopExistingTasks();
+        initializeValues();
+    }
+
+    /**
+     * Initializes all values to default.
+     */
+    public void initializeValues() throws NullPointerException {
+        positionCacheMap = new ConcurrentHashMap<>();
+        entityCacheMap = new ConcurrentHashMap<>();
+        entityCacheList = new ArrayList<>();
     }
 
     /**
@@ -85,14 +109,8 @@ public class LeaderboardManager {
      * @param sender user executing the update
      */
     public void doManualLeaderboardUpdate(CommandSender sender) {
-        leaderboardTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                isUpdating = true;
-                initiateLeaderboardUpdate(sender);
-            }
-
-        }.runTaskAsynchronously(main);
+        isUpdating = true;
+        initiateLeaderboardUpdate(sender);
     }
 
     /**
@@ -102,7 +120,59 @@ public class LeaderboardManager {
      */
     public void initiateLeaderboardUpdate(CommandSender sender) {
         leaderboardUpdateStartTime = Instant.now().getEpochSecond();
-        main.getServerStatsManager().updateWealthStats(sender);
+        try {
+            MessageManager.sendMessage(sender, "update-started");
+            leaderboardSender = sender;
+            if (this.main.getOptions().groupIsEnabled()) {
+                updateForGroups(sender);
+            } else {
+                updateForPlayers(sender);
+            }
+        } catch (Exception e) {
+            LogManager.error(e.getMessage());
+            this.main.getLeaderboardManager().stopExistingTasks();
+        }
+    }
+
+    /**
+     * Performs update by individual players.
+     */
+    private void updateForPlayers(CommandSender sender) {
+        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join", false);
+        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) * 1000;
+        leaderboardUpdateTracker = 1;
+
+        // code intentionally duplicated to keep the if condition outside loop to save check time
+
+        // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
+        if (!filterLastJoin || lastJoinTime <= 0) {
+            Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer ->
+                main.getStatsManager().getStatsForLeaderboard(sender, offlinePlayer.getName()));
+            return;
+        }
+
+        // path for if last join filter is on
+        Instant instant = Instant.now();
+        long currentTime = instant.getEpochSecond() * 1000;
+        Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
+            if (currentTime - offlinePlayer.getLastPlayed() > lastJoinTime) {
+                return;
+            }
+            main.getStatsManager().getStatsForLeaderboard(sender, offlinePlayer.getName());
+        });
+    }
+
+    /**
+     * Performs update by groups.
+     */
+    private void updateForGroups(CommandSender sender) {
+        List<String> groups = this.main.getGroupManager().getGroups();
+        int groupSize = groups.size();
+        leaderboardUpdateTracker = groupSize;
+        for (int i = 0; i < groupSize; i++) {
+            String group = groups.get(i);
+            main.getStatsManager().getStatsForLeaderboard(sender, group);
+        }
     }
 
     /**
@@ -112,10 +182,9 @@ public class LeaderboardManager {
      * @param tempSortedCache temporary cache for sorted player wealth to set the leaderboard
      */
     public void completeLeaderboardUpdate(CommandSender sender,
-            HashMap<UUID, EntityLeaderboardCache> tempSortedCache) {
+            HashMap<String, EntityCache> tempSortedCache) {
         MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0), main.getOptions().groupIsEnabled(),
-                main.getServerStatsManager().getGroupUuidToNameMap());
+                "minimum-wealth", 0.0));
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
         MessageManager.sendMessage(sender, "update-complete",
                 new String[]{"%time%"},
@@ -128,6 +197,43 @@ public class LeaderboardManager {
             }
         });
         isUpdating = false;
+    }
+
+    /**
+     * Sorts entities by total wealth.
+     *
+     * @param hm hashmap of entity wealth to sort
+     *
+     * @return sorted total wealth hashmap
+     */
+    private HashMap<String, EntityCache> sortEntitiesByTotalWealth(ConcurrentHashMap<String,
+        EntityCache> hm) {
+        List<Map.Entry<String, EntityCache> > list =
+            new LinkedList<>(hm.entrySet());
+
+        list.sort((o1, o2) -> (o2.getValue().getTotalWealth())
+            .compareTo(o1.getValue().getTotalWealth()));
+
+        HashMap<String, EntityCache> temp = new LinkedHashMap<>();
+        for (Map.Entry<String, EntityCache> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
+    }
+
+    /**
+     * Set entity position and entity cache list for easy PAPI access.
+     *
+     * @param tempSortedCache hashmap to use to generate cache for
+     */
+    private void setUpEntityCache(HashMap<String, EntityCache> tempSortedCache) {
+        this.positionCacheMap = new ConcurrentHashMap<>();
+        int i = 0;
+        for (String nameKey : tempSortedCache.keySet()) {
+            this.positionCacheMap.put(nameKey, i);
+            i++;
+        }
+        this.entityCacheList = new ArrayList<>(tempSortedCache.values());
     }
 
     /**
@@ -170,13 +276,160 @@ public class LeaderboardManager {
     }
 
     /**
-     * Handles interruption of leaderboard update.
+     * Gets the name of an entity at given position.
      *
-     * @param sender sender who initiated the leaderboard update
+     * @param index position to get entity name at
+     *
+     * @return name of entity at specified position
      */
-    public void interruptLeaderboardUpdate(CommandSender sender) {
-        MessageManager.sendMessage(sender, "update-interrupted");
-        lastUpdateDuration = -1;
-        this.isUpdating = false;
+    public String getEntityNameAtPosition(int index) {
+        EntityCache eCache = this.entityCacheList.get(index);
+        String name = eCache.getName();
+
+        if (name == null) {
+            return "None";
+        }
+
+        return name;
+    }
+
+    /**
+     * Gets the wealth of an entity at given position.
+     *
+     * @param index position to get entity wealth at
+     *
+     * @return wealth of entity at specified position
+     */
+    public String getEntityWealthAtPosition(int index) {
+        EntityCache eCache = this.entityCacheList.get(index);
+        Double value = eCache.getTotalWealth();
+
+        if (value != null) {
+            return String.format("%.02f", value);
+        } else {
+            return "None";
+        }
+    }
+
+    /**
+     * Gets the position of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return position of given entity
+     */
+    public String getPositionOfEntity(String name) {
+        Integer position = this.positionCacheMap.get(name);
+        if (position != null) {
+            position = position + 1; // index 0
+            return String.format("%d", position);
+        } else {
+            return "None";
+        }
+    }
+
+    /**
+     * Gets the balance wealth of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return balance wealth of given entity
+     */
+    public String getEntityBalWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getBalWealth());
+    }
+
+    /**
+     * Gets the land wealth of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return land wealth of given entity
+     */
+    public String getEntityLandWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getLandWealth());
+    }
+
+    /**
+     * Gets the block wealth of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return block wealth of given entity
+     */
+    public String getEntityBlockWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getBlockWealth());
+    }
+
+    /**
+     * Gets the spawner wealth of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return spawner wealth of given entity
+     */
+    public String getEntitySpawnerWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getSpawnerWealth());
+    }
+
+    /**
+     * Gets the container wealth of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return container wealth of given entity
+     */
+    public String getEntityContainerWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getContainerWealth());
+    }
+
+    /**
+     * Gets the inventory wealth of an entity with given name.
+     *
+     * @param name name of entity
+     *
+     * @return inventory wealth of given entity
+     */
+    public String getEntityInvWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getInventoryWealth());
+    }
+
+    /**
+     * Gets the total wealth of an entity with given name.
+     *
+     * @param name of entity
+     *
+     * @return total wealth of given entity
+     */
+    public String getEntityTotalWealth(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        return String.format("%.02f", eCache.getTotalWealth());
+    }
+
+    public void processLeaderboardUpdate(String name, EntityCache eCache) {
+        entityCacheMap.put(name.toUpperCase(), eCache);
+        leaderboardUpdateTracker--;
+        if (leaderboardUpdateTracker == 0) {
+            HashMap<String, EntityCache> sortedMap = sortEntitiesByTotalWealth(entityCacheMap);
+            setUpEntityCache(sortedMap);
+            completeLeaderboardUpdate(leaderboardSender, sortedMap);
+        }
+    }
+
+    /**
+     * Gets the entity cache in the leaderboard.
+     *
+     * @param name name of entity
+     *
+     * @return cache of entity
+     */
+    public EntityCache getEntityCache(String name) {
+        return entityCacheMap.get(name);
     }
 }

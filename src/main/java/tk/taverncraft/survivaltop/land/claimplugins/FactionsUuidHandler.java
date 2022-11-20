@@ -52,15 +52,15 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
     /**
      * Processes the worth of a land.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
+     * @param id key to identify task
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
         try {
             Set<FLocation> claims = getClaims(name);
             for (FLocation claim : claims) {
-                landOperationsHelper.processEntityChunk(uuid, claim.getChunk(), claim.getWorld(),
+                landOperationsHelper.processEntityChunk(id, claim.getChunk(), claim.getWorld(),
                         isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {

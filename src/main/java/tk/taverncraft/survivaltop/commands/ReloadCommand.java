@@ -39,7 +39,7 @@ public class ReloadCommand {
 
         try {
             // stop existing player stats calculations
-            main.getEntityStatsManager().stopEntityStatsCalculations();
+            main.getStatsManager().stopAllCalculations(sender);
 
             // reload configs and reinitialize options
             main.getConfigManager().createConfigs();
@@ -53,21 +53,15 @@ public class ReloadCommand {
 
             // reinitialize manager values
             main.getStorageManager().initializeValues();
-            main.getEntityStatsManager().setStopCalculations(true);
-            main.getEntityStatsManager().clearCache();
-            main.getServerStatsManager().setStopCalculations(true);
-            main.getServerStatsManager().initializeValues();
-            main.getLandManager().setStopOperations(true);
             main.getLandManager().initializeLandOperations();
             main.getLandManager().initializeLandType();
-            main.getLandManager().doCleanUpForLeaderboard();
             main.getInventoryManager().setStopOperations(true);
             main.getInventoryManager().initializeWorth();
-            main.getInventoryManager().doCleanUpForLeaderboard();
             new InfoGui(main);
             main.getGroupManager().initializeLandType();
             main.getLogManager().stopExistingTasks();
             main.getLeaderboardManager().stopExistingTasks();
+            main.getLeaderboardManager().initializeValues();
             main.getLeaderboardManager().scheduleLeaderboardUpdate(
                     main.getConfig().getInt("update-interval"),
                     main.getConfig().getInt("update-interval")

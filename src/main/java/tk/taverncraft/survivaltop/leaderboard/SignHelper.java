@@ -147,8 +147,8 @@ public class SignHelper {
         String name;
         String wealth;
         try {
-            name = main.getServerStatsManager().getEntityNameAtPosition(position - 1);
-            wealth = main.getServerStatsManager().getEntityWealthAtPosition(position - 1);
+            name = main.getLeaderboardManager().getEntityNameAtPosition(position - 1);
+            wealth = main.getLeaderboardManager().getEntityWealthAtPosition(position - 1);
         } catch (IndexOutOfBoundsException ex) {
             name = savedName;
             wealth = savedWealth;

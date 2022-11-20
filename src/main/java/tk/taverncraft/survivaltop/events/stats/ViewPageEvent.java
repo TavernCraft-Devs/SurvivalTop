@@ -102,16 +102,16 @@ public class ViewPageEvent implements Listener {
     private void statsMainPageClickHandler(int slot, InventoryClickEvent e) {
         Inventory inv = null;
         if (slot == 13) {
-            inv = main.getEntityStatsManager().getBlockStatsPage(
+            inv = main.getGuiManager().getBlockStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
         } else if (slot == 14) {
-            inv = main.getEntityStatsManager().getSpawnerStatsPage(
+            inv = main.getGuiManager().getSpawnerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
         } else if (slot == 15) {
-            inv = main.getEntityStatsManager().getContainerStatsPage(
+            inv = main.getGuiManager().getContainerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
         } else if (slot == 16) {
-            inv = main.getEntityStatsManager().getInventoryStatsPage(
+            inv = main.getGuiManager().getInventoryStatsPage(
                 e.getWhoClicked().getUniqueId(), 0);
         }
         if (inv == null) {
@@ -140,16 +140,16 @@ public class ViewPageEvent implements Listener {
 
             Inventory inv = null;
             if (isBlockPage) {
-                inv = main.getEntityStatsManager().getBlockStatsPage(
+                inv = main.getGuiManager().getBlockStatsPage(
                         e.getWhoClicked().getUniqueId(), pageToGo);
             } else if (isSpawnerPage) {
-                inv = main.getEntityStatsManager().getSpawnerStatsPage(
+                inv = main.getGuiManager().getSpawnerStatsPage(
                         e.getWhoClicked().getUniqueId(), pageToGo);
             } else if (isContainerPage) {
-                inv = main.getEntityStatsManager().getContainerStatsPage(
+                inv = main.getGuiManager().getContainerStatsPage(
                         e.getWhoClicked().getUniqueId(), pageToGo);
             } else if (isInventoryPage) {
-                inv = main.getEntityStatsManager().getInventoryStatsPage(
+                inv = main.getGuiManager().getInventoryStatsPage(
                     e.getWhoClicked().getUniqueId(), pageToGo);
             }
             if (inv == null) {
@@ -159,7 +159,7 @@ public class ViewPageEvent implements Listener {
         }
 
         if (slot == 49) {
-            main.getEntityStatsManager().openMainStatsPage(e.getWhoClicked().getUniqueId());
+            main.getGuiManager().openMainStatsPage(e.getWhoClicked().getUniqueId());
         }
     }
 

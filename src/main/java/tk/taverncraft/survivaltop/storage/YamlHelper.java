@@ -3,16 +3,13 @@ package tk.taverncraft.survivaltop.storage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.cache.EntityLeaderboardCache;
+import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
  * YamlHelper is responsible for reading/writing from yml files.
@@ -32,12 +29,12 @@ public class YamlHelper implements StorageHelper {
     /**
      * Saves information to yaml file.
      *
-     * @param entityLeaderboardCacheList list of entities to store
+     * @param EntityCacheList list of entities to store
      */
-    public void saveToStorage(ArrayList<EntityLeaderboardCache> entityLeaderboardCacheList) {
-        int cacheSize = entityLeaderboardCacheList.size();
+    public void saveToStorage(ArrayList<EntityCache> EntityCacheList) {
+        int cacheSize = EntityCacheList.size();
         for (int i = 0; i < cacheSize; i++) {
-            EntityLeaderboardCache eCache = entityLeaderboardCacheList.get(i);
+            EntityCache eCache = EntityCacheList.get(i);
             saveToFile(eCache);
         }
     }
@@ -47,24 +44,14 @@ public class YamlHelper implements StorageHelper {
      *
      * @param eCache entity to save
      */
-    private void saveToFile(EntityLeaderboardCache eCache) {
-        UUID uuid = eCache.getUuid();
-        String entityFileName;
-        String entityName = "None";
+    private void saveToFile(EntityCache eCache) {
+        String entityName = eCache.getName();
         String entityType = "player";
         if (this.main.getOptions().groupIsEnabled()) {
-            entityFileName = this.main.getServerStatsManager().getGroupUuidToNameMap().get(uuid);
-            entityName = entityFileName;
             entityType = "group";
-        } else {
-            entityFileName = uuid.toString();
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            if (player != null) {
-                entityName = player.getName();
-            }
         }
         File entityFile = new File(this.main.getDataFolder() + "/entityData",
-            entityFileName + ".yml");
+            entityName + ".yml");
         FileConfiguration entityConfig = new YamlConfiguration();
         if (!entityFile.exists()) {
             entityFile.getParentFile().mkdirs();

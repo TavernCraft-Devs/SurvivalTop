@@ -58,11 +58,11 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
     /**
      * Processes the worth of a land.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
      * @param name name of entity to get land worth for
+     * @param id key to identify task
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(UUID uuid, String name, boolean isLeaderboardUpdate) {
+    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
         try {
             ArrayList<Claim> claims = getClaims(name);
             for (Claim claim : claims) {
@@ -73,7 +73,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
                 World world = Bukkit.getWorld(claim.getWorld());
                 Location loc1 = new Location(world, maxX, 0, maxZ);
                 Location loc2 = new Location(world, minX, 0, minZ);
-                processEntityClaim(uuid, loc1, loc2, world, isLeaderboardUpdate);
+                processEntityClaim(id, loc1, loc2, world, isLeaderboardUpdate);
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
@@ -82,13 +82,13 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
     /**
      * Processes the worth of a claim identified between 2 locations.
      *
-     * @param uuid uuid of sender if this is run through stats command; otherwise entities
+     * @param id key to identify task
      * @param l1 location 1
      * @param l2 location 2
      * @param world world that the claim is in
      * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    private void processEntityClaim(UUID uuid, Location l1, Location l2, World world,
+    private void processEntityClaim(int id, Location l1, Location l2, World world,
             boolean isLeaderboardUpdate) {
         double minX = Math.min(l1.getX(), l2.getX());
         double minY = main.getOptions().getMinLandHeight();
@@ -96,7 +96,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = main.getOptions().getMaxLandHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        landOperationsHelper.processEntityClaim(uuid, maxX, minX, maxY, minY, maxZ, minZ, world,
+        landOperationsHelper.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world,
                 isLeaderboardUpdate);
     }
 

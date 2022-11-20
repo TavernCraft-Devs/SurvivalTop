@@ -1,7 +1,5 @@
 package tk.taverncraft.survivaltop.commands;
 
-import java.util.UUID;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -61,7 +59,6 @@ public class StatsCommand {
         }
 
         Player player = (Player) sender;
-        UUID uuid = player.getUniqueId();
         String name = player.getName();
 
         // if group is enabled, get name of the group the player belongs to instead
@@ -73,17 +70,13 @@ public class StatsCommand {
         }
 
         // check if there is an ongoing calculation task (guard against spam)
-        if (main.getEntityStatsManager().senderHasCalculationInProgress(uuid)) {
+        if (main.getStatsManager().senderHasCalculationInProgress(sender)) {
             MessageManager.sendMessage(sender, "calculation-in-progress");
             return;
         }
 
         MessageManager.sendMessage(sender, "start-calculating-stats");
-        if (main.getOptions().isUseRealTimeStats()) {
-            main.getEntityStatsManager().getRealTimeEntityStats(sender, name);
-        } else {
-            main.getEntityStatsManager().getCachedEntityStats(sender, name);
-        }
+        main.getStatsManager().getStatsForPlayer(sender, name);
     }
 
     /**
@@ -109,19 +102,13 @@ public class StatsCommand {
             }
         }
 
-        UUID uuid = main.getSenderUuid(sender);
-
         // check if there is an ongoing calculation task (guard against spam)
-        if (main.getEntityStatsManager().senderHasCalculationInProgress(uuid)) {
+        if (main.getStatsManager().senderHasCalculationInProgress(sender)) {
             MessageManager.sendMessage(sender, "calculation-in-progress");
             return;
         }
 
         MessageManager.sendMessage(sender, "start-calculating-stats");
-        if (main.getOptions().isUseRealTimeStats()) {
-            main.getEntityStatsManager().getRealTimeEntityStats(sender, name);
-        } else {
-            main.getEntityStatsManager().getCachedEntityStats(sender, name);
-        }
+        main.getStatsManager().getStatsForPlayer(sender, name);
     }
 }
