@@ -27,8 +27,8 @@ import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.config.Options;
 import tk.taverncraft.survivaltop.stats.StatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
-import tk.taverncraft.survivaltop.ui.GuiManager;
-import tk.taverncraft.survivaltop.ui.InfoGui;
+import tk.taverncraft.survivaltop.gui.GuiManager;
+import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.config.ConfigManager;
 import tk.taverncraft.survivaltop.utils.services.DependencyManager;
 import tk.taverncraft.survivaltop.utils.services.PapiManager;
@@ -49,7 +49,8 @@ public class Main extends JavaPlugin {
     private FileConfiguration spawnersConfig;
     private FileConfiguration containersConfig;
     private FileConfiguration inventoriesConfig;
-    private FileConfiguration menuConfig;
+    private FileConfiguration statsMenuConfig;
+    private FileConfiguration infoMenuConfig;
     private FileConfiguration signsConfig;
 
     // managers
@@ -110,15 +111,12 @@ public class Main extends JavaPlugin {
             this.balanceManager = new BalanceManager(this);
             this.landManager = new LandManager(this);
             this.inventoryManager = new InventoryManager(this);
-            // todo: revisit how gui is done, that whole module is messy and needs to be rewritten
-            // load worth values into info gui
-            new InfoGui(this);
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
             this.guiManager = new GuiManager(this);
         } catch (NullPointerException e) {
             LogManager.error("Is your config.yml updated/set up correctly?");
-            LogManager.error(e.getMessage());
+            e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -245,12 +243,20 @@ public class Main extends JavaPlugin {
         this.inventoriesConfig = inventoriesConfig;
     }
 
-    public FileConfiguration getMenuConfig() {
-        return this.menuConfig;
+    public FileConfiguration getStatsMenuConfig() {
+        return this.statsMenuConfig;
     }
 
-    public void setMenuConfig(FileConfiguration menuConfig) {
-        this.menuConfig = menuConfig;
+    public void setStatsMenuConfig(FileConfiguration statsMenuConfig) {
+        this.statsMenuConfig = statsMenuConfig;
+    }
+
+    public FileConfiguration getInfoMenuConfig() {
+        return this.infoMenuConfig;
+    }
+
+    public void setInfoMenuConfig(FileConfiguration infoMenuConfig) {
+        this.infoMenuConfig = infoMenuConfig;
     }
 
     public FileConfiguration getSignsConfig() {

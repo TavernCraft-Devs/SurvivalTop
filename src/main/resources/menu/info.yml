@@ -1,0 +1,136 @@
+# options for main page of info
+main-page-title: "Item Values Info"
+
+main-page-size: 27
+
+main-page-buttons:
+  balance-info:
+    slot: 11
+    name: "&bBalance Info"
+    lore:
+      - "&eTaken directly from balance!"
+    material: EMERALD
+
+  block-info:
+    slot: 12
+    name: "&bBlock Info"
+    lore:
+      - "&eClick to learn more."
+    material: GRASS_BLOCK
+
+  spawner-info:
+    slot: 13
+    name: "&bSpawner Info"
+    lore:
+      - "&eClick to learn more."
+    material: SPAWNER
+
+  container-info:
+    slot: 14
+    name: "&bContainer Info"
+    lore:
+      - "&eClick to learn more."
+    material: CHEST
+
+  inventory-info:
+    slot: 15
+    name: "&bInventory Info"
+    lore:
+      - "&eClick to learn more."
+    material: PLAYER_HEAD
+
+disabled-button-lore: "&cDisabled"
+
+main-page-background:
+  0: BLUE_STAINED_GLASS_PANE
+  1: BLUE_STAINED_GLASS_PANE
+  2: BLUE_STAINED_GLASS_PANE
+  3: BLUE_STAINED_GLASS_PANE
+  4: BLUE_STAINED_GLASS_PANE
+  5: BLUE_STAINED_GLASS_PANE
+  6: BLUE_STAINED_GLASS_PANE
+  7: BLUE_STAINED_GLASS_PANE
+  8: BLUE_STAINED_GLASS_PANE
+  9: BLUE_STAINED_GLASS_PANE
+  10: BLUE_STAINED_GLASS_PANE
+  16: BLUE_STAINED_GLASS_PANE
+  17: BLUE_STAINED_GLASS_PANE
+  18: BLUE_STAINED_GLASS_PANE
+  19: BLUE_STAINED_GLASS_PANE
+  20: BLUE_STAINED_GLASS_PANE
+  21: BLUE_STAINED_GLASS_PANE
+  22: BLUE_STAINED_GLASS_PANE
+  23: BLUE_STAINED_GLASS_PANE
+  24: BLUE_STAINED_GLASS_PANE
+  25: BLUE_STAINED_GLASS_PANE
+  26: BLUE_STAINED_GLASS_PANE
+
+# options for sub-pages of info
+sub-page-block-title: "Block Info"
+sub-page-spawner-title: "Spawner Info"
+sub-page-container-title: "Container Info"
+sub-page-inventory-title: "Inventory Info"
+
+sub-page-size: 54
+
+sub-page-buttons:
+  main-menu:
+    slot: 49
+    name: "&bMain Page"
+    lore:
+      - "&eReturn to main page"
+    material: COMPASS
+
+  previous-page:
+    slot: 47
+    name: "&bPrevious Page"
+    lore:
+      - "&eView previous page"
+    material: ARROW
+
+  next-page:
+    slot: 51
+    name: "&bNext Page"
+    lore:
+      - "&eView next page"
+    material: ARROW
+
+sub-page-items:
+  name: "&b%name%"
+  lore:
+    - "&eItem Worth: &a%worth%"
+
+sub-page-background:
+  0: BLUE_STAINED_GLASS_PANE
+  1: BLUE_STAINED_GLASS_PANE
+  2: BLUE_STAINED_GLASS_PANE
+  3: BLUE_STAINED_GLASS_PANE
+  4: BLUE_STAINED_GLASS_PANE
+  5: BLUE_STAINED_GLASS_PANE
+  6: BLUE_STAINED_GLASS_PANE
+  7: BLUE_STAINED_GLASS_PANE
+  8: BLUE_STAINED_GLASS_PANE
+  9: BLUE_STAINED_GLASS_PANE
+  17: BLUE_STAINED_GLASS_PANE
+  18: BLUE_STAINED_GLASS_PANE
+  26: BLUE_STAINED_GLASS_PANE
+  27: BLUE_STAINED_GLASS_PANE
+  35: BLUE_STAINED_GLASS_PANE
+  36: BLUE_STAINED_GLASS_PANE
+  37: BLUE_STAINED_GLASS_PANE
+  38: BLUE_STAINED_GLASS_PANE
+  39: BLUE_STAINED_GLASS_PANE
+  40: BLUE_STAINED_GLASS_PANE
+  41: BLUE_STAINED_GLASS_PANE
+  42: BLUE_STAINED_GLASS_PANE
+  43: BLUE_STAINED_GLASS_PANE
+  44: BLUE_STAINED_GLASS_PANE
+  45: BLUE_STAINED_GLASS_PANE
+  46: BLUE_STAINED_GLASS_PANE
+  47: BLUE_STAINED_GLASS_PANE
+  48: BLUE_STAINED_GLASS_PANE
+  49: BLUE_STAINED_GLASS_PANE
+  50: BLUE_STAINED_GLASS_PANE
+  51: BLUE_STAINED_GLASS_PANE
+  52: BLUE_STAINED_GLASS_PANE
+  53: BLUE_STAINED_GLASS_PANE

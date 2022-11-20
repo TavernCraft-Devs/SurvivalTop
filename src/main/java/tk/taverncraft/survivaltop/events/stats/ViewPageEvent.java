@@ -9,7 +9,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.ui.InfoGui;
+import tk.taverncraft.survivaltop.gui.InfoMenuOptions;
+import tk.taverncraft.survivaltop.gui.StatsMenuOptions;
 
 /**
  * ViewPageEvent checks for when a player clicks on GUI menu.
@@ -17,8 +18,40 @@ import tk.taverncraft.survivaltop.ui.InfoGui;
 public class ViewPageEvent implements Listener {
     private final Main main;
 
+    // titles for stats menu
+    private final String mainStatsPageTitle;
+    private final String subStatsPageBlockTitle;
+    private final String subStatsPageSpawnerTitle;
+    private final String subStatsPageContainerTitle;
+    private final String subStatsPageInventoryTitle;
+
+    // buttons for stats menu
+    private final int mainStatsMenuSlot;
+    private final int nextStatsPageSlot;
+    private final int prevStatsPageSlot;
+    private final int blockWealthSlot;
+    private final int spawnerWealthSlot;
+    private final int containerWealthSlot;
+    private final int inventoryWealthSlot;
+
+    // titles for info menu
+    private final String mainInfoPageTitle;
+    private final String subInfoPageBlockTitle;
+    private final String subInfoPageSpawnerTitle;
+    private final String subInfoPageContainerTitle;
+    private final String subInfoPageInventoryTitle;
+
+    // buttons for info menu
+    private final int mainInfoMenuSlot;
+    private final int nextInfoPageSlot;
+    private final int prevInfoPageSlot;
+    private final int blockInfoSlot;
+    private final int spawnerInfoSlot;
+    private final int containerInfoSlot;
+    private final int inventoryInfoSlot;
+
     // used to identify inventory gui, consider a better alternative?
-    private final String identifier = "§s§u§r§v§t§o§p";
+    private final String identifier = "§s§t§o§p";
 
     /**
      * Constructor for ViewPageEvent.
@@ -27,6 +60,37 @@ public class ViewPageEvent implements Listener {
      */
     public ViewPageEvent(Main main) {
         this.main = main;
+        StatsMenuOptions statsOptions = main.getGuiManager().getStatsOptions();
+
+        mainStatsPageTitle = statsOptions.getMainPageTitle();
+        subStatsPageBlockTitle = statsOptions.getSubPageBlockTitle();
+        subStatsPageSpawnerTitle = statsOptions.getSubPageSpawnerTitle();
+        subStatsPageContainerTitle = statsOptions.getSubPageContainerTitle();
+        subStatsPageInventoryTitle = statsOptions.getSubPageInventoryTitle();
+
+        mainStatsMenuSlot = statsOptions.getMainMenuSlot();
+        nextStatsPageSlot = statsOptions.getNextPageSlot();
+        prevStatsPageSlot = statsOptions.getPrevPageSlot();
+        blockWealthSlot = statsOptions.getBlockWealthSlot();
+        spawnerWealthSlot = statsOptions.getSpawnerWealthSlot();
+        containerWealthSlot = statsOptions.getContainerWealthSlot();
+        inventoryWealthSlot = statsOptions.getInventoryWealthSlot();
+
+        InfoMenuOptions infoOptions = main.getGuiManager().getInfoOptions();
+
+        mainInfoPageTitle = infoOptions.getMainPageTitle();
+        subInfoPageBlockTitle = infoOptions.getSubPageBlockTitle();
+        subInfoPageSpawnerTitle = infoOptions.getSubPageSpawnerTitle();
+        subInfoPageContainerTitle = infoOptions.getSubPageContainerTitle();
+        subInfoPageInventoryTitle = infoOptions.getSubPageInventoryTitle();
+
+        mainInfoMenuSlot = infoOptions.getMainMenuSlot();
+        nextInfoPageSlot = infoOptions.getNextPageSlot();
+        prevInfoPageSlot = infoOptions.getPrevPageSlot();
+        blockInfoSlot = infoOptions.getBlockInfoSlot();
+        spawnerInfoSlot = infoOptions.getSpawnerInfoSlot();
+        containerInfoSlot = infoOptions.getContainerInfoSlot();
+        inventoryInfoSlot = infoOptions.getInventoryInfoSlot();
     }
 
     @EventHandler
@@ -45,20 +109,20 @@ public class ViewPageEvent implements Listener {
 
         // handle stats page and item info page differently
         int slot = e.getRawSlot();
-        if (title.contains("Wealth Stats")) {
+        if (title.contains(mainStatsPageTitle)) {
             statsMainPageClickHandler(slot, e);
             return;
         }
-        if (title.startsWith("Item Values Info")) {
+        if (title.startsWith(mainInfoPageTitle)) {
             infoMainPageClickHandler(slot, e);
             return;
         }
 
         // handle stats pagination
-        boolean isBlockStatsPage = title.contains("Block Stats");
-        boolean isSpawnerStatsPage = title.contains("Spawner Stats");
-        boolean isContainerStatsPage = title.contains("Container Stats");
-        boolean isInventoryStatsPage = title.contains("Inventory Stats");
+        boolean isBlockStatsPage = title.contains(subStatsPageBlockTitle);
+        boolean isSpawnerStatsPage = title.contains(subStatsPageSpawnerTitle);
+        boolean isContainerStatsPage = title.contains(subStatsPageContainerTitle);
+        boolean isInventoryStatsPage = title.contains(subStatsPageInventoryTitle);
         if (isBlockStatsPage || isSpawnerStatsPage || isContainerStatsPage || isInventoryStatsPage) {
             statsSubPageClickHandler(slot, e, isBlockStatsPage, isSpawnerStatsPage,
                     isContainerStatsPage, isInventoryStatsPage);
@@ -66,10 +130,10 @@ public class ViewPageEvent implements Listener {
         }
 
         // handle item info pagination
-        boolean isBlockInfoPage = title.contains("Block Info");
-        boolean isSpawnerInfoPage = title.contains("Spawner Info");
-        boolean isContainerInfoPage = title.contains("Container Info");
-        boolean isInventoryInfoPage = title.contains("Inventory Info");
+        boolean isBlockInfoPage = title.contains(subInfoPageBlockTitle);
+        boolean isSpawnerInfoPage = title.contains(subInfoPageSpawnerTitle);
+        boolean isContainerInfoPage = title.contains(subInfoPageContainerTitle);
+        boolean isInventoryInfoPage = title.contains(subInfoPageInventoryTitle);
         if (isBlockInfoPage || isSpawnerInfoPage || isContainerInfoPage || isInventoryInfoPage) {
             infoSubPageClickHandler(slot, e, isBlockInfoPage, isSpawnerInfoPage,
                     isContainerInfoPage, isInventoryInfoPage);
@@ -101,16 +165,16 @@ public class ViewPageEvent implements Listener {
      */
     private void statsMainPageClickHandler(int slot, InventoryClickEvent e) {
         Inventory inv = null;
-        if (slot == 13) {
+        if (slot == blockWealthSlot) {
             inv = main.getGuiManager().getBlockStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
-        } else if (slot == 14) {
+        } else if (slot == spawnerWealthSlot) {
             inv = main.getGuiManager().getSpawnerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
-        } else if (slot == 15) {
+        } else if (slot == containerWealthSlot) {
             inv = main.getGuiManager().getContainerStatsPage(
                     e.getWhoClicked().getUniqueId(), 0);
-        } else if (slot == 16) {
+        } else if (slot == inventoryWealthSlot) {
             inv = main.getGuiManager().getInventoryStatsPage(
                 e.getWhoClicked().getUniqueId(), 0);
         }
@@ -132,7 +196,7 @@ public class ViewPageEvent implements Listener {
      */
     private void statsSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
                 boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
-        if (slot == 47 || slot == 51) {
+        if (slot == prevStatsPageSlot || slot == nextStatsPageSlot) {
             int pageToGo = getPage(e);
             if (pageToGo == -1) {
                 return;
@@ -158,7 +222,7 @@ public class ViewPageEvent implements Listener {
             e.getWhoClicked().openInventory(inv);
         }
 
-        if (slot == 49) {
+        if (slot == mainStatsMenuSlot) {
             main.getGuiManager().openMainStatsPage(e.getWhoClicked().getUniqueId());
         }
     }
@@ -171,14 +235,14 @@ public class ViewPageEvent implements Listener {
      */
     private void infoMainPageClickHandler(int slot, InventoryClickEvent e) {
         Inventory inv = null;
-        if (slot == 12) {
-            inv = InfoGui.getBlockInfoPage(0);
-        } else if (slot == 13) {
-            inv = InfoGui.getSpawnerInfoPage(0);
-        } else if (slot == 14) {
-            inv = InfoGui.getContainerInfoPage(0);
-        } else if (slot == 15) {
-            inv = InfoGui.getInventoryInfoPage(0);
+        if (slot == blockInfoSlot) {
+            inv = main.getGuiManager().getBlockInfoPage(0);
+        } else if (slot == spawnerInfoSlot) {
+            inv = main.getGuiManager().getSpawnerInfoPage(0);
+        } else if (slot == containerInfoSlot) {
+            inv = main.getGuiManager().getContainerInfoPage(0);
+        } else if (slot == inventoryInfoSlot) {
+            inv = main.getGuiManager().getInventoryInfoPage(0);
         }
         if (inv == null) {
             return;
@@ -198,20 +262,20 @@ public class ViewPageEvent implements Listener {
      */
     private void infoSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
             boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
-        if (slot == 47 || slot == 51) {
+        if (slot == prevInfoPageSlot || slot == nextInfoPageSlot) {
             int pageToGo = getPage(e);
             if (pageToGo == -1) {
                 return;
             }
             Inventory inv = null;
             if (isBlockPage) {
-                inv = InfoGui.getBlockInfoPage(pageToGo);
+                inv = main.getGuiManager().getBlockInfoPage(pageToGo);
             } else if (isSpawnerPage) {
-                inv = InfoGui.getSpawnerInfoPage(pageToGo);
+                inv = main.getGuiManager().getSpawnerInfoPage(pageToGo);
             } else if (isContainerPage) {
-               inv = InfoGui.getContainerInfoPage(pageToGo);
+               inv = main.getGuiManager().getContainerInfoPage(pageToGo);
             } else if (isInventoryPage) {
-                inv = InfoGui.getInventoryInfoPage(pageToGo);
+                inv = main.getGuiManager().getInventoryInfoPage(pageToGo);
             }
             if (inv == null) {
                 return;
@@ -219,8 +283,8 @@ public class ViewPageEvent implements Listener {
             e.getWhoClicked().openInventory(inv);
         }
 
-        if (slot == 49) {
-            e.getWhoClicked().openInventory(InfoGui.mainPage);
+        if (slot == mainInfoMenuSlot) {
+            e.getWhoClicked().openInventory(main.getGuiManager().getMainInfoPage());
         }
     }
 
@@ -232,11 +296,11 @@ public class ViewPageEvent implements Listener {
      * @return page number to go to
      */
     private int getPage(InventoryClickEvent e) {
-        List<String> itemLores = e.getCurrentItem().getItemMeta().getLore();
-        if (itemLores == null) {
+        List<String> itemLore = e.getCurrentItem().getItemMeta().getLore();
+        if (itemLore == null) {
             return -1;
         }
-        String pageLine = itemLores.get(0);
+        String pageLine = itemLore.get(0);
 
         // minus 1 because of 0-based indexing
         return Integer.parseInt(pageLine.substring(pageLine.length() - 1)) - 1;

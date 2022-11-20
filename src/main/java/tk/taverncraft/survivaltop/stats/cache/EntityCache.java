@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.HashMap;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.ui.StatsGui;
+import tk.taverncraft.survivaltop.gui.types.StatsGui;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**

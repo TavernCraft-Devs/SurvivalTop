@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.ui.InfoGui;
+import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 import tk.taverncraft.survivaltop.utils.services.ValidationManager;
 
@@ -14,6 +14,7 @@ import tk.taverncraft.survivaltop.utils.services.ValidationManager;
  * blocks/spawners/containers.
  */
 public class ItemInfoCommand {
+    private final Main main;
     private final String itemInfoPerm = "survtop.iteminfo";
     private final ValidationManager validationManager;
 
@@ -23,6 +24,7 @@ public class ItemInfoCommand {
      * @param main plugin class
      */
     public ItemInfoCommand(Main main) {
+        this.main = main;
         this.validationManager = new ValidationManager(main);
     }
 
@@ -40,9 +42,9 @@ public class ItemInfoCommand {
 
         // if sender is player, show info in a gui
         if (sender instanceof Player) {
-            Inventory inv = InfoGui.mainPage;
+            Inventory inv = main.getGuiManager().getMainInfoPage();
             if (inv != null) {
-                ((Player) sender).openInventory(InfoGui.mainPage);
+                ((Player) sender).openInventory(inv);
             } else {
                 MessageManager.sendMessage(sender, "unexpected-error");
             }

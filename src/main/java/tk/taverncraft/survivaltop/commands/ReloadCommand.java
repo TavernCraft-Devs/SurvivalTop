@@ -3,7 +3,7 @@ package tk.taverncraft.survivaltop.commands;
 import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.ui.InfoGui;
+import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 import tk.taverncraft.survivaltop.utils.services.ValidationManager;
 
@@ -57,7 +57,7 @@ public class ReloadCommand {
             main.getLandManager().initializeLandType();
             main.getInventoryManager().setStopOperations(true);
             main.getInventoryManager().initializeWorth();
-            new InfoGui(main);
+            main.getGuiManager().initializeMenuOptions();
             main.getGroupManager().initializeLandType();
             main.getLogManager().stopExistingTasks();
             main.getLeaderboardManager().stopExistingTasks();

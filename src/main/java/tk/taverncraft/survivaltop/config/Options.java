@@ -84,11 +84,11 @@ public class Options {
     }
 
     public boolean spawnerIsIncluded() {
-        return includeSpawners;
+        return includeLand && includeSpawners;
     }
 
     public boolean containerIsIncluded() {
-        return includeContainers;
+        return includeLand && includeContainers;
     }
 
     public boolean inventoryIsIncluded() {

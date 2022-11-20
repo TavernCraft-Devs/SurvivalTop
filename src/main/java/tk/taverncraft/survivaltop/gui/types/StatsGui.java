@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.ui;
+package tk.taverncraft.survivaltop.gui.types;
 
 import java.util.ArrayList;
 

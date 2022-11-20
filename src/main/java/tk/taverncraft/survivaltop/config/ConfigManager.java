@@ -38,7 +38,8 @@ public class ConfigManager {
         createSpawnersConfig();
         createContainersConfig();
         createInventoriesConfig();
-        createMenuConfig();
+        createStatsMenuConfig();
+        createInfoMenuConfig();
         createSignsConfig();
     }
 
@@ -83,11 +84,19 @@ public class ConfigManager {
     }
 
     /**
-     * Creates menu config file.
+     * Creates stats menu config file.
      */
-    public void createMenuConfig() {
-        FileConfiguration config = getConfig("menu.yml");
-        main.setMenuConfig(config);
+    public void createStatsMenuConfig() {
+        FileConfiguration config = getConfig("menu/stats.yml");
+        main.setStatsMenuConfig(config);
+    }
+
+    /**
+     * Creates info menu config file.
+     */
+    public void createInfoMenuConfig() {
+        FileConfiguration config = getConfig("menu/info.yml");
+        main.setInfoMenuConfig(config);
     }
 
     /**
