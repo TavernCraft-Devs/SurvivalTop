@@ -1,20 +1,27 @@
-package tk.taverncraft.survivaltop.gui;
+package tk.taverncraft.survivaltop.gui.options;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.gui.GuiUtils;
+import tk.taverncraft.survivaltop.gui.types.InfoGui;
 
 /**
  * InfoMenuOptions loads all configured menu options for info pages.
  */
 public class InfoMenuOptions {
-    private final GuiManager guiManager;
+    private final Main main;
     private final int mainPageSize;
     private final int subPageSize;
     private final String mainIdentifier = "§m§i§s§t§o§p";
@@ -48,9 +55,10 @@ public class InfoMenuOptions {
     // sub page items
     private final String subPageItemName;
     private final List<String> subPageItemLore;
+    private final List<Integer> subPageItemSlots;
 
-    public InfoMenuOptions(Main main, GuiManager guiManager) {
-        this.guiManager = guiManager;
+    public InfoMenuOptions(Main main) {
+        this.main = main;
         FileConfiguration config = main.getInfoMenuConfig();
         mainPageSize = config.getInt("main-page-size", 27);
         subPageSize = config.getInt("sub-page-size", 54);
@@ -64,6 +72,7 @@ public class InfoMenuOptions {
         setupSubPageBackground(config);
         subPageItemName = config.getString("sub-page-items.name");
         subPageItemLore = config.getStringList("sub-page-items.lore");
+        subPageItemSlots = config.getIntegerList("sub-page-items.slots");
 
         disabledButtonLore = config.getString("disabled-button-lore");
         mainMenuSlot = setUpSubPageButton(config, "main-menu");
@@ -81,7 +90,7 @@ public class InfoMenuOptions {
             .getKeys(false)) {
             int slot = Integer.parseInt(key);
             Material material = Material.valueOf(config.getString("main-page-background." + key));
-            ItemStack itemStack = guiManager.createGuiItem(material, "", false, null);
+            ItemStack itemStack = GuiUtils.createGuiItem(material, "", false, null);
             mainPageBackground.put(slot, itemStack);
         }
     }
@@ -91,7 +100,7 @@ public class InfoMenuOptions {
             .getKeys(false)) {
             int slot = Integer.parseInt(key);
             Material material = Material.valueOf(config.getString("sub-page-background." + key));
-            ItemStack itemStack = guiManager.createGuiItem(material, "", false, null);
+            ItemStack itemStack = GuiUtils.createGuiItem(material, "", false, null);
             subPageBackground.put(slot, itemStack);
         }
     }
@@ -103,7 +112,7 @@ public class InfoMenuOptions {
         String name = configurationSection.getString("name");
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = guiManager.createGuiItem(material, name, isEnabled, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnabled, lore.toArray(new String[0]));
         mainPageButtons.put(slot, itemStack);
         return slot;
     }
@@ -115,9 +124,29 @@ public class InfoMenuOptions {
         String name = configurationSection.getString("name");
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = guiManager.createGuiItem(material, name, false, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, false, lore.toArray(new String[0]));
         subPageButtons.put(slot, itemStack);
         return slot;
+    }
+
+    public String getMainPageIdentifier() {
+        return mainIdentifier;
+    }
+
+    public String getSubPageBlockIdentifier() {
+        return blockIdentifier;
+    }
+
+    public String getSubPageSpawnerIdentifier() {
+        return spawnerIdentifier;
+    }
+
+    public String getSubPageContainerIdentifier() {
+        return containerIdentifier;
+    }
+
+    public String getSubPageInventoryIdentifier() {
+        return inventoryIdentifier;
     }
 
     public int getMainPageSize() {
@@ -184,10 +213,6 @@ public class InfoMenuOptions {
         return prevPageSlot;
     }
 
-    public int getBalInfoSlot() {
-        return balInfoSlot;
-    }
-
     public int getBlockInfoSlot() {
         return blockInfoSlot;
     }
@@ -204,7 +229,119 @@ public class InfoMenuOptions {
         return inventoryInfoSlot;
     }
 
-    public String getDisabledButtonLore() {
-        return disabledButtonLore;
+    /**
+     * Prepares the inventory views for block, spawner and container.
+     *
+     * @param materialList list of materials to show in gui
+     * @param viewType type of view (block, spawner or container)
+     *
+     * @return An array list representing pages of inventory for the view type
+     */
+    private ArrayList<Inventory> prepareInfoViews(LinkedHashMap<String, Double> materialList,
+            String viewType) {
+        ArrayList<Inventory> entityViews = new ArrayList<>();
+        int pageNum = 1;
+        Inventory entityView = initializeInfoSubPageTemplate(pageNum, viewType);
+
+        // if no entity, return empty inventory
+        if (materialList == null ) {
+            entityViews.add(entityView);
+            return entityViews;
+        }
+
+        int counter = 0;
+        int endCount = subPageItemSlots.size() - 1;
+        int slot = subPageItemSlots.get(counter);
+        for (Map.Entry<String, Double> map : materialList.entrySet()) {
+            String name = map.getKey();
+            double worth = map.getValue();
+            Material material;
+            if (viewType.equals("Spawner Info")) {
+                material = Material.SPAWNER;
+            } else {
+                material = Material.getMaterial(name);
+            }
+
+            List<String> lore = subPageItemLore;
+            List<String> parsedLore = GuiUtils.parseLore(lore, "%worth%", worth);
+            String itemName = subPageItemName;
+            String parsedName = GuiUtils.parseName(itemName, "%name%", name);
+            entityView.setItem(slot, GuiUtils.createGuiItem(material, parsedName, false,
+                parsedLore.toArray(new String[0])));
+
+            counter++;
+            slot = subPageItemSlots.get(counter);
+
+            // next page
+            if (counter == endCount) {
+                entityViews.add(entityView);
+                pageNum++;
+                slot = 10;
+                entityView = initializeInfoSubPageTemplate(pageNum, viewType);
+            }
+        }
+        entityViews.add(entityView);
+
+        return entityViews;
+    }
+
+    /**
+     * Creates template for subpage.
+     *
+     * @param pageNum page number to show
+     * @param viewType type of view (block, spawner or container)
+     *
+     * @return an inventory gui template for subpage
+     */
+    public Inventory initializeInfoSubPageTemplate(int pageNum, String viewType) {
+        Inventory inv;
+        String pageNumPrefix = "§" + pageNum + "§8";
+        if (viewType.equals("Block Info")) {
+            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + getSubPageBlockTitle());
+        } else if (viewType.equals("Spawner Info")) {
+            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + getSubPageSpawnerTitle());
+        } else if (viewType.equals("Container Info")) {
+            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + getSubPageContainerTitle());
+        } else {
+            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + getSubPageInventoryTitle());
+        }
+
+        for (Map.Entry<Integer, ItemStack> map : getSubPageBackground().entrySet()) {
+            inv.setItem(map.getKey(), map.getValue());
+        }
+
+        for (Map.Entry<Integer, ItemStack> map : getSubPageButtons().entrySet()) {
+            inv.setItem(map.getKey(), map.getValue());
+        }
+        return inv;
+    }
+
+    public InfoGui createInfoGui() {
+        LinkedHashMap<String, Double> blockList = main.getLandManager().getBlockWorth();
+        LinkedHashMap<String, Double> spawnerList = main.getLandManager().getSpawnerWorth();
+        LinkedHashMap<String, Double> containerList = main.getLandManager().getContainerWorth();
+        LinkedHashMap<String, Double> inventoryList = main.getInventoryManager().getInventoryItemWorth();
+        Inventory mainPage = getInfoMainPage();
+        ArrayList<Inventory> blockViews = prepareInfoViews(blockList, "Block Info");
+        ArrayList<Inventory> spawnerViews = prepareInfoViews(spawnerList, "Spawner Info");
+        ArrayList<Inventory> containerViews = prepareInfoViews(containerList, "Container Info");
+        ArrayList<Inventory> inventoryViews = prepareInfoViews(inventoryList, "Inventory Info");
+        return new InfoGui(mainPage, blockViews, spawnerViews, containerViews, inventoryViews);
+    }
+
+    /**
+     * Sets up the main page for item info.
+     */
+    public Inventory getInfoMainPage() {
+        Inventory inv = Bukkit.createInventory(null, getMainPageSize(), getMainPageTitle());
+        for (Map.Entry<Integer, ItemStack> map : getMainPageBackground().entrySet()) {
+            inv.setItem(map.getKey(), map.getValue());
+        }
+
+        for (Map.Entry<Integer, ItemStack> map : getMainPageButtons().entrySet()) {
+            inv.setItem(map.getKey(), map.getValue());
+        }
+
+        return inv;
     }
 }

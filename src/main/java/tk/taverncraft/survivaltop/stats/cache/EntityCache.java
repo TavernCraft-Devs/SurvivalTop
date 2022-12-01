@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.types.StatsGui;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
@@ -62,13 +63,13 @@ public class EntityCache {
      */
     public StatsGui getGui(Main main) {
         if (gui == null) {
-            createGui(main);
+            setGui(main);
         }
         return gui;
     }
 
-    public void createGui(Main main) {
-        this.gui = main.getGuiManager().createStatsGui(name, balWealth, getLandWealth(),
+    public void setGui(Main main) {
+        this.gui = main.getGuiManager().getStatsGui(name, balWealth, getLandWealth(),
                 blockWealth, spawnerWealth, containerWealth, inventoryWealth, getTotalWealth(),
                 blockCounter, spawnerCounter, containerCounter, inventoryCounter);
     }

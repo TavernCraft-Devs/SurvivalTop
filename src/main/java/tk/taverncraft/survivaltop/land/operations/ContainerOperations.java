@@ -189,7 +189,7 @@ public class ContainerOperations {
                 }
                 String material = itemStack.getType().name();
                 if (containerMaterial.contains(material)) {
-                    containerHolderMap.get(id).addToHolder(material);
+                    containerHolderMap.get(id).addToHolder(material, itemStack.getAmount());
                 }
             }
         }

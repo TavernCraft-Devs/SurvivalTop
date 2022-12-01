@@ -99,6 +99,28 @@ sub-page-items:
   name: "&b%name%"
   lore:
     - "&eItem Worth: &a%worth%"
+  slots:
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 25
+    - 25
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
 
 sub-page-background:
   0: BLUE_STAINED_GLASS_PANE

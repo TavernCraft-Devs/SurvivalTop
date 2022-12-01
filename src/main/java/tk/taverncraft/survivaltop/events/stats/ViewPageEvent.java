@@ -1,7 +1,6 @@
 package tk.taverncraft.survivaltop.events.stats;
 
-import java.util.List;
-
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
@@ -9,8 +8,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.gui.InfoMenuOptions;
-import tk.taverncraft.survivaltop.gui.StatsMenuOptions;
+import tk.taverncraft.survivaltop.gui.options.InfoMenuOptions;
+import tk.taverncraft.survivaltop.gui.options.StatsMenuOptions;
 
 /**
  * ViewPageEvent checks for when a player clicks on GUI menu.
@@ -19,11 +18,11 @@ public class ViewPageEvent implements Listener {
     private final Main main;
 
     // titles for stats menu
-    private final String mainStatsPageTitle;
-    private final String subStatsPageBlockTitle;
-    private final String subStatsPageSpawnerTitle;
-    private final String subStatsPageContainerTitle;
-    private final String subStatsPageInventoryTitle;
+    private final String mainStatsPageIdentifier;
+    private final String subStatsPageBlockIdentifier;
+    private final String subStatsPageSpawnerIdentifier;
+    private final String subStatsPageContainerIdentifier;
+    private final String subStatsPageInventoryIdentifier;
 
     // buttons for stats menu
     private final int mainStatsMenuSlot;
@@ -35,11 +34,11 @@ public class ViewPageEvent implements Listener {
     private final int inventoryWealthSlot;
 
     // titles for info menu
-    private final String mainInfoPageTitle;
-    private final String subInfoPageBlockTitle;
-    private final String subInfoPageSpawnerTitle;
-    private final String subInfoPageContainerTitle;
-    private final String subInfoPageInventoryTitle;
+    private final String mainInfoPageIdentifier;
+    private final String subInfoPageBlockIdentifier;
+    private final String subInfoPageSpawnerIdentifier;
+    private final String subInfoPageContainerIdentifier;
+    private final String subInfoPageInventoryIdentifier;
 
     // buttons for info menu
     private final int mainInfoMenuSlot;
@@ -62,11 +61,11 @@ public class ViewPageEvent implements Listener {
         this.main = main;
         StatsMenuOptions statsOptions = main.getGuiManager().getStatsOptions();
 
-        mainStatsPageTitle = statsOptions.getMainPageTitle();
-        subStatsPageBlockTitle = statsOptions.getSubPageBlockTitle();
-        subStatsPageSpawnerTitle = statsOptions.getSubPageSpawnerTitle();
-        subStatsPageContainerTitle = statsOptions.getSubPageContainerTitle();
-        subStatsPageInventoryTitle = statsOptions.getSubPageInventoryTitle();
+        mainStatsPageIdentifier = statsOptions.getMainPageIdentifier();
+        subStatsPageBlockIdentifier = statsOptions.getSubPageBlockIdentifier();
+        subStatsPageSpawnerIdentifier = statsOptions.getSubPageSpawnerIdentifier();
+        subStatsPageContainerIdentifier = statsOptions.getSubPageContainerIdentifier();
+        subStatsPageInventoryIdentifier = statsOptions.getSubPageInventoryIdentifier();
 
         mainStatsMenuSlot = statsOptions.getMainMenuSlot();
         nextStatsPageSlot = statsOptions.getNextPageSlot();
@@ -78,11 +77,11 @@ public class ViewPageEvent implements Listener {
 
         InfoMenuOptions infoOptions = main.getGuiManager().getInfoOptions();
 
-        mainInfoPageTitle = infoOptions.getMainPageTitle();
-        subInfoPageBlockTitle = infoOptions.getSubPageBlockTitle();
-        subInfoPageSpawnerTitle = infoOptions.getSubPageSpawnerTitle();
-        subInfoPageContainerTitle = infoOptions.getSubPageContainerTitle();
-        subInfoPageInventoryTitle = infoOptions.getSubPageInventoryTitle();
+        mainInfoPageIdentifier = infoOptions.getMainPageIdentifier();
+        subInfoPageBlockIdentifier = infoOptions.getSubPageBlockIdentifier();
+        subInfoPageSpawnerIdentifier = infoOptions.getSubPageSpawnerIdentifier();
+        subInfoPageContainerIdentifier = infoOptions.getSubPageContainerIdentifier();
+        subInfoPageInventoryIdentifier = infoOptions.getSubPageInventoryIdentifier();
 
         mainInfoMenuSlot = infoOptions.getMainMenuSlot();
         nextInfoPageSlot = infoOptions.getNextPageSlot();
@@ -109,20 +108,20 @@ public class ViewPageEvent implements Listener {
 
         // handle stats page and item info page differently
         int slot = e.getRawSlot();
-        if (title.contains(mainStatsPageTitle)) {
+        if (title.endsWith(mainStatsPageIdentifier)) {
             statsMainPageClickHandler(slot, e);
             return;
         }
-        if (title.startsWith(mainInfoPageTitle)) {
+        if (title.endsWith(mainInfoPageIdentifier)) {
             infoMainPageClickHandler(slot, e);
             return;
         }
 
         // handle stats pagination
-        boolean isBlockStatsPage = title.contains(subStatsPageBlockTitle);
-        boolean isSpawnerStatsPage = title.contains(subStatsPageSpawnerTitle);
-        boolean isContainerStatsPage = title.contains(subStatsPageContainerTitle);
-        boolean isInventoryStatsPage = title.contains(subStatsPageInventoryTitle);
+        boolean isBlockStatsPage = title.endsWith(subStatsPageBlockIdentifier);
+        boolean isSpawnerStatsPage = title.endsWith(subStatsPageSpawnerIdentifier);
+        boolean isContainerStatsPage = title.endsWith(subStatsPageContainerIdentifier);
+        boolean isInventoryStatsPage = title.endsWith(subStatsPageInventoryIdentifier);
         if (isBlockStatsPage || isSpawnerStatsPage || isContainerStatsPage || isInventoryStatsPage) {
             statsSubPageClickHandler(slot, e, isBlockStatsPage, isSpawnerStatsPage,
                     isContainerStatsPage, isInventoryStatsPage);
@@ -130,10 +129,10 @@ public class ViewPageEvent implements Listener {
         }
 
         // handle item info pagination
-        boolean isBlockInfoPage = title.contains(subInfoPageBlockTitle);
-        boolean isSpawnerInfoPage = title.contains(subInfoPageSpawnerTitle);
-        boolean isContainerInfoPage = title.contains(subInfoPageContainerTitle);
-        boolean isInventoryInfoPage = title.contains(subInfoPageInventoryTitle);
+        boolean isBlockInfoPage = title.endsWith(subInfoPageBlockIdentifier);
+        boolean isSpawnerInfoPage = title.endsWith(subInfoPageSpawnerIdentifier);
+        boolean isContainerInfoPage = title.endsWith(subInfoPageContainerIdentifier);
+        boolean isInventoryInfoPage = title.endsWith(subInfoPageInventoryIdentifier);
         if (isBlockInfoPage || isSpawnerInfoPage || isContainerInfoPage || isInventoryInfoPage) {
             infoSubPageClickHandler(slot, e, isBlockInfoPage, isSpawnerInfoPage,
                     isContainerInfoPage, isInventoryInfoPage);
@@ -197,7 +196,8 @@ public class ViewPageEvent implements Listener {
     private void statsSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
                 boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
         if (slot == prevStatsPageSlot || slot == nextStatsPageSlot) {
-            int pageToGo = getPage(e);
+            int currPage = getCurrentPage(e.getView().getTitle());
+            int pageToGo = slot == nextStatsPageSlot ? currPage + 1 : currPage - 1;
             if (pageToGo == -1) {
                 return;
             }
@@ -263,10 +263,12 @@ public class ViewPageEvent implements Listener {
     private void infoSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
             boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
         if (slot == prevInfoPageSlot || slot == nextInfoPageSlot) {
-            int pageToGo = getPage(e);
+            int currPage = getCurrentPage(e.getView().getTitle());
+            int pageToGo = slot == nextInfoPageSlot ? currPage + 1 : currPage - 1;
             if (pageToGo == -1) {
                 return;
             }
+            
             Inventory inv = null;
             if (isBlockPage) {
                 inv = main.getGuiManager().getBlockInfoPage(pageToGo);
@@ -289,20 +291,13 @@ public class ViewPageEvent implements Listener {
     }
 
     /**
-     * Gets the page number to go to.
+     * Gets the current page number
      *
-     * @param e inventory click event
+     * @param title title of inventory
      *
-     * @return page number to go to
+     * @return current page number
      */
-    private int getPage(InventoryClickEvent e) {
-        List<String> itemLore = e.getCurrentItem().getItemMeta().getLore();
-        if (itemLore == null) {
-            return -1;
-        }
-        String pageLine = itemLore.get(0);
-
-        // minus 1 because of 0-based indexing
-        return Integer.parseInt(pageLine.substring(pageLine.length() - 1)) - 1;
+    private int getCurrentPage(String title) {
+        return Integer.parseInt(title.split("§", 3)[1]);
     }
 }

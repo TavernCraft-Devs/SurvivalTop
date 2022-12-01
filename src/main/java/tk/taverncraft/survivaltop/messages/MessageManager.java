@@ -120,15 +120,15 @@ public class MessageManager {
         StringBuilder message = new StringBuilder(header);
         int position = 1;
         int currentPage = 1;
-        for (Map.Entry<String, EntityCache> entry : leaderboard.entrySet()) {
-            String name = entry.getKey();
+        for (EntityCache eCache : leaderboard.values()) {
+            String name = eCache.getName();
 
             // handle null player names (can happen if world folder is deleted)
             if (name == null) {
                 continue;
             }
 
-            double wealth = entry.getValue().getTotalWealth();
+            double wealth = eCache.getTotalWealth();
             if (wealth < minimumWealth) {
                 continue;
             }

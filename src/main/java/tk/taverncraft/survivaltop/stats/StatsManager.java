@@ -11,6 +11,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,7 +43,7 @@ public class StatsManager {
     private final Set<UUID> creatorList = new HashSet<>();
 
     // entity cache, used if realtime stats are disabled
-    private ConcurrentHashMap<String, EntityCache> entityCache = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, EntityCache> entityCacheMap = new ConcurrentHashMap<>();
 
     /**
      * Constructor for StatsManager.
@@ -60,7 +61,7 @@ public class StatsManager {
     public void getStatsForPlayer(CommandSender sender, String name) {
         creatorList.add(main.getSenderUuid(sender));
         if (main.getOptions().cacheIsEnabled()) {
-            main.getStatsManager().getCachedStats(sender, name.toUpperCase());
+            main.getStatsManager().getCachedStats(sender, name);
         } else {
             main.getStatsManager().getRealTimeStats(sender, name, PLAYER);
         }
@@ -90,10 +91,10 @@ public class StatsManager {
      * @param name name of entity
      */
     public void getCachedStats(CommandSender sender, String name) {
-        EntityCache eCache = entityCache.get(name);
+        EntityCache eCache = entityCacheMap.get(name.toUpperCase());
         // if stats cache not found or invalid, look into leaderboard cache
         if (eCache == null || eCache.isExpired(main.getOptions().getCacheDuration())) {
-            eCache = main.getLeaderboardManager().getEntityCache(name);
+            eCache = main.getLeaderboardManager().getEntityCache(name.toUpperCase());
             // if leaderboard cache also not found or invalid, calculate again
             if (eCache == null || eCache.isExpired(main.getOptions().getCacheDuration())) {
                 getRealTimeStats(sender, name, PLAYER);
@@ -101,11 +102,11 @@ public class StatsManager {
             }
 
             if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
-                eCache.createGui(main);
+                eCache.setGui(main);
             } else {
                 eCache.createChat();
             }
-            entityCache.put(name, eCache);
+            entityCacheMap.put(name.toUpperCase(), eCache);
         }
 
         long timeElapsed = Instant.now().getEpochSecond() - eCache.getCacheTime();
@@ -239,8 +240,8 @@ public class StatsManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                eCache.createGui(main);
-                entityCache.put(name.toUpperCase(), eCache);
+                eCache.setGui(main);
+                entityCacheMap.put(name.toUpperCase(), eCache);
                 sendGuiInteractiveText(sender, eCache);
                 doCleanUp(id);
             }
@@ -272,7 +273,7 @@ public class StatsManager {
      */
     private void processStatsForChat(CommandSender sender, String name, int id, EntityCache eCache) {
         eCache.createChat();
-        entityCache.put(name.toUpperCase(), eCache);
+        entityCacheMap.put(name.toUpperCase(), eCache);
         MessageManager.sendMessage(sender, "entity-stats", eCache.getPlaceholders(),
                 eCache.getValues());
         doCleanUp(id);
@@ -340,7 +341,7 @@ public class StatsManager {
         this.stopCalculations = true;
         taskMap.clear();
         creatorList.clear();
-        this.entityCache = new ConcurrentHashMap<>();
+        this.entityCacheMap = new ConcurrentHashMap<>();
         MessageManager.sendMessage(sender, "calculation-interrupted");
     }
 

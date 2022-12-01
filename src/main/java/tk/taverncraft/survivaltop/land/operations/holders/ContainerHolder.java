@@ -33,11 +33,12 @@ public class ContainerHolder {
     }
 
     /**
-     * Adds 1 count to holder.
+     * Adds count to holder.
      *
      * @param material material to add count for
+     * @param amount amount to add
      */
-    public void addToHolder(String material) {
-        counter.get(material).increment();
+    public void addToHolder(String material, int amount) {
+        counter.get(material).increment(amount);
     }
 }
