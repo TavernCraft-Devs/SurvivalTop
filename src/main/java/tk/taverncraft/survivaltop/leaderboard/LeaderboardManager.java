@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -29,7 +31,7 @@ public class LeaderboardManager {
     private BukkitTask leaderboardTask;
     private long leaderboardUpdateStartTime = -1;
     private long lastUpdateDuration = -1;
-    private long leaderboardUpdateTracker = -1;
+    private Iterator<String> leaderboardTaskQueue;
     CommandSender leaderboardSender;
 
     // cache values used for leaderboard/papi
@@ -124,9 +126,12 @@ public class LeaderboardManager {
             MessageManager.sendMessage(sender, "update-started");
             leaderboardSender = sender;
             if (this.main.getOptions().groupIsEnabled()) {
-                updateForGroups(sender);
+                setTaskQueueForGroups();
             } else {
-                updateForPlayers(sender);
+                setTaskQueueForPlayers();
+            }
+            if (leaderboardTaskQueue.hasNext()) {
+                main.getStatsManager().getStatsForLeaderboard(sender, leaderboardTaskQueue.next());
             }
         } catch (Exception e) {
             LogManager.error(e.getMessage());
@@ -137,42 +142,28 @@ public class LeaderboardManager {
     /**
      * Performs update by individual players.
      */
-    private void updateForPlayers(CommandSender sender) {
+    private void setTaskQueueForPlayers() {
         boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join", false);
         long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) * 1000;
-        leaderboardUpdateTracker = 1;
-
-        // code intentionally duplicated to keep the if condition outside loop to save check time
 
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
         if (!filterLastJoin || lastJoinTime <= 0) {
-            Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer ->
-                main.getStatsManager().getStatsForLeaderboard(sender, offlinePlayer.getName()));
+            leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).iterator();
             return;
         }
 
         // path for if last join filter is on
         Instant instant = Instant.now();
         long currentTime = instant.getEpochSecond() * 1000;
-        Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-            if (currentTime - offlinePlayer.getLastPlayed() > lastJoinTime) {
-                return;
-            }
-            main.getStatsManager().getStatsForLeaderboard(sender, offlinePlayer.getName());
-        });
+        leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers()).filter(p -> currentTime - p.getLastPlayed() <= lastJoinTime).map(OfflinePlayer::getName).iterator();
     }
 
     /**
      * Performs update by groups.
      */
-    private void updateForGroups(CommandSender sender) {
+    private void setTaskQueueForGroups() {
         List<String> groups = this.main.getGroupManager().getGroups();
-        int groupSize = groups.size();
-        leaderboardUpdateTracker = groupSize;
-        for (int i = 0; i < groupSize; i++) {
-            String group = groups.get(i);
-            main.getStatsManager().getStatsForLeaderboard(sender, group);
-        }
+        leaderboardTaskQueue = groups.iterator();
     }
 
     /**
@@ -414,11 +405,12 @@ public class LeaderboardManager {
 
     public void processLeaderboardUpdate(String name, EntityCache eCache) {
         entityCacheMap.put(name.toUpperCase(), eCache);
-        leaderboardUpdateTracker--;
-        if (leaderboardUpdateTracker == 0) {
+        if (!leaderboardTaskQueue.hasNext()) {
             HashMap<String, EntityCache> sortedMap = sortEntitiesByTotalWealth(entityCacheMap);
             setUpEntityCache(sortedMap);
             completeLeaderboardUpdate(leaderboardSender, sortedMap);
+        } else {
+            main.getStatsManager().getStatsForLeaderboard(leaderboardSender, leaderboardTaskQueue.next());
         }
     }
 

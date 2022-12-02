@@ -123,6 +123,7 @@ public class StatsManager {
             MessageManager.sendMessage(sender, "entity-stats", eCache.getPlaceholders(),
                 eCache.getValues());
         }
+        creatorList.remove(main.getSenderUuid(sender));
     }
 
     /**

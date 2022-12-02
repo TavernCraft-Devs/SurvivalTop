@@ -268,7 +268,7 @@ public class ViewPageEvent implements Listener {
             if (pageToGo == -1) {
                 return;
             }
-            
+
             Inventory inv = null;
             if (isBlockPage) {
                 inv = main.getGuiManager().getBlockInfoPage(pageToGo);
