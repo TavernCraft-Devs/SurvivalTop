@@ -52,8 +52,10 @@ public class EntityCache {
         wealthBreakdown.put("spawner-wealth", spawnerWealth);
         wealthBreakdown.put("container-wealth", containerWealth);
         wealthBreakdown.put("inventory-wealth", inventoryWealth);
-        wealthBreakdown.put("land-wealth", blockWealth + spawnerWealth + containerWealth);
-        double totalWealth = wealthBreakdown.values().stream().mapToDouble(Double::valueOf).sum();
+        double landWealth = blockWealth + spawnerWealth + containerWealth;
+        wealthBreakdown.put("land-wealth", landWealth);
+        double totalWealth = papiWealth.values().stream().mapToDouble(Double::valueOf).sum()
+            + balWealth + landWealth + inventoryWealth;
         wealthBreakdown.put("total-wealth", totalWealth);
         this.cacheTime = Instant.now().getEpochSecond();
     }
