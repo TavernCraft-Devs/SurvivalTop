@@ -38,6 +38,7 @@ public class ConfigManager {
         createSpawnersConfig();
         createContainersConfig();
         createInventoriesConfig();
+        createPapiConfig();
         createStatsMenuConfig();
         createInfoMenuConfig();
         createSignsConfig();
@@ -81,6 +82,14 @@ public class ConfigManager {
     public void createInventoriesConfig() {
         FileConfiguration config = getConfig("inventories.yml");
         main.setInventoriesConfig(config);
+    }
+
+    /**
+     * Creates papi config file.
+     */
+    public void createPapiConfig() {
+        FileConfiguration config = getConfig("papi.yml");
+        main.setPapiConfig(config);
     }
 
     /**

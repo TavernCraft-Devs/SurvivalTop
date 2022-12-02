@@ -10,6 +10,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: BEACON
+    enchanted: false
 
   balance-wealth:
     slot: 11
@@ -17,6 +18,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: EMERALD
+    enchanted: false
 
   land-wealth:
     slot: 12
@@ -24,6 +26,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: GOLDEN_SHOVEL
+    enchanted: false
 
   block-wealth:
     slot: 13
@@ -31,6 +34,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: GRASS_BLOCK
+    enchanted: false
 
   spawner-wealth:
     slot: 14
@@ -38,6 +42,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: SPAWNER
+    enchanted: false
 
   container-wealth:
     slot: 15
@@ -45,6 +50,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: CHEST
+    enchanted: false
 
   inventory-wealth:
     slot: 16
@@ -52,8 +58,7 @@ main-page-buttons:
     lore:
       - "&eValue: &a%value%"
     material: PLAYER_HEAD
-
-disabled-button-lore: "&cDisabled"
+    enchanted: false
 
 main-page-background:
   0: BLUE_STAINED_GLASS_PANE
@@ -93,6 +98,7 @@ sub-page-buttons:
     lore:
       - "&eReturn to main page"
     material: COMPASS
+    enchanted: false
 
   previous-page:
     slot: 47
@@ -100,6 +106,7 @@ sub-page-buttons:
     lore:
       - "&eView previous page"
     material: ARROW
+    enchanted: false
 
   next-page:
     slot: 51
@@ -107,6 +114,7 @@ sub-page-buttons:
     lore:
       - "&eView next page"
     material: ARROW
+    enchanted: false
 
 sub-page-items:
   name: "&b%name%"

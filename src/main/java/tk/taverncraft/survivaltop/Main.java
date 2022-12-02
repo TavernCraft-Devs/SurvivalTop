@@ -28,10 +28,9 @@ import tk.taverncraft.survivaltop.config.Options;
 import tk.taverncraft.survivaltop.stats.StatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
 import tk.taverncraft.survivaltop.gui.GuiManager;
-import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.config.ConfigManager;
 import tk.taverncraft.survivaltop.utils.services.DependencyManager;
-import tk.taverncraft.survivaltop.utils.services.PapiManager;
+import tk.taverncraft.survivaltop.papi.PapiManager;
 import tk.taverncraft.survivaltop.utils.services.PluginUpdateManager;
 import tk.taverncraft.survivaltop.utils.services.Metrics;
 
@@ -49,6 +48,7 @@ public class Main extends JavaPlugin {
     private FileConfiguration spawnersConfig;
     private FileConfiguration containersConfig;
     private FileConfiguration inventoriesConfig;
+    private FileConfiguration papiConfig;
     private FileConfiguration statsMenuConfig;
     private FileConfiguration infoMenuConfig;
     private FileConfiguration signsConfig;
@@ -59,6 +59,7 @@ public class Main extends JavaPlugin {
     private BalanceManager balanceManager;
     private LandManager landManager;
     private InventoryManager inventoryManager;
+    private PapiManager papiManager;
     private GroupManager groupManager;
     private StatsManager statsManager;
     private LeaderboardManager leaderboardManager;
@@ -111,6 +112,7 @@ public class Main extends JavaPlugin {
             this.balanceManager = new BalanceManager(this);
             this.landManager = new LandManager(this);
             this.inventoryManager = new InventoryManager(this);
+            this.papiManager = new PapiManager(this);
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
             this.guiManager = new GuiManager(this);
@@ -173,7 +175,7 @@ public class Main extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             LogManager.info(String.format("[%s] - PlaceholderAPI found, integrated with plugin!",
                     getDescription().getName()));
-            new PapiManager(this).register();
+            papiManager.register();
         }
     }
 
@@ -208,11 +210,11 @@ public class Main extends JavaPlugin {
     }
 
     public FileConfiguration getConfig() {
-        return this.config;
+        return config;
     }
 
     public FileConfiguration getBlocksConfig() {
-        return this.blocksConfig;
+        return blocksConfig;
     }
 
     public void setBlocksConfig(FileConfiguration blocksConfig) {
@@ -220,7 +222,7 @@ public class Main extends JavaPlugin {
     }
 
     public FileConfiguration getSpawnersConfig() {
-        return this.spawnersConfig;
+        return spawnersConfig;
     }
 
     public void setSpawnersConfig(FileConfiguration spawnersConfig) {
@@ -228,7 +230,7 @@ public class Main extends JavaPlugin {
     }
 
     public FileConfiguration getContainersConfig() {
-        return this.containersConfig;
+        return containersConfig;
     }
 
     public void setContainersConfig(FileConfiguration containersConfig) {
@@ -236,15 +238,23 @@ public class Main extends JavaPlugin {
     }
 
     public FileConfiguration getInventoriesConfig() {
-        return this.inventoriesConfig;
+        return inventoriesConfig;
     }
 
     public void setInventoriesConfig(FileConfiguration inventoriesConfig) {
         this.inventoriesConfig = inventoriesConfig;
     }
 
+    public FileConfiguration getPapiConfig() {
+        return papiConfig;
+    }
+
+    public void setPapiConfig(FileConfiguration papiConfig) {
+        this.papiConfig = papiConfig;
+    }
+
     public FileConfiguration getStatsMenuConfig() {
-        return this.statsMenuConfig;
+        return statsMenuConfig;
     }
 
     public void setStatsMenuConfig(FileConfiguration statsMenuConfig) {
@@ -252,7 +262,7 @@ public class Main extends JavaPlugin {
     }
 
     public FileConfiguration getInfoMenuConfig() {
-        return this.infoMenuConfig;
+        return infoMenuConfig;
     }
 
     public void setInfoMenuConfig(FileConfiguration infoMenuConfig) {
@@ -260,7 +270,7 @@ public class Main extends JavaPlugin {
     }
 
     public FileConfiguration getSignsConfig() {
-        return this.signsConfig;
+        return signsConfig;
     }
 
     public void setSignsConfig(FileConfiguration signsConfig) {
@@ -276,11 +286,11 @@ public class Main extends JavaPlugin {
     }
 
     public DependencyManager getDependencyManager() {
-        return this.dependencyManager;
+        return dependencyManager;
     }
 
     public BalanceManager getBalanceManager() {
-        return this.balanceManager;
+        return balanceManager;
     }
 
     public LandManager getLandManager() {
@@ -288,34 +298,38 @@ public class Main extends JavaPlugin {
     }
 
     public InventoryManager getInventoryManager() {
-        return this.inventoryManager;
+        return inventoryManager;
+    }
+
+    public PapiManager getPapiManager() {
+        return papiManager;
     }
 
     public GroupManager getGroupManager() {
-        return this.groupManager;
+        return groupManager;
     }
 
     public StatsManager getStatsManager() {
-        return this.statsManager;
+        return statsManager;
     }
 
     public LeaderboardManager getLeaderboardManager() {
-        return this.leaderboardManager;
+        return leaderboardManager;
     }
 
     public StorageManager getStorageManager() {
-        return this.storageManager;
+        return storageManager;
     }
 
     public LogManager getLogManager() {
-        return this.logManager;
+        return logManager;
     }
 
     public GuiManager getGuiManager() {
-        return this.guiManager;
+        return guiManager;
     }
 
     public Options getOptions() {
-        return this.options;
+        return options;
     }
 }

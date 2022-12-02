@@ -10,6 +10,7 @@ main-page-buttons:
     lore:
       - "&eTaken directly from balance!"
     material: EMERALD
+    enchanted: false
 
   block-info:
     slot: 12
@@ -17,6 +18,7 @@ main-page-buttons:
     lore:
       - "&eClick to learn more."
     material: GRASS_BLOCK
+    enchanted: false
 
   spawner-info:
     slot: 13
@@ -24,6 +26,7 @@ main-page-buttons:
     lore:
       - "&eClick to learn more."
     material: SPAWNER
+    enchanted: false
 
   container-info:
     slot: 14
@@ -31,6 +34,7 @@ main-page-buttons:
     lore:
       - "&eClick to learn more."
     material: CHEST
+    enchanted: false
 
   inventory-info:
     slot: 15
@@ -38,8 +42,7 @@ main-page-buttons:
     lore:
       - "&eClick to learn more."
     material: PLAYER_HEAD
-
-disabled-button-lore: "&cDisabled"
+    enchanted: false
 
 main-page-background:
   0: BLUE_STAINED_GLASS_PANE
@@ -80,6 +83,7 @@ sub-page-buttons:
     lore:
       - "&eReturn to main page"
     material: COMPASS
+    enchanted: false
 
   previous-page:
     slot: 47
@@ -87,6 +91,7 @@ sub-page-buttons:
     lore:
       - "&eView previous page"
     material: ARROW
+    enchanted: false
 
   next-page:
     slot: 51
@@ -94,6 +99,7 @@ sub-page-buttons:
     lore:
       - "&eView next page"
     material: ARROW
+    enchanted: false
 
 sub-page-items:
   name: "&b%name%"

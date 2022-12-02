@@ -1,5 +1,10 @@
-package tk.taverncraft.survivaltop.utils.services;
+package tk.taverncraft.survivaltop.papi;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -11,8 +16,8 @@ import tk.taverncraft.survivaltop.Main;
  * An expansion class for PAPI.
  */
 public class PapiManager extends PlaceholderExpansion {
-
     private final Main main;
+    private HashMap<String, List<String>> categoriesToPlaceholdersMap;
 
     /**
      * Constructor for PapiManager.
@@ -21,16 +26,102 @@ public class PapiManager extends PlaceholderExpansion {
      */
     public PapiManager(Main main) {
         this.main = main;
+        initializePlaceholders();
+    }
+
+    /**
+     * Initializes all placeholders.
+     */
+    public void initializePlaceholders() {
+        categoriesToPlaceholdersMap = new HashMap<>();
+        for (String category: main.getPapiConfig().getConfigurationSection("").getKeys(false)) {
+            List<String> placeholders = main.getPapiConfig().getStringList(category + ".placeholders");
+            categoriesToPlaceholdersMap.put(category, placeholders);
+        }
+    }
+
+    /**
+     * Gets the placeholder value of an entity based on name.
+     *
+     * @param name name of entity to get placeholder value for
+     *
+     * @return placeholder value of entity
+     */
+    public HashMap<String, Double> getPlaceholderValForEntity(String name) {
+        if (main.getOptions().groupIsEnabled()) {
+            return getPlaceholderValByGroup(name);
+        }
+        return getPlaceholderValByPlayer(name);
+    }
+
+    /**
+     * Gets the placeholder value from a player by name.
+     *
+     * @param name name of player to get placeholder value for
+     *
+     * @return placeholder value of player
+     */
+    public HashMap<String, Double> getPlaceholderValByPlayer(String name) {
+        HashMap<String, Double> papiWealth = new HashMap<>();
+        OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+        for (Map.Entry<String, List<String>> map : categoriesToPlaceholdersMap.entrySet()) {
+            String category = map.getKey();
+            double value = 0;
+            for (String placeholder : map.getValue()) {
+                value += getParsedValue(player, placeholder, name);
+            }
+            papiWealth.put(category, value);
+        }
+        return papiWealth;
+    }
+
+    /**
+     * Gets the placeholder value from a group by name.
+     *
+     * @param group name of group to get placeholder value for
+     *
+     * @return placeholder value of group
+     */
+    private HashMap<String, Double> getPlaceholderValByGroup(String group) {
+        HashMap<String, Double> papiWealth = new HashMap<>();
+        for (Map.Entry<String, List<String>> map : categoriesToPlaceholdersMap.entrySet()) {
+            String category = map.getKey();
+            double value = 0;
+            if (main.getPapiConfig().getString(category + ".type", "GROUP").equalsIgnoreCase("GROUP")) {
+                for (String placeholder : map.getValue()) {
+                    value += getParsedValue(null, placeholder, group);
+                }
+            } else {
+                List<OfflinePlayer> offlinePlayers = this.main.getGroupManager().getPlayers(group);
+                for (OfflinePlayer offlinePlayer : offlinePlayers) {
+                    for (String placeholder : map.getValue()) {
+                        value += getParsedValue(offlinePlayer, placeholder, offlinePlayer.getName());
+                    }
+                }
+            }
+            papiWealth.put(category, value);
+        }
+        return papiWealth;
+    }
+
+    private double getParsedValue(OfflinePlayer player, String placeholder, String name) {
+        String parsedName = placeholder.replaceAll("\\{name}", name);
+        String strValue = PlaceholderAPI.setPlaceholders(player, parsedName);
+        try {
+            return Double.parseDouble(strValue);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override
     public String getAuthor() {
-        return "tjtanjin - FrozenFever";
+        return main.getDescription().getAuthors().get(0);
     }
 
     @Override
     public String getIdentifier() {
-        return "survtop";
+        return main.getDescription().getPrefix();
     }
 
     @Override

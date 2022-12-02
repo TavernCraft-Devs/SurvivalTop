@@ -1,0 +1,7 @@
+# you may use {name} for entity names in your placeholders
+# for detailed guide on setting up placeholders in wealth, check out our wiki:
+# ???
+tax-paid:
+  type: PLAYER
+  placeholders:
+    - "%qtax_player_total_paid%"

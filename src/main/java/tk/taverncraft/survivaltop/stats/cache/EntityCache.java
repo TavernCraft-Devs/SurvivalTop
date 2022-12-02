@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.types.StatsGui;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
@@ -26,15 +25,13 @@ public class EntityCache {
 
     // entity information
     private final String name;
-    private final double balWealth;
-    private final double blockWealth;
-    private final double spawnerWealth;
-    private final double containerWealth;
-    private final double inventoryWealth;
-    HashMap<String, MutableInt> blockCounter;
-    HashMap<String, MutableInt> spawnerCounter;
-    HashMap<String, MutableInt> containerCounter;
-    HashMap<String, MutableInt> inventoryCounter;
+    private HashMap<String, MutableInt> blockCounter;
+    private HashMap<String, MutableInt> spawnerCounter;
+    private HashMap<String, MutableInt> containerCounter;
+    private HashMap<String, MutableInt> inventoryCounter;
+
+    // contains breakdown of entity wealth
+    private final HashMap<String, Double> wealthBreakdown;
 
     /**
      * Constructor for EntityCache.
@@ -45,14 +42,19 @@ public class EntityCache {
      * @param containerWealth container wealth of entity
      * @param inventoryWealth inventory wealth of entity
      */
-    public EntityCache(String name, double balWealth, double blockWealth,
-                       double spawnerWealth, double containerWealth, double inventoryWealth) {
+    public EntityCache(String name, double balWealth, HashMap<String, Double> papiWealth,
+            double blockWealth, double spawnerWealth, double containerWealth, double inventoryWealth) {
         this.name = name;
-        this.balWealth = balWealth;
-        this.blockWealth = blockWealth;
-        this.spawnerWealth = spawnerWealth;
-        this.containerWealth = containerWealth;
-        this.inventoryWealth = inventoryWealth;
+        wealthBreakdown = new HashMap<>();
+        wealthBreakdown.put("balance-wealth", balWealth);
+        wealthBreakdown.putAll(papiWealth);
+        wealthBreakdown.put("block-wealth", blockWealth);
+        wealthBreakdown.put("spawner-wealth", spawnerWealth);
+        wealthBreakdown.put("container-wealth", containerWealth);
+        wealthBreakdown.put("inventory-wealth", inventoryWealth);
+        wealthBreakdown.put("land-wealth", blockWealth + spawnerWealth + containerWealth);
+        double totalWealth = wealthBreakdown.values().stream().mapToDouble(Double::valueOf).sum();
+        wealthBreakdown.put("total-wealth", totalWealth);
         this.cacheTime = Instant.now().getEpochSecond();
     }
 
@@ -69,8 +71,7 @@ public class EntityCache {
     }
 
     public void setGui(Main main) {
-        this.gui = main.getGuiManager().getStatsGui(name, balWealth, getLandWealth(),
-                blockWealth, spawnerWealth, containerWealth, inventoryWealth, getTotalWealth(),
+        this.gui = main.getGuiManager().getStatsGui(name, wealthBreakdown,
                 blockCounter, spawnerCounter, containerCounter, inventoryCounter);
     }
 
@@ -79,12 +80,12 @@ public class EntityCache {
             return;
         }
         String strTotalWealth = String.format("%.02f", getTotalWealth());
-        String strBalWealth = String.format("%.02f", balWealth);
+        String strBalWealth = String.format("%.02f", getBalWealth());
         String strLandWealth = String.format("%.02f", getLandWealth());
-        String strBlockWealth = String.format("%.02f", blockWealth);
-        String strSpawnerWealth = String.format("%.02f", spawnerWealth);
-        String strContainerWealth = String.format("%.02f", containerWealth);
-        String strInvWealth = String.format("%.02f", inventoryWealth);
+        String strBlockWealth = String.format("%.02f", getBlockWealth());
+        String strSpawnerWealth = String.format("%.02f", getSpawnerWealth());
+        String strContainerWealth = String.format("%.02f", getContainerWealth());
+        String strInvWealth = String.format("%.02f", getInventoryWealth());
 
         this.placeholders = new String[]{"%entity%", "%landwealth%", "%balwealth%",
             "%totalwealth%", "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
@@ -109,7 +110,7 @@ public class EntityCache {
      * @return balance wealth of entity
      */
     public double getBalWealth() {
-        return balWealth;
+        return wealthBreakdown.get("balance-wealth");
     }
 
     /**
@@ -118,7 +119,7 @@ public class EntityCache {
      * @return block wealth of entity
      */
     public double getBlockWealth() {
-        return blockWealth;
+        return wealthBreakdown.get("block-wealth");
     }
 
     /**
@@ -127,7 +128,7 @@ public class EntityCache {
      * @return spawner wealth of the entity
      */
     public double getSpawnerWealth() {
-        return spawnerWealth;
+        return wealthBreakdown.get("spawner-wealth");
     }
 
     /**
@@ -136,7 +137,7 @@ public class EntityCache {
      * @return container wealth of the entity
      */
     public double getContainerWealth() {
-        return containerWealth;
+        return wealthBreakdown.get("container-wealth");
     }
 
     /**
@@ -145,7 +146,7 @@ public class EntityCache {
      * @return inventory wealth of the entity
      */
     public double getInventoryWealth() {
-        return inventoryWealth;
+        return wealthBreakdown.get("inventory-wealth");
     }
 
     /**
@@ -155,7 +156,7 @@ public class EntityCache {
      * @return land wealth of the entity
      */
     public double getLandWealth() {
-        return blockWealth + spawnerWealth + containerWealth;
+        return wealthBreakdown.get("land-wealth");
     }
 
     /**
@@ -165,7 +166,7 @@ public class EntityCache {
      * @return total wealth of the entity
      */
     public Double getTotalWealth() {
-        return balWealth + getLandWealth() + inventoryWealth;
+        return wealthBreakdown.get("total-wealth");
     }
 
     /**

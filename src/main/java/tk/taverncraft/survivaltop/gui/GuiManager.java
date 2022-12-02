@@ -48,13 +48,11 @@ public class GuiManager {
         this.infoGui = infoOptions.createInfoGui();
     }
 
-    public StatsGui getStatsGui(String name, double balWealth, double landWealth, double blockWealth,
-            double spawnerWealth, double containerWealth, double inventoryWealth, double totalWealth,
+    public StatsGui getStatsGui(String name, HashMap<String, Double> wealthBreakdown,
             HashMap<String, MutableInt> blockList, HashMap<String, MutableInt> spawnerList,
             HashMap<String, MutableInt> containerList, HashMap<String, MutableInt> inventoryList) {
 
-        return statsOptions.createStatsGui(name, balWealth, landWealth, blockWealth,
-            spawnerWealth, containerWealth, inventoryWealth, totalWealth, blockList, spawnerList,
+        return statsOptions.createStatsGui(name, wealthBreakdown, blockList, spawnerList,
             containerList, inventoryList);
     }
 

@@ -38,19 +38,16 @@ public class InfoMenuOptions {
     private final String subPageInventoryTitle;
 
     // button slots for use in inventory click events
-    private final String disabledButtonLore;
-    private final int mainMenuSlot;
-    private final int nextPageSlot;
-    private final int prevPageSlot;
-    private final int balInfoSlot;
-    private final int blockInfoSlot;
-    private final int spawnerInfoSlot;
-    private final int containerInfoSlot;
-    private final int inventoryInfoSlot;
-    private final HashMap<Integer, ItemStack> mainPageBackground = new HashMap<>();
+    private final HashMap<String, Integer> mainButtonSlots = new HashMap<>();
+    private final HashMap<String, Integer> subButtonSlots = new HashMap<>();
+
+    // button items
     private final HashMap<Integer, ItemStack> mainPageButtons = new HashMap<>();
-    private final HashMap<Integer, ItemStack> subPageBackground = new HashMap<>();
     private final HashMap<Integer, ItemStack> subPageButtons = new HashMap<>();
+
+    // backgrounds
+    private final HashMap<Integer, ItemStack> mainPageBackground = new HashMap<>();
+    private final HashMap<Integer, ItemStack> subPageBackground = new HashMap<>();
 
     // sub page items
     private final String subPageItemName;
@@ -74,15 +71,12 @@ public class InfoMenuOptions {
         subPageItemLore = config.getStringList("sub-page-items.lore");
         subPageItemSlots = config.getIntegerList("sub-page-items.slots");
 
-        disabledButtonLore = config.getString("disabled-button-lore");
-        mainMenuSlot = setUpSubPageButton(config, "main-menu");
-        nextPageSlot = setUpSubPageButton(config, "next-page");
-        prevPageSlot = setUpSubPageButton(config, "previous-page");
-        balInfoSlot = setUpMainPageButton(config, "balance-info", main.getOptions().balIsIncluded());
-        blockInfoSlot = setUpMainPageButton(config, "block-info", main.getOptions().landIsIncluded());
-        spawnerInfoSlot = setUpMainPageButton(config, "spawner-info", main.getOptions().spawnerIsIncluded());
-        containerInfoSlot = setUpMainPageButton(config, "container-info", main.getOptions().containerIsIncluded());
-        inventoryInfoSlot = setUpMainPageButton(config, "inventory-info", main.getOptions().inventoryIsIncluded());
+        for (String key: config.getConfigurationSection("sub-page-buttons").getKeys(false)) {
+            setUpSubPageButton(config, key);
+        }
+        for (String key : config.getConfigurationSection("main-page-buttons").getKeys(false)) {
+            setUpMainPageButton(config, key);
+        }
     }
 
     private void setupMainPageBackground(FileConfiguration config) {
@@ -105,28 +99,30 @@ public class InfoMenuOptions {
         }
     }
 
-    private int setUpMainPageButton(FileConfiguration config, String button, boolean isEnabled) {
+    private void setUpMainPageButton(FileConfiguration config, String button) {
         ConfigurationSection configurationSection = config.getConfigurationSection("main-page-buttons." + button);
         int slot = configurationSection.getInt("slot");
         Material material = Material.valueOf(configurationSection.getString("material"));
         String name = configurationSection.getString("name");
+        boolean isEnchanted = configurationSection.getBoolean("enchanted", false);
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnabled, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted, lore.toArray(new String[0]));
         mainPageButtons.put(slot, itemStack);
-        return slot;
+        mainButtonSlots.put(button, slot);
     }
 
-    private int setUpSubPageButton(FileConfiguration config, String button) {
+    private void setUpSubPageButton(FileConfiguration config, String button) {
         ConfigurationSection configurationSection = config.getConfigurationSection("sub-page-buttons." + button);
         int slot = configurationSection.getInt("slot");
         Material material = Material.valueOf(configurationSection.getString("material"));
         String name = configurationSection.getString("name");
+        boolean isEnchanted = configurationSection.getBoolean("enchanted", false);
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = GuiUtils.createGuiItem(material, name, false, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted, lore.toArray(new String[0]));
         subPageButtons.put(slot, itemStack);
-        return slot;
+        subButtonSlots.put(button, slot);
     }
 
     public String getMainPageIdentifier() {
@@ -202,31 +198,31 @@ public class InfoMenuOptions {
     }
 
     public int getMainMenuSlot() {
-        return mainMenuSlot;
+        return subButtonSlots.get("main-menu");
     }
 
     public int getNextPageSlot() {
-        return nextPageSlot;
+        return subButtonSlots.get("next-page");
     }
 
     public int getPrevPageSlot() {
-        return prevPageSlot;
+        return subButtonSlots.get("previous-page");
     }
 
     public int getBlockInfoSlot() {
-        return blockInfoSlot;
+        return mainButtonSlots.get("block-info");
     }
 
     public int getSpawnerInfoSlot() {
-        return spawnerInfoSlot;
+        return mainButtonSlots.get("spawner-info");
     }
 
     public int getContainerInfoSlot() {
-        return containerInfoSlot;
+        return mainButtonSlots.get("container-info");
     }
 
     public int getInventoryInfoSlot() {
-        return inventoryInfoSlot;
+        return mainButtonSlots.get("inventory-info");
     }
 
     /**

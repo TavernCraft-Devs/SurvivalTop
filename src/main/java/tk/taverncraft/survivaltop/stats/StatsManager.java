@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.stats;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,6 +141,7 @@ public class StatsManager {
         double balWealth = 0;
         double blockValue = 0;
         double inventoryValue = 0;
+        HashMap<String, Double> papiWealth = new HashMap<>();
         HashMap<String, MutableInt> blockCounter = new HashMap<>();
         HashMap<String, MutableInt> inventoryCounter = new HashMap<>();
         if (main.getOptions().landIsIncluded()) {
@@ -156,13 +158,16 @@ public class StatsManager {
             inventoryValue = main.getInventoryManager().calculateInventoryWorth(id);
             inventoryCounter = main.getInventoryManager().getInventoriesForGui(id);
         }
+        if (main.getOptions().papiIsIncluded()) {
+            papiWealth = getEntityPapiWealth(name);
+        }
 
         if (stopCalculations) {
             stopAllCalculations(sender);
             return;
         }
 
-        executePostCalculationActions(sender, name, id, balWealth, blockValue,
+        executePostCalculationActions(sender, name, id, balWealth, papiWealth, blockValue,
                 inventoryValue, blockCounter, inventoryCounter);
     }
 
@@ -175,8 +180,8 @@ public class StatsManager {
      * @param balWealth bal wealth of the entity
      */
     private void executePostCalculationActions(CommandSender sender, String name, int id,
-            double balWealth, double blockWealth, double inventoryWealth,
-            HashMap<String, MutableInt> blockCounter,
+            double balWealth, HashMap<String, Double> papiWealth, double blockWealth,
+            double inventoryWealth, HashMap<String, MutableInt> blockCounter,
             HashMap<String, MutableInt> inventoryCounter) {
         new BukkitRunnable() {
             @Override
@@ -201,7 +206,7 @@ public class StatsManager {
                     return;
                 }
 
-                EntityCache eCache = new EntityCache(name, balWealth, blockWealth,
+                EntityCache eCache = new EntityCache(name, balWealth, papiWealth, blockWealth,
                         spawnerValue, containerValue, inventoryWealth);
                 eCache.setCounters(blockCounter, spawnerCounter, containerCounter, inventoryCounter);
                 Task task = taskMap.remove(id);
@@ -322,6 +327,17 @@ public class StatsManager {
      */
     private double getEntityBalWealth(String name) {
         return main.getBalanceManager().getBalanceForEntity(name);
+    }
+
+    /**
+     * Gets the papi wealth of an entity.
+     *
+     * @param name name of entity
+     *
+     * @return double value representing entity papi wealth
+     */
+    private HashMap<String, Double> getEntityPapiWealth(String name) {
+        return main.getPapiManager().getPlaceholderValForEntity(name);
     }
 
     /**

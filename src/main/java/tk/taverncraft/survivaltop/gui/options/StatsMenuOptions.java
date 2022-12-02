@@ -42,21 +42,16 @@ public class StatsMenuOptions {
     private final String subPageInventoryTitle;
 
     // button slots for use in inventory click events
-    private final String disabledButtonLore;
-    private final int mainMenuSlot;
-    private final int nextPageSlot;
-    private final int prevPageSlot;
-    private final int totalWealthSlot;
-    private final int balWealthSlot;
-    private final int landWealthSlot;
-    private final int blockWealthSlot;
-    private final int spawnerWealthSlot;
-    private final int containerWealthSlot;
-    private final int inventoryWealthSlot;
-    private final HashMap<Integer, ItemStack> mainPageBackground = new HashMap<>();
+    private final HashMap<String, Integer> mainButtonSlots = new HashMap<>();
+    private final HashMap<String, Integer> subButtonSlots = new HashMap<>();
+
+    // button items
     private final HashMap<Integer, ItemStack> mainPageButtons = new HashMap<>();
-    private final HashMap<Integer, ItemStack> subPageBackground = new HashMap<>();
     private final HashMap<Integer, ItemStack> subPageButtons = new HashMap<>();
+
+    // backgrounds
+    private final HashMap<Integer, ItemStack> mainPageBackground = new HashMap<>();
+    private final HashMap<Integer, ItemStack> subPageBackground = new HashMap<>();
 
     // sub page items
     private final String subPageItemName;
@@ -80,17 +75,12 @@ public class StatsMenuOptions {
         subPageItemLore = config.getStringList("sub-page-items.lore");
         subPageItemSlots = config.getIntegerList("sub-page-items.slots");
 
-        disabledButtonLore = config.getString("disabled-button-lore");
-        mainMenuSlot = setUpSubPageButton(config, "main-menu");
-        nextPageSlot = setUpSubPageButton(config, "next-page");
-        prevPageSlot = setUpSubPageButton(config, "previous-page");
-        totalWealthSlot = setUpMainPageButton(config, "total-wealth", true);
-        balWealthSlot = setUpMainPageButton(config, "balance-wealth", main.getOptions().balIsIncluded());
-        landWealthSlot = setUpMainPageButton(config, "land-wealth", main.getOptions().landIsIncluded());
-        blockWealthSlot = setUpMainPageButton(config, "block-wealth", main.getOptions().landIsIncluded());
-        spawnerWealthSlot = setUpMainPageButton(config, "spawner-wealth", main.getOptions().spawnerIsIncluded());
-        containerWealthSlot = setUpMainPageButton(config, "container-wealth", main.getOptions().containerIsIncluded());
-        inventoryWealthSlot = setUpMainPageButton(config, "inventory-wealth", main.getOptions().inventoryIsIncluded());
+        for (String key: config.getConfigurationSection("sub-page-buttons").getKeys(false)) {
+            setUpSubPageButton(config, key);
+        }
+        for (String key : config.getConfigurationSection("main-page-buttons").getKeys(false)) {
+            setUpMainPageButton(config, key);
+        }
     }
 
     private void setupMainPageBackground(FileConfiguration config) {
@@ -113,28 +103,30 @@ public class StatsMenuOptions {
         }
     }
 
-    private int setUpMainPageButton(FileConfiguration config, String button, boolean isEnabled) {
+    private void setUpMainPageButton(FileConfiguration config, String button) {
         ConfigurationSection configurationSection = config.getConfigurationSection("main-page-buttons." + button);
         int slot = configurationSection.getInt("slot");
         Material material = Material.valueOf(configurationSection.getString("material"));
         String name = configurationSection.getString("name");
+        boolean isEnchanted = configurationSection.getBoolean("enchanted", false);
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnabled, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted, lore.toArray(new String[0]));
         mainPageButtons.put(slot, itemStack);
-        return slot;
+        mainButtonSlots.put(button, slot);
     }
 
-    private int setUpSubPageButton(FileConfiguration config, String button) {
+    private void setUpSubPageButton(FileConfiguration config, String button) {
         ConfigurationSection configurationSection = config.getConfigurationSection("sub-page-buttons." + button);
         int slot = configurationSection.getInt("slot");
         Material material = Material.valueOf(configurationSection.getString("material"));
         String name = configurationSection.getString("name");
+        boolean isEnchanted = configurationSection.getBoolean("enchanted", false);
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = GuiUtils.createGuiItem(material, name, false, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted, lore.toArray(new String[0]));
         subPageButtons.put(slot, itemStack);
-        return slot;
+        subButtonSlots.put(button, slot);
     }
 
     public String getMainPageIdentifier() {
@@ -169,22 +161,6 @@ public class StatsMenuOptions {
         return mainPageTitle;
     }
 
-    public String getSubPageBlockTitle() {
-        return subPageBlockTitle;
-    }
-
-    public String getSubPageSpawnerTitle() {
-        return subPageSpawnerTitle;
-    }
-
-    public String getSubPageContainerTitle() {
-        return subPageContainerTitle;
-    }
-
-    public String getSubPageInventoryTitle() {
-        return subPageInventoryTitle;
-    }
-
     public HashMap<Integer, ItemStack> getMainPageBackground() {
         return mainPageBackground;
     }
@@ -210,35 +186,35 @@ public class StatsMenuOptions {
     }
 
     public int getMainMenuSlot() {
-        return mainMenuSlot;
+        return subButtonSlots.get("main-menu");
     }
 
     public int getNextPageSlot() {
-        return nextPageSlot;
+        return subButtonSlots.get("next-page");
     }
 
     public int getPrevPageSlot() {
-        return prevPageSlot;
+        return subButtonSlots.get("previous-page");
     }
 
     public int getTotalWealthSlot() {
-        return totalWealthSlot;
+        return mainButtonSlots.get("total-wealth");
     }
 
     public int getBlockWealthSlot() {
-        return blockWealthSlot;
+        return mainButtonSlots.get("block-wealth");
     }
 
     public int getSpawnerWealthSlot() {
-        return spawnerWealthSlot;
+        return mainButtonSlots.get("spawner-wealth");
     }
 
     public int getContainerWealthSlot() {
-        return containerWealthSlot;
+        return mainButtonSlots.get("container-wealth");
     }
 
     public int getInventoryWealthSlot() {
-        return inventoryWealthSlot;
+        return mainButtonSlots.get("inventory-wealth");
     }
 
     /**
@@ -348,14 +324,12 @@ public class StatsMenuOptions {
         return inv;
     }
 
-    public StatsGui createStatsGui(String name, double balWealth, double landWealth, double blockWealth,
-            double spawnerWealth, double containerWealth, double inventoryWealth, double totalWealth,
+    public StatsGui createStatsGui(String name, HashMap<String, Double> wealthBreakdown,
             HashMap<String, MutableInt> blockList, HashMap<String, MutableInt> spawnerList,
             HashMap<String, MutableInt> containerList, HashMap<String, MutableInt> inventoryList) {
 
         // set up inventories
-        Inventory mainPage = getStatsMainPage(name, balWealth, landWealth, blockWealth, spawnerWealth,
-            containerWealth, inventoryWealth, totalWealth);
+        Inventory mainPage = getStatsMainPage(name, wealthBreakdown);
 
         ArrayList<Inventory> blockViews = prepareStatsViews(blockList, name, "Block Stats");
         ArrayList<Inventory> spawnerViews = prepareStatsViews(spawnerList, name, "Spawner Stats");
@@ -370,8 +344,7 @@ public class StatsMenuOptions {
      *
      * @param entityName name of entity whose stats is shown
      */
-    public Inventory getStatsMainPage(String entityName, double balWealth, double landWealth, double blockWealth,
-                                      double spawnerWealth, double containerWealth, double inventoryWealth, double totalWealth) {
+    public Inventory getStatsMainPage(String entityName, HashMap<String, Double> wealthBreakdown) {
         String title = getMainPageTitle();
         String parsedName = GuiUtils.parseName(title, "%entity%", entityName);
         Inventory inv = Bukkit.createInventory(null, getMainPageSize(),
@@ -380,34 +353,16 @@ public class StatsMenuOptions {
             inv.setItem(map.getKey(), map.getValue());
         }
 
-        // formatting to 2dp
-        balWealth = new BigDecimal(balWealth).setScale(2,
-            RoundingMode.CEILING).doubleValue();
-        totalWealth = new BigDecimal(totalWealth).setScale(2,
-            RoundingMode.CEILING).doubleValue();
-
-        for (Map.Entry<Integer, ItemStack> map : getMainPageButtons().entrySet()) {
-            int slot = map.getKey();
-            ItemStack itemStack = map.getValue();
+        for (Map.Entry<String, Integer> map : mainButtonSlots.entrySet()) {
+            int slot = map.getValue();
+            ItemStack itemStack = mainPageButtons.get(slot);
             ItemMeta meta = itemStack.getItemMeta();
             List<String> parsedLore;
-            if (slot == getTotalWealthSlot()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", totalWealth);
-            } else if (slot == balWealthSlot && main.getOptions().balIsIncluded()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", balWealth);
-            } else if (slot == landWealthSlot && main.getOptions().landIsIncluded()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", landWealth);
-            } else if (slot == blockWealthSlot && main.getOptions().landIsIncluded()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", blockWealth);
-            } else if (slot == spawnerWealthSlot && main.getOptions().spawnerIsIncluded()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", spawnerWealth);
-            } else if (slot == containerWealthSlot && main.getOptions().containerIsIncluded()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", containerWealth);
-            } else if (slot == inventoryWealthSlot && main.getOptions().inventoryIsIncluded()) {
-                parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", inventoryWealth);
-            } else {
-                parsedLore = Arrays.asList(disabledButtonLore);
+            Double wealth = wealthBreakdown.get(map.getKey());
+            if (wealth == null) {
+                wealth = 0.0;
             }
+            parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", wealth);
             meta.setLore(parsedLore);
             itemStack.setItemMeta(meta);
             inv.setItem(slot, itemStack);

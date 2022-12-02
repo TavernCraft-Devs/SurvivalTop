@@ -25,6 +25,7 @@ public class Options {
     private boolean includeSpawners;
     private boolean includeContainers;
     private boolean includeInventory;
+    private boolean includePapi;
     private int updateInterval;
     private boolean updateOnStart;
     private double minimumWealth;
@@ -62,6 +63,7 @@ public class Options {
         this.includeSpawners = config.getBoolean("include-spawners", false);
         this.includeContainers = config.getBoolean("include-containers", false);
         this.includeInventory = config.getBoolean("include-inventory", false);
+        this.includePapi = config.getBoolean("include-papi", false);
         this.updateInterval = config.getInt("update-interval", 3600);
         this.updateOnStart = config.getBoolean("update-on-start", false);
         this.minimumWealth = config.getInt("minimum-wealth", 0);
@@ -93,6 +95,10 @@ public class Options {
 
     public boolean inventoryIsIncluded() {
         return includeInventory;
+    }
+
+    public boolean papiIsIncluded() {
+        return includePapi;
     }
 
     public boolean groupIsEnabled() {

@@ -118,6 +118,16 @@ include-inventory: false
 
 #####################################################################################
 #                                                                                   #
+#                                 Papi Configurations                               #
+#                                                                                   #
+#####################################################################################
+
+# if true, will include papi placeholders in calculating wealth
+# note that this option is not necessary for papi placeholders provided by this plugin to work
+include-papi: false
+
+#####################################################################################
+#                                                                                   #
 #                             Leaderboard Configurations                            #
 #                                                                                   #
 #####################################################################################
