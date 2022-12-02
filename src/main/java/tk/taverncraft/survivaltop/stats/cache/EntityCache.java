@@ -1,8 +1,10 @@
 package tk.taverncraft.survivaltop.stats.cache;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.types.StatsGui;
@@ -46,17 +48,17 @@ public class EntityCache {
             double blockWealth, double spawnerWealth, double containerWealth, double inventoryWealth) {
         this.name = name;
         wealthBreakdown = new HashMap<>();
-        wealthBreakdown.put("balance-wealth", balWealth);
+        wealthBreakdown.put("balance-wealth", new BigDecimal(balWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
         wealthBreakdown.putAll(papiWealth);
-        wealthBreakdown.put("block-wealth", blockWealth);
-        wealthBreakdown.put("spawner-wealth", spawnerWealth);
-        wealthBreakdown.put("container-wealth", containerWealth);
-        wealthBreakdown.put("inventory-wealth", inventoryWealth);
+        wealthBreakdown.put("block-wealth", new BigDecimal(blockWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("spawner-wealth", new BigDecimal(spawnerWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("container-wealth", new BigDecimal(containerWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("inventory-wealth", new BigDecimal(inventoryWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
         double landWealth = blockWealth + spawnerWealth + containerWealth;
-        wealthBreakdown.put("land-wealth", landWealth);
+        wealthBreakdown.put("land-wealth", new BigDecimal(landWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
         double totalWealth = papiWealth.values().stream().mapToDouble(Double::valueOf).sum()
             + balWealth + landWealth + inventoryWealth;
-        wealthBreakdown.put("total-wealth", totalWealth);
+        wealthBreakdown.put("total-wealth", new BigDecimal(totalWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
         this.cacheTime = Instant.now().getEpochSecond();
     }
 
@@ -77,29 +79,18 @@ public class EntityCache {
                 blockCounter, spawnerCounter, containerCounter, inventoryCounter);
     }
 
-    public void createChat() {
+    public void setChat() {
         if (this.placeholders != null && this.values != null) {
             return;
         }
-        String strTotalWealth = String.format("%.02f", getTotalWealth());
-        String strBalWealth = String.format("%.02f", getBalWealth());
-        String strLandWealth = String.format("%.02f", getLandWealth());
-        String strBlockWealth = String.format("%.02f", getBlockWealth());
-        String strSpawnerWealth = String.format("%.02f", getSpawnerWealth());
-        String strContainerWealth = String.format("%.02f", getContainerWealth());
-        String strInvWealth = String.format("%.02f", getInventoryWealth());
 
-        this.placeholders = new String[]{"%entity%", "%landwealth%", "%balwealth%",
-            "%totalwealth%", "%blockwealth%", "%spawnerwealth%", "%containerwealth%",
-            "%inventorywealth%"};
+        Stream<String> placeholdersStream = Stream.concat(Stream.of("entity"), wealthBreakdown.keySet().stream());
+        this.placeholders = placeholdersStream.map(e -> "%" + e + "%").toArray(String[]::new);
 
-        this.values = new String[]{name, new BigDecimal(strLandWealth).toPlainString(),
-            new BigDecimal(strBalWealth).toPlainString(),
-            new BigDecimal(strTotalWealth).toPlainString(),
-            new BigDecimal(strBlockWealth).toPlainString(),
-            new BigDecimal(strSpawnerWealth).toPlainString(),
-            new BigDecimal(strContainerWealth).toPlainString(),
-            new BigDecimal(strInvWealth).toPlainString()};
+        Stream<String> valuesStream = Stream.concat(Stream.of(name),
+            wealthBreakdown.values().stream().map(e ->
+                new BigDecimal(e).setScale(2, RoundingMode.HALF_UP).toPlainString()));
+        this.values = valuesStream.toArray(String[]::new);
     }
 
     public String getName() {

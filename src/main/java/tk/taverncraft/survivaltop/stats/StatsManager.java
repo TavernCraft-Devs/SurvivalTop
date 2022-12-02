@@ -3,7 +3,6 @@ package tk.taverncraft.survivaltop.stats;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +11,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -105,7 +103,7 @@ public class StatsManager {
             if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
                 eCache.setGui(main);
             } else {
-                eCache.createChat();
+                eCache.setChat();
             }
             entityCacheMap.put(name.toUpperCase(), eCache);
         }
@@ -278,7 +276,7 @@ public class StatsManager {
      * @param eCache entity cache
      */
     private void processStatsForChat(CommandSender sender, String name, int id, EntityCache eCache) {
-        eCache.createChat();
+        eCache.setChat();
         entityCacheMap.put(name.toUpperCase(), eCache);
         MessageManager.sendMessage(sender, "entity-stats", eCache.getPlaceholders(),
                 eCache.getValues());

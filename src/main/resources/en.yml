@@ -46,10 +46,10 @@ help-text: |
 # format for leaderboard sign message (line 1 and 2 are fixed, only line 3 and 4 are customizable)
 # supports the following placeholders:
 # %entity%
-# %totalwealth%
+# %total-wealth%
 leaderboard-sign: |
   &a&l%entity%
-  &c&l%totalwealth%
+  &c&l%total-wealth%
 
 # format for leaderboard
 leaderboard-header: |
@@ -66,19 +66,19 @@ leaderboard-footer: |
 # format for showing entity stats
 # supports the following placeholders:
 # %entity%
-# %landwealth%
-# %balwealth%
-# %totalwealth%
-# %blockwealth%
-# %spawnerwealth%
-# %containerwealth%
-# %inventorywealth%
+# %land-wealth%
+# %balance-wealth%
+# %total-wealth%
+# %block-wealth%
+# %spawner-wealth%
+# %container-wealth%
+# %inventory-wealth%
 entity-stats: |
   &b----- &6%entity%'s Wealth &b-----
-  &aTotal Wealth: &b%totalwealth%
-  &aBalance Wealth: &b%balwealth%
-  &aLand Wealth: &b%landwealth%
-  &aBlock Wealth: &b%blockwealth%
-  &aSpawner Wealth: &b%spawnerwealth%
-  &aContainer Wealth: &b%containerwealth%
-  &aInventory Wealth: &b%inventorywealth%
+  &aTotal Wealth: &b%total-wealth%
+  &aBalance Wealth: &b%balance-wealth%
+  &aLand Wealth: &b%land-wealth%
+  &aBlock Wealth: &b%block-wealth%
+  &aSpawner Wealth: &b%spawner-wealth%
+  &aContainer Wealth: &b%container-wealth%
+  &aInventory Wealth: &b%inventory-wealth%
