@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -259,8 +258,7 @@ public class StatsManager {
      */
     private void sendGuiInteractiveText(CommandSender sender, EntityCache eCache) {
         main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
-        TextComponent message = new TextComponent("Click here to view stats!");
-        message.setColor(ChatColor.GOLD);
+        TextComponent message = MessageManager.getTextComponentMessage("gui-stats-ready");
         message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
             "/st openstatsinv"));
         sender.spigot().sendMessage(message);

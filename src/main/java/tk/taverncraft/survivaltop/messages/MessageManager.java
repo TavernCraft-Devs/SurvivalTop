@@ -2,19 +2,22 @@ package tk.taverncraft.survivaltop.messages;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-import org.bukkit.Bukkit;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
+
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.ChatPaginator;
 
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.utils.types.Pair;
 
 import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
 
@@ -148,6 +151,51 @@ public class MessageManager {
         }
 
         completeLeaderboard = message.toString();
+    }
+
+    /**
+     * Creates and returns text component for a message.
+     *
+     * @param key key of message
+     *
+     * @return text component for message
+     */
+    public static TextComponent getTextComponentMessage(String key) {
+        char[] message = getMessage(key).toCharArray();
+        int lastIndex = message.length - 1;
+        List<Pair> pairs = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        net.md_5.bungee.api.ChatColor color = net.md_5.bungee.api.ChatColor.WHITE;
+        for (int i = 0 ; i <= lastIndex; i++) {
+            char c = message[i];
+            if (c == '&' && i != lastIndex) {
+                net.md_5.bungee.api.ChatColor nextColor = net.md_5.bungee.api.ChatColor.getByChar(message[i + 1]);
+                if (color == null) {
+                    sb.append(c);
+                } else {
+                    pairs.add(new Pair(sb.toString(), color));
+                    color = nextColor;
+                    sb = new StringBuilder();
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        pairs.add(new Pair(sb.toString(), color));
+
+        ComponentBuilder componentBuilder = new ComponentBuilder("");
+        int numPairs = pairs.size();
+        for (int i = 0; i < numPairs; i++) {
+            Pair pair = pairs.get(i);
+            componentBuilder.append(pair.getMessage()).color(pair.getColor());
+        }
+        BaseComponent[] baseComponent = componentBuilder.create();
+
+        TextComponent textComponent = new TextComponent();
+        for (BaseComponent bc : baseComponent) {
+            textComponent.addExtra(bc);
+        }
+        return textComponent;
     }
 }
 

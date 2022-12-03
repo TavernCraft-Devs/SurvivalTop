@@ -15,21 +15,24 @@ log-started: '&aStarted log dump. This may take a while depending on your server
 log-in-progress: '&cThere is already a log dump in progress, please try again later!'
 log-complete: '&aLog dump complete! You may find the latest output inside the plugin &bdumps &afolder!'
 
-# leaderboard/stats messages
+# leaderboard messages
 update-started: '&aStarted leaderboard update. This may take a while depending on the player-base size.'
 update-in-progress: '&cThe leaderboard update is currently in progress, please try again later.'
 update-complete: '&aThe leaderboard update completed in &b%time% &aseconds!' #%time%
 update-interrupted: '&cThe leaderboard update was interrupted!'
-start-calculating-stats: '&aPlease give a few moments for calculating stats...'
-calculation-in-progress: '&cYour previous stats request is still in progress!'
-calculation-complete-realtime: '&aStats calculation completed in &b%time% &aseconds!' #%time%
-calculation-complete-cache: '&aA cached calculation from &b%time% &aseconds ago was found!' #%time%
-calculation-interrupted: '&cAll ongoing calculations have been interrupted!'
 no-updated-leaderboard: '&cThere is no updated leaderboard yet!'
 survtop-sign-placed: '&aLeaderboard sign for rank %rank% has been placed!' #%rank%
 survtop-sign-broken: '&aLeaderboard sign for rank %rank% has been broken!' #%rank%
 no-survtop-sign-add-permission: '&cYou do not have permission to create a leaderboard sign!'
 no-survtop-sign-remove-permission: '&cYou do not have permission to break a leaderboard sign!'
+
+# stats messages
+start-calculating-stats: '&aPlease give a few moments for calculating stats...'
+calculation-in-progress: '&cYour previous stats request is still in progress!'
+calculation-complete-realtime: '&aStats calculation completed in &b%time% &aseconds!' #%time%
+calculation-complete-cache: '&aA cached calculation from &b%time% &aseconds ago was found!' #%time%
+calculation-interrupted: '&cAll ongoing calculations have been interrupted!'
+gui-stats-ready: '&6Click &bhere &6to view stats!'
 
 # format for help command
 help-text: |
