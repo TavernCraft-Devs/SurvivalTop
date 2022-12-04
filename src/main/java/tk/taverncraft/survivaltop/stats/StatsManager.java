@@ -61,6 +61,7 @@ public class StatsManager {
         if (main.getOptions().cacheIsEnabled()) {
             main.getStatsManager().getCachedStats(sender, name);
         } else {
+            MessageManager.sendMessage(sender, "start-calculating-stats");
             main.getStatsManager().getRealTimeStats(sender, name, PLAYER);
         }
     }
@@ -95,6 +96,7 @@ public class StatsManager {
             eCache = main.getLeaderboardManager().getEntityCache(name.toUpperCase());
             // if leaderboard cache also not found or invalid, calculate again
             if (eCache == null || eCache.isExpired(main.getOptions().getCacheDuration())) {
+                MessageManager.sendMessage(sender, "start-calculating-stats");
                 getRealTimeStats(sender, name, PLAYER);
                 return;
             }
@@ -258,10 +260,7 @@ public class StatsManager {
      */
     private void sendGuiInteractiveText(CommandSender sender, EntityCache eCache) {
         main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
-        TextComponent message = MessageManager.getTextComponentMessage("gui-stats-ready");
-        message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-            "/st openstatsinv"));
-        sender.spigot().sendMessage(message);
+        MessageManager.sendGuiStatsReadyMessage(sender);
     }
 
     /**
@@ -276,8 +275,7 @@ public class StatsManager {
     private void processStatsForChat(CommandSender sender, String name, int id, EntityCache eCache) {
         eCache.setChat();
         entityCacheMap.put(name.toUpperCase(), eCache);
-        MessageManager.sendMessage(sender, "entity-stats", eCache.getPlaceholders(),
-                eCache.getValues());
+        MessageManager.sendChatStatsReadyMessage(sender, eCache);
         doCleanUp(id);
     }
 

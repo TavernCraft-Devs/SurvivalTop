@@ -35,7 +35,7 @@ public class PapiManager extends PlaceholderExpansion {
     public void initializePlaceholders() {
         categoriesToPlaceholdersMap = new HashMap<>();
         for (String category: main.getPapiConfig().getConfigurationSection("").getKeys(false)) {
-            List<String> placeholders = main.getPapiConfig().getStringList(category + ".placeholders");
+            List<String> placeholders = main.getPapiConfig().getStringList(category);
             categoriesToPlaceholdersMap.put(category, placeholders);
         }
     }
@@ -65,11 +65,18 @@ public class PapiManager extends PlaceholderExpansion {
         HashMap<String, Double> papiWealth = new HashMap<>();
         OfflinePlayer player = Bukkit.getOfflinePlayer(name);
         for (Map.Entry<String, List<String>> map : categoriesToPlaceholdersMap.entrySet()) {
-            String category = map.getKey();
-            double value = 0;
-            for (String placeholder : map.getValue()) {
-                value += getParsedValue(player, placeholder, name);
-            }
+                String category = map.getKey();
+                double value = 0;
+                for (String placeholder : map.getValue()) {
+                    try {
+                        String[] values = placeholder.split(";");
+                        double multiplier = Double.parseDouble(values[1]);
+                        String entry = values[2];
+                        value += getParsedValue(player, entry, name) * multiplier;
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
             papiWealth.put(category, value);
         }
         return papiWealth;
@@ -86,17 +93,25 @@ public class PapiManager extends PlaceholderExpansion {
         HashMap<String, Double> papiWealth = new HashMap<>();
         for (Map.Entry<String, List<String>> map : categoriesToPlaceholdersMap.entrySet()) {
             String category = map.getKey();
+            List<String> placeholders = map.getValue();
             double value = 0;
-            if (main.getPapiConfig().getString(category + ".type", "GROUP").equalsIgnoreCase("GROUP")) {
-                for (String placeholder : map.getValue()) {
-                    value += getParsedValue(null, placeholder, group);
-                }
-            } else {
-                List<OfflinePlayer> offlinePlayers = this.main.getGroupManager().getPlayers(group);
-                for (OfflinePlayer offlinePlayer : offlinePlayers) {
-                    for (String placeholder : map.getValue()) {
-                        value += getParsedValue(offlinePlayer, placeholder, offlinePlayer.getName());
+            for (String placeholder : placeholders) {
+                try {
+                    String[] values = placeholder.split(";");
+                    String type = values[0];
+                    double multiplier = Double.parseDouble(values[1]);
+                    String entry = values[2];
+
+                    if (type.equalsIgnoreCase("GROUP")) {
+                        value += getParsedValue(null, entry, group) * multiplier;
+                    } else if (type.equalsIgnoreCase("PLAYER")) {
+                        List<OfflinePlayer> offlinePlayers = this.main.getGroupManager().getPlayers(group);
+                        for (OfflinePlayer offlinePlayer : offlinePlayers) {
+                            value += getParsedValue(offlinePlayer, entry, offlinePlayer.getName()) * multiplier;
+                        }
                     }
+                } catch (Exception e) {
+                    continue;
                 }
             }
             papiWealth.put(category, value);

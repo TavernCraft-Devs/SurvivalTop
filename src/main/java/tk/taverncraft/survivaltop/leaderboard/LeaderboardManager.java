@@ -174,8 +174,13 @@ public class LeaderboardManager {
      */
     public void completeLeaderboardUpdate(CommandSender sender,
             HashMap<String, EntityCache> tempSortedCache) {
-        MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0));
+        if (main.getOptions().isHoverableLeaderboard()) {
+            MessageManager.setUpHoverableLeaderboard(tempSortedCache, main.getConfig().getDouble(
+                "minimum-wealth", 0.0), main.getOptions().isHoverableLeaderboard());
+        } else {
+            MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
+                "minimum-wealth", 0.0), main.getOptions().isHoverableLeaderboard());
+        }
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
         MessageManager.sendMessage(sender, "update-complete",
                 new String[]{"%time%"},

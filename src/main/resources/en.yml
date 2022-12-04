@@ -56,7 +56,7 @@ leaderboard-sign: |
 
 # format for leaderboard
 leaderboard-header: |
-  &b----- &6Wealth Leaderboard &b-----
+  &b----- &aSurvivalTop &6Wealth Leaderboard &b-----
 
 # %num% is rank position, %entity% is entity name and %wealth% is entity wealth
 leaderboard-body: |
@@ -65,6 +65,26 @@ leaderboard-body: |
 # %page% is the next page number
 leaderboard-footer: |
   &6Type &e/st top %page% &6to view next page
+
+# format for showing hover leaderboard
+# supports the following placeholders:
+# %entity%
+# %land-wealth%
+# %balance-wealth%
+# %total-wealth%
+# %block-wealth%
+# %spawner-wealth%
+# %container-wealth%
+# %inventory-wealth%
+leaderboard-hover: |
+  &b<=- &6%entity%'s Wealth &b-=>
+  &aTotal Wealth: &b%total-wealth%
+  &aBalance Wealth: &b%balance-wealth%
+  &aLand Wealth: &b%land-wealth%
+  &aBlock Wealth: &b%block-wealth%
+  &aSpawner Wealth: &b%spawner-wealth%
+  &aContainer Wealth: &b%container-wealth%
+  &aInventory Wealth: &b%inventory-wealth%
 
 # format for showing entity stats
 # supports the following placeholders:

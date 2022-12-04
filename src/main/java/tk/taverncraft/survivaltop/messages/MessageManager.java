@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Set;
 
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,6 +30,8 @@ import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
 public class MessageManager {
     private static final HashMap<String, String> messageKeysMap = new HashMap<>();
     private static String completeLeaderboard;
+    private static BaseComponent[][] completeHoverableLeaderboard;
+    private static TextComponent guiStatsReadyMessage;
 
     /**
      * Sets the messages to use.
@@ -63,11 +68,16 @@ public class MessageManager {
      */
     public static void sendMessage(CommandSender sender, String messageKey, String[] keys,
             String[] values) {
+        String message = getParsedMessage(messageKey, keys, values);
+        sender.sendMessage(message);
+    }
+
+    private static String getParsedMessage(String messageKey, String[] keys, String[] values) {
         String message = getMessage(messageKey);
         for (int i = 0; i < keys.length; i++) {
             message = message.replaceAll(keys[i], values[i]);
         }
-        sender.sendMessage(message);
+        return message;
     }
 
     /**
@@ -109,15 +119,31 @@ public class MessageManager {
     }
 
     /**
+     * Shows leaderboard to the user.
+     *
+     * @param sender sender to send message to
+     * @param pageNum page number of leaderboard
+     */
+    public static void showHoverableLeaderboard(CommandSender sender, int pageNum) {
+        if (completeHoverableLeaderboard == null) {
+            sendMessage(sender, "no-updated-leaderboard");
+            return;
+        }
+
+        sender.spigot().sendMessage(completeHoverableLeaderboard[pageNum - 1]);
+    }
+
+    /**
      * Sets up message for leaderboard beforehand to improve performance.
      *
      * @param leaderboard hashmap of leaderboard positions
      * @param minimumWealth minimum wealth to show on leaderboard
      */
-    public static void setUpLeaderboard(HashMap<String, EntityCache> leaderboard, double minimumWealth) {
+    public static void setUpLeaderboard(HashMap<String, EntityCache> leaderboard,
+            double minimumWealth, boolean hoverable) {
         int positionsPerPage = 10;
 
-        String header = getMessage("leaderboard-header");
+        String header = messageKeysMap.get("leaderboard-header");
         String footer = messageKeysMap.get("leaderboard-footer");
         String messageTemplate = messageKeysMap.get("leaderboard-body");
         StringBuilder message = new StringBuilder(header);
@@ -135,41 +161,97 @@ public class MessageManager {
             if (wealth < minimumWealth) {
                 continue;
             }
-            message.append(messageTemplate);
-            message = new StringBuilder(message.toString().replaceAll("%num%",
-                    String.valueOf(position))
-                    .replaceAll("%entity%", name)
-                    .replaceAll("%wealth%", new BigDecimal(wealth).setScale(2,
-                            RoundingMode.CEILING).toPlainString()));
+
+            String entry = messageTemplate.replaceAll("%num%", String.valueOf(position))
+                .replaceAll("%entity%", name)
+                .replaceAll("%wealth%", new BigDecimal(wealth).setScale(2,
+                    RoundingMode.HALF_UP).toPlainString());
+            message.append(entry);
             if (position % positionsPerPage == 0) {
                 currentPage++;
-                message = new StringBuilder(message.append(footer).toString().replaceAll(
-                        "%page%", String.valueOf(currentPage)));
+                message.append(footer.replaceAll("%page%", String.valueOf(currentPage)));
                 message.append(header);
             }
             position++;
         }
-
         completeLeaderboard = message.toString();
     }
 
+    public static void setUpHoverableLeaderboard(HashMap<String, EntityCache> leaderboard,
+                                        double minimumWealth, boolean hoverable) {
+        int positionsPerPage = 10;
+        completeHoverableLeaderboard = new BaseComponent[(int) Math.ceil((double) leaderboard.size() / 10)][];
+
+        String header = messageKeysMap.get("leaderboard-header").substring(0, messageKeysMap.get("leaderboard-header").length() - 1);
+        String footer = messageKeysMap.get("leaderboard-footer").substring(0, messageKeysMap.get("leaderboard-footer").length() - 2);
+        String messageTemplate = messageKeysMap.get("leaderboard-body").substring(0, messageKeysMap.get("leaderboard-body").length() - 1);
+        ComponentBuilder message = new ComponentBuilder(header);
+        int position = 1;
+        int currentPage = 1;
+        for (EntityCache eCache : leaderboard.values()) {
+            String name = eCache.getName();
+
+            // handle null player names (can happen if world folder is deleted)
+            if (name == null) {
+                continue;
+            }
+
+            double wealth = eCache.getTotalWealth();
+            if (wealth < minimumWealth) {
+                continue;
+            }
+
+            String entry = messageTemplate.replaceAll("%num%", String.valueOf(position))
+                .replaceAll("%entity%", name)
+                .replaceAll("%wealth%", new BigDecimal(wealth).setScale(2,
+                    RoundingMode.HALF_UP).toPlainString());
+            TextComponent component = getTextComponentMessage(entry);
+            eCache.setChat();
+            String parsedMessage = getParsedMessage("leaderboard-hover", eCache.getPlaceholders(), eCache.getValues());
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, getBaseComponentArrMessage(parsedMessage)));
+            message.append(component);
+            if (position % positionsPerPage == 0) {
+                message.append(footer.replaceAll("%page%", String.valueOf(currentPage + 1)));
+                completeHoverableLeaderboard[currentPage - 1] = message.create();
+                currentPage++;
+                message = new ComponentBuilder(header);
+            }
+            position++;
+        }
+        completeHoverableLeaderboard[currentPage - 1] = message.create();
+    }
+
+    public static void sendGuiStatsReadyMessage(CommandSender sender) {
+        if (guiStatsReadyMessage == null) {
+            guiStatsReadyMessage = getTextComponentMessage(getMessage("gui-stats-ready"));
+        }
+        guiStatsReadyMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+            "/st openstatsinv"));
+        sender.spigot().sendMessage(guiStatsReadyMessage);
+    }
+
+    public static void sendChatStatsReadyMessage(CommandSender sender, EntityCache eCache) {
+        String message = getParsedMessage("leaderboard-header", eCache.getPlaceholders(), eCache.getValues());
+        sender.sendMessage(message);
+    }
+
     /**
-     * Creates and returns text component for a message.
+     * Creates and returns base component array for a message.
      *
-     * @param key key of message
+     * @param message to put in base component array
      *
-     * @return text component for message
+     * @return base component array for message
      */
-    public static TextComponent getTextComponentMessage(String key) {
-        char[] message = getMessage(key).toCharArray();
-        int lastIndex = message.length - 1;
+    public static BaseComponent[] getBaseComponentArrMessage(String message) {
+        char[] chars = message.toCharArray();
+        int lastIndex = chars.length - 1;
         List<Pair> pairs = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         net.md_5.bungee.api.ChatColor color = net.md_5.bungee.api.ChatColor.WHITE;
         for (int i = 0 ; i <= lastIndex; i++) {
-            char c = message[i];
+            char c = chars[i];
             if (c == '&' && i != lastIndex) {
-                net.md_5.bungee.api.ChatColor nextColor = net.md_5.bungee.api.ChatColor.getByChar(message[i + 1]);
+                net.md_5.bungee.api.ChatColor nextColor = net.md_5.bungee.api.ChatColor.getByChar(chars[i + 1]);
                 if (color == null) {
                     sb.append(c);
                 } else {
@@ -189,7 +271,18 @@ public class MessageManager {
             Pair pair = pairs.get(i);
             componentBuilder.append(pair.getMessage()).color(pair.getColor());
         }
-        BaseComponent[] baseComponent = componentBuilder.create();
+        return componentBuilder.create();
+    }
+
+    /**
+     * Creates and returns text component for a message.
+     *
+     * @param message to put in text component
+     *
+     * @return text component for message
+     */
+    public static TextComponent getTextComponentMessage(String message) {
+        BaseComponent[] baseComponent = getBaseComponentArrMessage(message);
 
         TextComponent textComponent = new TextComponent();
         for (BaseComponent bc : baseComponent) {

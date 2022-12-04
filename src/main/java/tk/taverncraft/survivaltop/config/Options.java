@@ -35,6 +35,7 @@ public class Options {
     private int minLandHeight;
     private long lastLoadTime;
     private int cacheDuration;
+    private boolean hoverableLeaderboard;
 
     /**
      * Constructor for Options.
@@ -71,6 +72,7 @@ public class Options {
         this.storageType = config.getString("storage-type", "None");
         this.lastLoadTime = Instant.now().getEpochSecond();
         this.cacheDuration = config.getInt("cache-duration", 1800);
+        this.hoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
         setMaxLandHeight();
         setMinLandHeight();
     }
@@ -163,6 +165,10 @@ public class Options {
 
     public int getCacheDuration() {
         return cacheDuration;
+    }
+
+    public boolean isHoverableLeaderboard() {
+        return hoverableLeaderboard;
     }
 
     // setters below
