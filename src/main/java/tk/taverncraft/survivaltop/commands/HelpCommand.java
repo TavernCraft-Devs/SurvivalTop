@@ -4,14 +4,13 @@ import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.services.ValidationManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * HelpCommand contains the execute method for when a user inputs the command to get help for the plugin.
  */
 public class HelpCommand {
-    private final String helpPerm = "survtop.help";
-    private final ValidationManager validationManager;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for HelpCommand.
@@ -19,7 +18,7 @@ public class HelpCommand {
      * @param main plugin class
      */
     public HelpCommand(Main main) {
-        this.validationManager = new ValidationManager(main);
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     /**
@@ -30,7 +29,7 @@ public class HelpCommand {
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender) {
-        if (!validationManager.hasPermission(helpPerm, sender)) {
+        if (!permissionsManager.hasHelpCmdPerm(sender)) {
             return true;
         }
 

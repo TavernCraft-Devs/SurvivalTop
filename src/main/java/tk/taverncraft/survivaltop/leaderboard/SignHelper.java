@@ -75,7 +75,7 @@ public class SignHelper {
      * @param wealth wealth of entity at position
      */
     public void save(Block block, int position, String name, String wealth) {
-        File signsFile = new File(main.getDataFolder(), "signs.yml");
+        File signsFile = new File(main.getDataFolder(), "dat/signs.yml");
         if (!signsFile.exists()) {
             main.getConfigManager().createSignsConfig();
         }
@@ -194,7 +194,7 @@ public class SignHelper {
      */
     public void removeSign(Block block) {
         String key = getKey(block);
-        File signsFile = new File(main.getDataFolder(), "signs.yml");
+        File signsFile = new File(main.getDataFolder(), "dat/signs.yml");
         if (!signsFile.exists()) {
             main.getConfigManager().createSignsConfig();
         }

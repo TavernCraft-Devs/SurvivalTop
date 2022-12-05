@@ -3,17 +3,15 @@ package tk.taverncraft.survivaltop.commands;
 import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.services.ValidationManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * ReloadCommand contains the execute method for when a user inputs command to reload plugin.
  */
 public class ReloadCommand {
-    private final String reloadPerm = "survtop.reload";
     private final Main main;
-    private final ValidationManager validationManager;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for ReloadCommand.
@@ -22,7 +20,7 @@ public class ReloadCommand {
      */
     public ReloadCommand(Main main) {
         this.main = main;
-        this.validationManager = new ValidationManager(main);
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     /**
@@ -33,7 +31,7 @@ public class ReloadCommand {
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender) {
-        if (!validationManager.hasPermission(reloadPerm, sender)) {
+        if (!permissionsManager.hasReloadCmdPerm(sender)) {
             return true;
         }
 

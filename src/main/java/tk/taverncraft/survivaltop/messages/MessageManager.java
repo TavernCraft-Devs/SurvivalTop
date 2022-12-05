@@ -140,9 +140,7 @@ public class MessageManager {
      * @param minimumWealth minimum wealth to show on leaderboard
      */
     public static void setUpLeaderboard(HashMap<String, EntityCache> leaderboard,
-            double minimumWealth, boolean hoverable) {
-        int positionsPerPage = 10;
-
+            double minimumWealth, int positionsPerPage) {
         String header = messageKeysMap.get("leaderboard-header");
         String footer = messageKeysMap.get("leaderboard-footer");
         String messageTemplate = messageKeysMap.get("leaderboard-body");
@@ -178,9 +176,8 @@ public class MessageManager {
     }
 
     public static void setUpHoverableLeaderboard(HashMap<String, EntityCache> leaderboard,
-                                        double minimumWealth, boolean hoverable) {
-        int positionsPerPage = 10;
-        completeHoverableLeaderboard = new BaseComponent[(int) Math.ceil((double) leaderboard.size() / 10)][];
+            double minimumWealth, int positionsPerPage) {
+        completeHoverableLeaderboard = new BaseComponent[(int) Math.ceil((double) leaderboard.size() / positionsPerPage)][];
 
         String header = messageKeysMap.get("leaderboard-header").substring(0, messageKeysMap.get("leaderboard-header").length() - 1);
         String footer = messageKeysMap.get("leaderboard-footer").substring(0, messageKeysMap.get("leaderboard-footer").length() - 2);

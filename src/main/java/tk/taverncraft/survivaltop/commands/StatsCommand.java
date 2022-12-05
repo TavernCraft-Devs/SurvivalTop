@@ -5,16 +5,14 @@ import org.bukkit.entity.Player;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.services.ValidationManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * StatsCommand contains the execute method for when a user views stats of self or others.
  */
 public class StatsCommand {
-    private final String statsSelfPerm = "survtop.stats.self";
-    private final String statsOthersPerm = "survtop.stats.others";
     private final Main main;
-    private final ValidationManager validationManager;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for StatsCommand.
@@ -23,7 +21,7 @@ public class StatsCommand {
      */
     public StatsCommand(Main main) {
         this.main = main;
-        this.validationManager = new ValidationManager(main);
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     /**
@@ -54,7 +52,7 @@ public class StatsCommand {
             return;
         }
 
-        if (!validationManager.hasPermission(statsSelfPerm, sender)) {
+        if (!permissionsManager.hasStatsSelfCmdPerm(sender)) {
             return;
         }
 
@@ -64,7 +62,7 @@ public class StatsCommand {
         // if group is enabled, get name of the group the player belongs to instead
         if (main.getOptions().groupIsEnabled()) {
             name = main.getGroupManager().getGroupOfPlayer(name);
-            if (!validationManager.groupExist(name, sender)) {
+            if (!permissionsManager.groupExist(name, sender)) {
                 return;
             }
         }
@@ -87,17 +85,17 @@ public class StatsCommand {
      */
     private void getStatsForOthers(CommandSender sender, String[] args) {
         String name = args[1];
-        if (!validationManager.hasPermission(statsOthersPerm, sender)) {
+        if (!permissionsManager.hasStatsOthersCmdPerm(sender)) {
             return;
         }
 
         // check if group/player provided exist
         if (this.main.getOptions().groupIsEnabled()) {
-            if (!validationManager.groupExist(args[1], sender)) {
+            if (!permissionsManager.groupExist(args[1], sender)) {
                 return;
             }
         } else {
-            if (!validationManager.playerExist(args[1], sender)) {
+            if (!permissionsManager.playerExist(args[1], sender)) {
                 return;
             }
         }

@@ -12,13 +12,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.leaderboard.SignHelper;
 import tk.taverncraft.survivaltop.messages.MessageManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * SignBreakEvent checks for when a leaderboard sign is broken.
  */
 public class SignBreakEvent implements Listener {
-    private final String signRemovePerm = "survtop.sign.remove";
     private final Main main;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for SignBreakEvent.
@@ -27,6 +28,7 @@ public class SignBreakEvent implements Listener {
      */
     public SignBreakEvent(Main main) {
         this.main = main;
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     @EventHandler
@@ -52,7 +54,7 @@ public class SignBreakEvent implements Listener {
         }
 
         Player player = e.getPlayer();
-        if (!player.hasPermission(signRemovePerm)) {
+        if (!permissionsManager.hasSignRemovePerm(player)) {
             e.setCancelled(true);
             MessageManager.sendMessage(player, "no-survtop-sign-remove-permission");
             return;

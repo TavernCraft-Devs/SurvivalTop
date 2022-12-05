@@ -144,6 +144,14 @@ update-on-start: false
 # minimum wealth (inclusive) required to be included on the leaderboard - 0 will disallow negative wealth on leaderboard
 minimum-wealth: 0
 
+# total number of leaderboard positions to be shown
+# -1 means all players are shown
+# 100 means only the top 100 players are shown
+total-leaderboard-positions: -1
+
+# number of leaderboard positions shown on each page
+leaderboard-positions-per-page: 10
+
 # if true, will show breakdown of wealth on hover
 # disabling may improve performance on servers with little resources
 use-hoverable-leaderboard: false

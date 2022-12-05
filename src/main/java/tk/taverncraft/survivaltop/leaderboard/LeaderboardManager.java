@@ -174,12 +174,12 @@ public class LeaderboardManager {
      */
     public void completeLeaderboardUpdate(CommandSender sender,
             HashMap<String, EntityCache> tempSortedCache) {
-        if (main.getOptions().isHoverableLeaderboard()) {
+        if (main.getOptions().isUseHoverableLeaderboard()) {
             MessageManager.setUpHoverableLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0), main.getOptions().isHoverableLeaderboard());
+                "minimum-wealth", 0.0), main.getOptions().getLeaderboardPositionsPerPage());
         } else {
             MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0), main.getOptions().isHoverableLeaderboard());
+                "minimum-wealth", 0.0), main.getOptions().getLeaderboardPositionsPerPage());
         }
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
         MessageManager.sendMessage(sender, "update-complete",
@@ -196,13 +196,14 @@ public class LeaderboardManager {
     }
 
     /**
-     * Sorts entities by total wealth.
+     * Sorts entities by total wealth and filters for total leaderboard position limit shown
+     * if applicable.
      *
      * @param hm hashmap of entity wealth to sort
      *
      * @return sorted total wealth hashmap
      */
-    private HashMap<String, EntityCache> sortEntitiesByTotalWealth(ConcurrentHashMap<String,
+    private HashMap<String, EntityCache> sortAndFilterEntities(ConcurrentHashMap<String,
         EntityCache> hm) {
         List<Map.Entry<String, EntityCache> > list =
             new LinkedList<>(hm.entrySet());
@@ -211,8 +212,19 @@ public class LeaderboardManager {
             .compareTo(o1.getValue().getTotalWealth()));
 
         HashMap<String, EntityCache> temp = new LinkedHashMap<>();
-        for (Map.Entry<String, EntityCache> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
+        int totalLeaderboardPositions = main.getOptions().getTotalLeaderboardPositions();
+        if (totalLeaderboardPositions >= 0) {
+            for (Map.Entry<String, EntityCache> aa : list) {
+                if (totalLeaderboardPositions == 0) {
+                    break;
+                }
+                temp.put(aa.getKey(), aa.getValue());
+                totalLeaderboardPositions--;
+            }
+        } else {
+            for (Map.Entry<String, EntityCache> aa : list) {
+                temp.put(aa.getKey(), aa.getValue());
+            }
         }
         return temp;
     }
@@ -411,7 +423,7 @@ public class LeaderboardManager {
     public void processLeaderboardUpdate(String name, EntityCache eCache) {
         entityCacheMap.put(name.toUpperCase(), eCache);
         if (!leaderboardTaskQueue.hasNext()) {
-            HashMap<String, EntityCache> sortedMap = sortEntitiesByTotalWealth(entityCacheMap);
+            HashMap<String, EntityCache> sortedMap = sortAndFilterEntities(entityCacheMap);
             setUpEntityCache(sortedMap);
             completeLeaderboardUpdate(leaderboardSender, sortedMap);
         } else {

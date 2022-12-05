@@ -11,13 +11,14 @@ import org.bukkit.event.block.SignChangeEvent;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.leaderboard.SignHelper;
 import tk.taverncraft.survivaltop.messages.MessageManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * SignPlaceEvent checks for when a leaderboard sign is placed.
  */
 public class SignPlaceEvent implements Listener {
-    private final String signAddPerm = "survtop.sign.add";
     private final Main main;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for SignPlaceEvent.
@@ -26,6 +27,7 @@ public class SignPlaceEvent implements Listener {
      */
     public SignPlaceEvent(Main main) {
         this.main = main;
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     @EventHandler
@@ -49,7 +51,7 @@ public class SignPlaceEvent implements Listener {
         }
 
         Player player = e.getPlayer();
-        if (!player.hasPermission(signAddPerm)) {
+        if (!permissionsManager.hasSignAddPerm(player)) {
             e.setCancelled(true);
             MessageManager.sendMessage(player, "no-survtop-sign-add-permission");
             return;

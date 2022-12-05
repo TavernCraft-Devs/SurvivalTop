@@ -29,13 +29,15 @@ public class Options {
     private int updateInterval;
     private boolean updateOnStart;
     private double minimumWealth;
+    private int totalLeaderboardPositions;
+    private int leaderboardPositionsPerPage;
     private boolean useGuiLeaderboard;
+    private boolean useHoverableLeaderboard;
     private String storageType;
     private int maxLandHeight;
     private int minLandHeight;
     private long lastLoadTime;
     private int cacheDuration;
-    private boolean hoverableLeaderboard;
 
     /**
      * Constructor for Options.
@@ -68,11 +70,13 @@ public class Options {
         this.updateInterval = config.getInt("update-interval", 3600);
         this.updateOnStart = config.getBoolean("update-on-start", false);
         this.minimumWealth = config.getInt("minimum-wealth", 0);
+        this.totalLeaderboardPositions = config.getInt("total-leaderboard-positions", -1);
+        this.leaderboardPositionsPerPage = config.getInt("leaderboard-positions-per-page", 10);
         this.useGuiLeaderboard = config.getBoolean("use-gui-leaderboard", false);
+        this.useHoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
         this.storageType = config.getString("storage-type", "None");
         this.lastLoadTime = Instant.now().getEpochSecond();
         this.cacheDuration = config.getInt("cache-duration", 1800);
-        this.hoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
         setMaxLandHeight();
         setMinLandHeight();
     }
@@ -115,8 +119,20 @@ public class Options {
         return cacheIsEnabled;
     }
 
+    public int getTotalLeaderboardPositions() {
+        return totalLeaderboardPositions;
+    }
+
+    public int getLeaderboardPositionsPerPage() {
+        return leaderboardPositionsPerPage;
+    }
+
     public boolean isUseGuiLeaderboard() {
         return useGuiLeaderboard;
+    }
+
+    public boolean isUseHoverableLeaderboard() {
+        return useHoverableLeaderboard;
     }
 
     public double getMaxLandHeight() {
@@ -165,10 +181,6 @@ public class Options {
 
     public int getCacheDuration() {
         return cacheDuration;
-    }
-
-    public boolean isHoverableLeaderboard() {
-        return hoverableLeaderboard;
     }
 
     // setters below

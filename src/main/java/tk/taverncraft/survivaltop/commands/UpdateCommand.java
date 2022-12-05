@@ -4,16 +4,15 @@ import org.bukkit.command.CommandSender;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.services.ValidationManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * UpdateCommand contains the execute method for when a user wishes to manually trigger a
  * leaderboard update.
  */
 public class UpdateCommand {
-    private final String updatePerm = "survtop.update";
     private final Main main;
-    private final ValidationManager validationManager;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for UpdateCommand.
@@ -22,7 +21,7 @@ public class UpdateCommand {
      */
     public UpdateCommand(Main main) {
         this.main = main;
-        this.validationManager = new ValidationManager(main);
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     /**
@@ -33,7 +32,7 @@ public class UpdateCommand {
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender) {
-        if (!validationManager.hasPermission(updatePerm, sender)) {
+        if (!permissionsManager.hasUpdateCmdPerm(sender)) {
             return true;
         }
 

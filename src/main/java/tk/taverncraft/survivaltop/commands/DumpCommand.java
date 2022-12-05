@@ -5,15 +5,14 @@ import org.bukkit.command.CommandSender;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.utils.services.ValidationManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * DumpCommand contains the execute method for when a user dumps logs for debugging.
  */
 public class DumpCommand {
     private final Main main;
-    private final String dumpPerm = "survtop.dump";
-    private final ValidationManager validationManager;
+    private final PermissionsManager permissionsManager;
 
     /**
      * Constructor for DumpCommand.
@@ -22,7 +21,7 @@ public class DumpCommand {
      */
     public DumpCommand(Main main) {
         this.main = main;
-        this.validationManager = new ValidationManager(main);
+        this.permissionsManager = new PermissionsManager(main);
     }
 
     /**
@@ -33,7 +32,7 @@ public class DumpCommand {
      * @return true at end of execution
      */
     public boolean execute(CommandSender sender) {
-        if (!validationManager.hasPermission(dumpPerm, sender)) {
+        if (!permissionsManager.hasDumpCmdPerm(sender)) {
             return true;
         }
 

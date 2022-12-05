@@ -2,9 +2,6 @@ package tk.taverncraft.survivaltop.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -56,7 +53,7 @@ public class ConfigManager {
      * Creates blocks config file.
      */
     public void createBlocksConfig() {
-        FileConfiguration config = getConfig("blocks.yml");
+        FileConfiguration config = getConfig("calculations/blocks.yml");
         main.setBlocksConfig(config);
     }
 
@@ -64,7 +61,7 @@ public class ConfigManager {
      * Creates spawners config file.
      */
     public void createSpawnersConfig() {
-        FileConfiguration config = getConfig("spawners.yml");
+        FileConfiguration config = getConfig("calculations/spawners.yml");
         main.setSpawnersConfig(config);
     }
 
@@ -72,7 +69,7 @@ public class ConfigManager {
      * Creates containers config file.
      */
     public void createContainersConfig() {
-        FileConfiguration config = getConfig("containers.yml");
+        FileConfiguration config = getConfig("calculations/containers.yml");
         main.setContainersConfig(config);
     }
 
@@ -80,7 +77,7 @@ public class ConfigManager {
      * Creates inventories config file.
      */
     public void createInventoriesConfig() {
-        FileConfiguration config = getConfig("inventories.yml");
+        FileConfiguration config = getConfig("calculations/inventories.yml");
         main.setInventoriesConfig(config);
     }
 
@@ -88,7 +85,7 @@ public class ConfigManager {
      * Creates papi config file.
      */
     public void createPapiConfig() {
-        FileConfiguration config = getConfig("papi.yml");
+        FileConfiguration config = getConfig("calculations/papi.yml");
         main.setPapiConfig(config);
     }
 
@@ -112,40 +109,17 @@ public class ConfigManager {
      * Creates signs config file.
      */
     public void createSignsConfig() {
-        FileConfiguration config = getConfig("signs.yml");
+        FileConfiguration config = getConfig("dat/signs.yml");
         main.setSignsConfig(config);
     }
 
     /**
-     * Creates message file.
+     * Creates message lang file.
      */
     public void createMessageFile() {
         String langFileName = main.getConfig().getString("lang-file");
-
-        // default language
-        if (langFileName == null) {
-            langFileName = "en.yml";
-        }
-
-        File langFile = new File(main.getDataFolder() + "/lang", langFileName);
-        FileConfiguration lang = new YamlConfiguration();
-        if (!langFile.exists()) {
-            langFile.getParentFile().mkdirs();
-            try {
-                Path dest = Paths.get(main.getDataFolder() + "/lang/" + langFileName);
-                Files.copy(main.getResource(langFileName), dest);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            lang.load(langFile);
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-
-        MessageManager.setMessages(lang);
+        FileConfiguration langConfig = getConfig("lang/" + langFileName);
+        MessageManager.setMessages(langConfig);
     }
 
     /**
