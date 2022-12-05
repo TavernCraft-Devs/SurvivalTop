@@ -58,11 +58,11 @@ public class StatsManager {
 
     public void getStatsForPlayer(CommandSender sender, String name) {
         creatorList.add(main.getSenderUuid(sender));
-        if (main.getOptions().cacheIsEnabled()) {
-            main.getStatsManager().getCachedStats(sender, name);
-        } else {
+        if (main.getOptions().isCalculationMode0()) {
             MessageManager.sendMessage(sender, "start-calculating-stats");
-            main.getStatsManager().getRealTimeStats(sender, name, PLAYER);
+            getRealTimeStats(sender, name, PLAYER);
+        } else {
+            getCachedStats(sender, name);
         }
     }
 
@@ -96,8 +96,14 @@ public class StatsManager {
             eCache = main.getLeaderboardManager().getEntityCache(name.toUpperCase());
             // if leaderboard cache also not found or invalid, calculate again
             if (eCache == null || eCache.isExpired(main.getOptions().getCacheDuration())) {
-                MessageManager.sendMessage(sender, "start-calculating-stats");
-                getRealTimeStats(sender, name, PLAYER);
+                if (main.getOptions().isCalculationMode1()) {
+                    MessageManager.sendMessage(sender, "start-calculating-stats");
+                    getRealTimeStats(sender, name, PLAYER);
+                } else {
+                    MessageManager.sendMessage(sender, "no-updated-leaderboard");
+                    creatorList.remove(main.getSenderUuid(sender));
+                    return;
+                }
                 return;
             }
 

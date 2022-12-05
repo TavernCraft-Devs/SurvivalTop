@@ -19,14 +19,15 @@ lang-file: 'en.yml'
 # for servers very worried about lags, consider setting this to false
 use-gui-stats: false
 
-# if true, will provide realtime values when the stats command is executed
-# realtime calculations take a longer time depending on the claim size, spawner count etc
-# if false, will provide the cached value from the previous calculation
-# cached values provide near instant results (very much faster) but are not the latest
-# cache duration specifies in seconds how long cached data is stored
-# cache duration is ignored if realtime stats is used
-# note that if cached values cannot be found, the plugin defaults to getting real time stats
-enable-cache: true
+# calculation mode to use, defaults to 1 (descriptions are below and more details are on wiki)
+# 0 - only does real-time calculations and does not use cache (most performance intensive)
+# 1 - balance between using cache and real-time calculations (recommended)
+# 2 - only uses cache calculations from leaderboard (i.e. players cannot get real-time stats)
+# you may find out more details about the calculation modes on our wiki:
+# ???
+calculation-mode: 1
+
+# only used if calculation mode is 1 or 2, sets the duration before cache expires
 cache-duration: 1800
 
 #####################################################################################

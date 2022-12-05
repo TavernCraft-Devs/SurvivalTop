@@ -14,7 +14,7 @@ import tk.taverncraft.survivaltop.Main;
 public class Options {
     private final Main main;
     private boolean useGuiStats;
-    private boolean cacheIsEnabled;
+    private int calculationMode;
     private boolean filterLastJoin;
     private long filterPlayerTime;
     private boolean enableGroup;
@@ -55,7 +55,8 @@ public class Options {
     public void initializeOptions() {
         FileConfiguration config = main.getConfig();
         this.useGuiStats = config.getBoolean("use-gui-stats", true);
-        this.cacheIsEnabled = config.getBoolean("enable-cache", true);
+        this.calculationMode = config.getInt("calculation-mode", 1);
+        this.cacheDuration = config.getInt("cache-duration", 1800);
         this.filterLastJoin = config.getBoolean("filter-last-join", false);
         this.filterPlayerTime = config.getLong("filter-player-time", 2592000);
         this.enableGroup = config.getBoolean("enable-group", false);
@@ -76,12 +77,26 @@ public class Options {
         this.useHoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
         this.storageType = config.getString("storage-type", "None");
         this.lastLoadTime = Instant.now().getEpochSecond();
-        this.cacheDuration = config.getInt("cache-duration", 1800);
         setMaxLandHeight();
         setMinLandHeight();
     }
 
     // getters below
+    public boolean isCalculationMode0() {
+        return calculationMode == 0;
+    }
+
+    public boolean isCalculationMode1() {
+        return calculationMode != 0 && calculationMode != 2;
+    }
+
+    public boolean isCalculationMode2() {
+        return calculationMode == 2;
+    }
+
+    public int getCalculationMode() {
+        return calculationMode;
+    }
 
     public boolean balIsIncluded() {
         return includeBal;
@@ -113,10 +128,6 @@ public class Options {
 
     public boolean isUseGuiStats() {
         return useGuiStats;
-    }
-
-    public boolean cacheIsEnabled() {
-        return cacheIsEnabled;
     }
 
     public int getTotalLeaderboardPositions() {

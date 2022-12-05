@@ -201,7 +201,7 @@ public class LogManager {
 
         // config options
         config.set("use-gui-stats", main.getOptions().isUseGuiStats());
-        config.set("enable-cache", main.getOptions().cacheIsEnabled());
+        config.set("calculation-mode", main.getOptions().getCalculationMode());
         config.set("filter-last-join", main.getOptions().filterLastJoin());
         config.set("filter-player-time", main.getOptions().filterPlayerTime());
         config.set("enable-group", main.getOptions().groupIsEnabled());
