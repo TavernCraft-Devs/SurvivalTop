@@ -336,7 +336,7 @@ public class StatsMenuOptions {
         ArrayList<Inventory> containerViews = prepareStatsViews(containerList, name, "Container Stats");
         ArrayList<Inventory> inventoryViews = prepareStatsViews(inventoryList, name, "Inventory Stats");
 
-        return new StatsGui(mainPage, blockViews, spawnerViews, containerViews, inventoryViews);
+        return new StatsGui(name, mainPage, blockViews, spawnerViews, containerViews, inventoryViews);
     }
 
     /**

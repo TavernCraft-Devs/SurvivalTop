@@ -5,6 +5,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import tk.taverncraft.survivaltop.Main;
@@ -13,6 +15,7 @@ import tk.taverncraft.survivaltop.gui.options.StatsMenuOptions;
 import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.gui.types.StatsGui;
 import tk.taverncraft.survivaltop.logs.LogManager;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
@@ -21,6 +24,8 @@ import tk.taverncraft.survivaltop.utils.types.MutableInt;
  */
 public class GuiManager {
     private final Main main;
+    private final PermissionsManager permissionsManager;
+
     private StatsMenuOptions statsOptions;
     private InfoMenuOptions infoOptions;
 
@@ -35,6 +40,7 @@ public class GuiManager {
      */
     public GuiManager(Main main) {
         this.main = main;
+        this.permissionsManager = new PermissionsManager(main);
         initializeMenuOptions();
     }
 
@@ -72,49 +78,97 @@ public class GuiManager {
     /**
      * Retrieves player inventory gui stats block page.
      *
-     * @param uuid uuid of sender
+     * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
      *
      * @return inventory page containing block info for given page
      */
-    public Inventory getBlockStatsPage(UUID uuid, int pageNum) {
-        return senderGui.get(uuid).getBlockStatsPage(pageNum);
+    public Inventory getBlockStatsPage(HumanEntity humanEntity, int pageNum) {
+        UUID uuid = humanEntity.getUniqueId();
+        StatsGui statsGui = senderGui.get(uuid);
+        String name = getUpperCaseNameForEntity(uuid);
+        if (name.equals(statsGui.getName().toUpperCase())) {
+            if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
+                return senderGui.get(uuid).getBlockStatsPage(pageNum);
+            }
+        } else {
+            if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
+                return senderGui.get(uuid).getBlockStatsPage(pageNum);
+            }
+        }
+        return null;
     }
 
     /**
      * Retrieves player inventory gui stats spawner page.
      *
-     * @param uuid uuid of sender
+     * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
      *
      * @return inventory page containing spawner info for given page
      */
-    public Inventory getSpawnerStatsPage(UUID uuid, int pageNum) {
-        return senderGui.get(uuid).getSpawnerStatsPage(pageNum);
+    public Inventory getSpawnerStatsPage(HumanEntity humanEntity, int pageNum) {
+        UUID uuid = humanEntity.getUniqueId();
+        StatsGui statsGui = senderGui.get(uuid);
+        String name = getUpperCaseNameForEntity(uuid);
+        if (name.equals(statsGui.getName().toUpperCase())) {
+            if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
+                return senderGui.get(uuid).getSpawnerStatsPage(pageNum);
+            }
+        } else {
+            if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
+                return senderGui.get(uuid).getSpawnerStatsPage(pageNum);
+            }
+        }
+        return null;
     }
 
     /**
      * Retrieves player inventory gui stats container page.
      *
-     * @param uuid uuid of sender
+     * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
      *
      * @return inventory page containing container info for given page
      */
-    public Inventory getContainerStatsPage(UUID uuid, int pageNum) {
-        return senderGui.get(uuid).getContainerStatsPage(pageNum);
+    public Inventory getContainerStatsPage(HumanEntity humanEntity, int pageNum) {
+        UUID uuid = humanEntity.getUniqueId();
+        StatsGui statsGui = senderGui.get(uuid);
+        String name = getUpperCaseNameForEntity(uuid);
+        if (name.equals(statsGui.getName().toUpperCase())) {
+            if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
+                return senderGui.get(uuid).getContainerStatsPage(pageNum);
+            }
+        } else {
+            if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
+                return senderGui.get(uuid).getContainerStatsPage(pageNum);
+            }
+        }
+        return null;
     }
 
     /**
      * Retrieves player inventory gui stats inventory page.
      *
-     * @param uuid uuid of sender
+     * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
      *
      * @return inventory page containing inventory info for given page
      */
-    public Inventory getInventoryStatsPage(UUID uuid, int pageNum) {
-        return senderGui.get(uuid).getInventoryStatsPage(pageNum);
+    public Inventory getInventoryStatsPage(HumanEntity humanEntity, int pageNum) {
+        UUID uuid = humanEntity.getUniqueId();
+        StatsGui statsGui = senderGui.get(uuid);
+        String name = getUpperCaseNameForEntity(uuid);
+        if (name.equals(statsGui.getName().toUpperCase())) {
+            if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
+                return senderGui.get(uuid).getInventoryStatsPage(pageNum);
+            }
+        } else {
+            if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
+                return senderGui.get(uuid).getInventoryStatsPage(pageNum);
+            }
+        }
+        return null;
     }
 
     public void setSenderGui(UUID uuid, EntityCache eCache) {
@@ -171,5 +225,18 @@ public class GuiManager {
 
     public InfoMenuOptions getInfoOptions() {
         return infoOptions;
+    }
+
+    private String getUpperCaseNameForEntity(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (main.getOptions().groupIsEnabled()) {
+            String group = main.getGroupManager().getGroupOfPlayer(player.getName());
+            if (group == null) {
+                return "";
+            }
+            return group.toUpperCase();
+        } else {
+            return player.getName().toUpperCase();
+        }
     }
 }

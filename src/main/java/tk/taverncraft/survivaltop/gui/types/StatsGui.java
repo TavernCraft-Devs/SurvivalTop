@@ -6,19 +6,30 @@ import org.bukkit.inventory.Inventory;
 
 public class StatsGui {
     // list of inventories
-    private Inventory mainPage;
-    private ArrayList<Inventory> blockViews;
-    private ArrayList<Inventory> spawnerViews;
-    private ArrayList<Inventory> containerViews;
-    private ArrayList<Inventory> inventoryViews;
+    private final String name;
+    private final Inventory mainPage;
+    private final ArrayList<Inventory> blockViews;
+    private final ArrayList<Inventory> spawnerViews;
+    private final ArrayList<Inventory> containerViews;
+    private final ArrayList<Inventory> inventoryViews;
 
-    public StatsGui(Inventory mainPage, ArrayList<Inventory> blockViews, ArrayList<Inventory> spawnerViews,
+    public StatsGui(String name, Inventory mainPage, ArrayList<Inventory> blockViews, ArrayList<Inventory> spawnerViews,
             ArrayList<Inventory> containerViews, ArrayList<Inventory> inventoryViews) {
+        this.name = name;
         this.mainPage = mainPage;
         this.blockViews = blockViews;
         this.spawnerViews = spawnerViews;
         this.containerViews = containerViews;
         this.inventoryViews = inventoryViews;
+    }
+
+    /**
+     * Gets the name of the entity for these stats.
+     *
+     * @return name of entity
+     */
+    public String getName() {
+        return name;
     }
 
     /**

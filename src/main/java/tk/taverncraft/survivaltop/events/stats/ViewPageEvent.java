@@ -1,6 +1,6 @@
 package tk.taverncraft.survivaltop.events.stats;
 
-import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
@@ -10,6 +10,7 @@ import org.bukkit.inventory.Inventory;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.options.InfoMenuOptions;
 import tk.taverncraft.survivaltop.gui.options.StatsMenuOptions;
+import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * ViewPageEvent checks for when a player clicks on GUI menu.
@@ -164,23 +165,20 @@ public class ViewPageEvent implements Listener {
      */
     private void statsMainPageClickHandler(int slot, InventoryClickEvent e) {
         Inventory inv = null;
+        HumanEntity humanEntity = e.getWhoClicked();
         if (slot == blockWealthSlot) {
-            inv = main.getGuiManager().getBlockStatsPage(
-                    e.getWhoClicked().getUniqueId(), 0);
+            inv = main.getGuiManager().getBlockStatsPage(humanEntity, 0);
         } else if (slot == spawnerWealthSlot) {
-            inv = main.getGuiManager().getSpawnerStatsPage(
-                    e.getWhoClicked().getUniqueId(), 0);
+            inv = main.getGuiManager().getSpawnerStatsPage(humanEntity, 0);
         } else if (slot == containerWealthSlot) {
-            inv = main.getGuiManager().getContainerStatsPage(
-                    e.getWhoClicked().getUniqueId(), 0);
+            inv = main.getGuiManager().getContainerStatsPage(humanEntity, 0);
         } else if (slot == inventoryWealthSlot) {
-            inv = main.getGuiManager().getInventoryStatsPage(
-                e.getWhoClicked().getUniqueId(), 0);
+            inv = main.getGuiManager().getInventoryStatsPage(humanEntity, 0);
         }
         if (inv == null) {
             return;
         }
-        e.getWhoClicked().openInventory(inv);
+        humanEntity.openInventory(inv);
     }
 
     /**
@@ -203,18 +201,15 @@ public class ViewPageEvent implements Listener {
             }
 
             Inventory inv = null;
+            HumanEntity humanEntity = e.getWhoClicked();
             if (isBlockPage) {
-                inv = main.getGuiManager().getBlockStatsPage(
-                        e.getWhoClicked().getUniqueId(), pageToGo);
+                inv = main.getGuiManager().getBlockStatsPage(humanEntity, pageToGo);
             } else if (isSpawnerPage) {
-                inv = main.getGuiManager().getSpawnerStatsPage(
-                        e.getWhoClicked().getUniqueId(), pageToGo);
+                inv = main.getGuiManager().getSpawnerStatsPage(humanEntity, pageToGo);
             } else if (isContainerPage) {
-                inv = main.getGuiManager().getContainerStatsPage(
-                        e.getWhoClicked().getUniqueId(), pageToGo);
+                inv = main.getGuiManager().getContainerStatsPage(humanEntity, pageToGo);
             } else if (isInventoryPage) {
-                inv = main.getGuiManager().getInventoryStatsPage(
-                    e.getWhoClicked().getUniqueId(), pageToGo);
+                inv = main.getGuiManager().getInventoryStatsPage(humanEntity, pageToGo);
             }
             if (inv == null) {
                 return;

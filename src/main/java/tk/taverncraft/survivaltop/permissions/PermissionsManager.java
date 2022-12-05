@@ -21,6 +21,8 @@ public class PermissionsManager {
     private final String updateCmdPerm = "survtop.update";
     private final String signRemovePerm = "survtop.sign.remove";
     private final String signAddPerm = "survtop.sign.add";
+    private final String guiDetailsSelfPerm = "survtop.gui.details.self";
+    private final String guiDetailsOthersPerm = "survtop.gui.details.others";
 
     /**
      * Constructor for PermissionsManager.
@@ -43,38 +45,6 @@ public class PermissionsManager {
         }
         MessageManager.sendMessage(sender, "no-permission");
         return false;
-    }
-
-    /**
-     * Validates if inputted player exist and sends a message if not.
-     *
-     * @param name the name of the player to check for
-     * @param sender the player executing the command
-     */
-    public boolean playerExist(String name, CommandSender sender) {
-        if (name.length() > 16 || this.main.getServer().getOfflinePlayer(name).getFirstPlayed() == 0L) {
-            MessageManager.sendMessage(sender, "entity-not-exist",
-                    new String[]{"%entity%"},
-                    new String[]{name});
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validates if inputted group exist and sends a message if not.
-     *
-     * @param name the name of the group to check for
-     * @param sender the player executing the command
-     */
-    public boolean groupExist(String name, CommandSender sender) {
-        if (!this.main.getGroupManager().isValidGroup(name)) {
-            MessageManager.sendMessage(sender, "entity-not-exist",
-                new String[]{"%entity%"},
-                new String[]{name});
-            return false;
-        }
-        return true;
     }
 
     public boolean hasDumpCmdPerm(CommandSender sender) {
@@ -115,5 +85,45 @@ public class PermissionsManager {
 
     public boolean hasSignRemovePerm(CommandSender sender) {
         return hasPermission(signRemovePerm, sender);
+    }
+
+    public boolean hasGuiDetailsSelfPerm(CommandSender sender) {
+        return hasPermission(guiDetailsSelfPerm, sender);
+    }
+
+    public boolean hasGuiDetailsOthersPerm(CommandSender sender) {
+        return hasPermission(guiDetailsOthersPerm, sender);
+    }
+
+    /**
+     * Validates if inputted player exist and sends a message if not.
+     *
+     * @param name the name of the player to check for
+     * @param sender the player executing the command
+     */
+    public boolean playerExist(String name, CommandSender sender) {
+        if (name.length() > 16 || this.main.getServer().getOfflinePlayer(name).getFirstPlayed() == 0L) {
+            MessageManager.sendMessage(sender, "entity-not-exist",
+                new String[]{"%entity%"},
+                new String[]{name});
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validates if inputted group exist and sends a message if not.
+     *
+     * @param name the name of the group to check for
+     * @param sender the player executing the command
+     */
+    public boolean groupExist(String name, CommandSender sender) {
+        if (!this.main.getGroupManager().isValidGroup(name)) {
+            MessageManager.sendMessage(sender, "entity-not-exist",
+                new String[]{"%entity%"},
+                new String[]{name});
+            return false;
+        }
+        return true;
     }
 }

@@ -73,7 +73,6 @@ public class StatsCommand {
             return;
         }
 
-        MessageManager.sendMessage(sender, "start-calculating-stats");
         main.getStatsManager().getStatsForPlayer(sender, name);
     }
 
