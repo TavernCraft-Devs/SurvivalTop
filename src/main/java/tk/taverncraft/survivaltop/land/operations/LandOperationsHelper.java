@@ -175,18 +175,17 @@ public class LandOperationsHelper {
      * @param maxZ max z coordinate
      * @param minZ min z coordinate
      * @param world world to search in
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
     public void processEntityClaim(int id, double maxX, double minX, double maxY, double minY,
-                                   double maxZ, double minZ, World world, boolean isLeaderboardUpdate) {
+            double maxZ, double minZ, World world) {
 
         for (int i = (int) minX; i < maxX; i++) {
-            for (int j = (int) minY; j < maxY; j++) {
-                for (int k = (int) minZ; k < maxZ; k++) {
-                    if (stopOperations) {
-                        return;
-                    }
-                    Block block = world.getBlockAt(i, j, k);
+            for (int j = (int) minZ; j < maxZ; j++) {
+                if (stopOperations) {
+                    return;
+                }
+                for (int k = (int) minY; k < maxY; k++) {
+                    Block block = world.getBlockAt(i, k, j);
                     for (BiFunction<Integer, Block, Boolean> f : landOperations) {
                         if (f.apply(id, block)) {
                             break;
@@ -204,9 +203,8 @@ public class LandOperationsHelper {
      * @param id key to identify task
      * @param chunk chunk to get worth for.
      * @param world world to search in
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityChunk(int id, Chunk chunk, World world, boolean isLeaderboardUpdate) {
+    public void processEntityChunk(int id, Chunk chunk, World world) {
 
         int x = chunk.getX() << 4;
         int z = chunk.getZ() << 4;
@@ -214,10 +212,10 @@ public class LandOperationsHelper {
         int minHeight = (int) main.getOptions().getMinLandHeight();
         for (int i = x; i < x + 16; ++i) {
             for (int j = z; j < z + 16; ++j) {
+                if (stopOperations) {
+                    return;
+                }
                 for (int k = minHeight; k < maxHeight; ++k) {
-                    if (stopOperations) {
-                        return;
-                    }
                     Block block = world.getBlockAt(i, k, j);
                     for (BiFunction<Integer, Block, Boolean> f : landOperations) {
                         if (f.apply(id, block)) {

@@ -60,8 +60,7 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
         try {
             Set<FLocation> claims = getClaims(name);
             for (FLocation claim : claims) {
-                landOperationsHelper.processEntityChunk(id, claim.getChunk(), claim.getWorld(),
-                        isLeaderboardUpdate);
+                landOperationsHelper.processEntityChunk(id, claim.getChunk(), claim.getWorld());
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }

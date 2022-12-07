@@ -10,9 +10,8 @@ public interface LandClaimPluginHandler {
      *
      * @param name name of entity to get land worth for
      * @param id key to identify task
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    void processEntityLand(String name, int id, boolean isLeaderboardUpdate);
+    void processEntityLand(String name, int id);
 
     /**
      * Gets the claim info for an entity.

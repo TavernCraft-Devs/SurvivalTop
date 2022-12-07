@@ -59,8 +59,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
         try {
             Set<SimpleChunkLocation> claims = getClaims(name);
             for (SimpleChunkLocation claim : claims) {
-                landOperationsHelper.processEntityChunk(id, claim.toChunk(),
-                        claim.getBukkitWorld(), isLeaderboardUpdate);
+                landOperationsHelper.processEntityChunk(id, claim.toChunk(), claim.getBukkitWorld());
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }
