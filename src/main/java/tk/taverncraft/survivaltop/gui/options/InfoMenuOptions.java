@@ -301,6 +301,9 @@ public class InfoMenuOptions {
 
         for (Map.Entry<Integer, ItemStack> map : subPageButtons.entrySet()) {
             int slot = map.getKey();
+            if (pageNum == 1 && slot == getPrevPageSlot()) {
+                continue;
+            }
             if (slot == getNextPageSlot() || slot == getPrevPageSlot()) {
                 int pageToUse = slot == getNextPageSlot() ? pageNum + 1 : pageNum - 1;
                 ItemStack itemStack = map.getValue();

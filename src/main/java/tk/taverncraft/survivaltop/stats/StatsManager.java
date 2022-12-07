@@ -156,22 +156,26 @@ public class StatsManager {
         LinkedHashMap<String, Double> papiWealth = new LinkedHashMap<>();
         HashMap<String, MutableInt> blockCounter = new HashMap<>();
         HashMap<String, MutableInt> inventoryCounter = new HashMap<>();
-        if (main.getOptions().landIsIncluded()) {
-            // land calculations are done async and will be retrieved later
-            processEntityLandWealth(name, id);
-            blockValue = main.getLandManager().calculateBlockWorth(id);
-            blockCounter = main.getLandManager().getBlocksForGui(id);
-        }
-        if (main.getOptions().balIsIncluded()) {
-            balWealth = getEntityBalWealth(name);
-        }
-        if (main.getOptions().inventoryIsIncluded()) {
-            processEntityInvWealth(name, id);
-            inventoryValue = main.getInventoryManager().calculateInventoryWorth(id);
-            inventoryCounter = main.getInventoryManager().getInventoriesForGui(id);
-        }
-        if (main.getOptions().papiIsIncluded()) {
-            papiWealth = getEntityPapiWealth(name);
+        try {
+            if (main.getOptions().landIsIncluded()) {
+                // land calculations are done async and will be retrieved later
+                processEntityLandWealth(name, id);
+                blockValue = main.getLandManager().calculateBlockWorth(id);
+                blockCounter = main.getLandManager().getBlocksForGui(id);
+            }
+            if (main.getOptions().balIsIncluded()) {
+                balWealth = getEntityBalWealth(name);
+            }
+            if (main.getOptions().inventoryIsIncluded()) {
+                processEntityInvWealth(name, id);
+                inventoryValue = main.getInventoryManager().calculateInventoryWorth(id);
+                inventoryCounter = main.getInventoryManager().getInventoriesForGui(id);
+            }
+            if (main.getOptions().papiIsIncluded()) {
+                papiWealth = getEntityPapiWealth(name);
+            }
+        } catch (NullPointerException ignored) {
+
         }
 
         if (!taskMap.containsKey(id)) {
