@@ -143,17 +143,6 @@ public class LandOperationsHelper {
     }
 
     /**
-     * Cleans up holders after stats update.
-     *
-     * @param id key to identify task
-     */
-    public void doCleanUp(int id) {
-        blockOperations.doCleanUp(id);
-        spawnerOperations.doCleanUp(id);
-        containerOperations.doCleanUp(id);
-    }
-
-    /**
      * Creates holders for stats.
      *
      * @param id key to identify task
@@ -162,6 +151,17 @@ public class LandOperationsHelper {
         blockOperations.createHolder(id);
         spawnerOperations.createHolder(id);
         containerOperations.createHolder(id);
+    }
+
+    /**
+     * Cleans up holders after stats update.
+     *
+     * @param id key to identify task
+     */
+    public void doCleanUp(int id) {
+        blockOperations.doCleanUp(id);
+        spawnerOperations.doCleanUp(id);
+        containerOperations.doCleanUp(id);
     }
 
     /**

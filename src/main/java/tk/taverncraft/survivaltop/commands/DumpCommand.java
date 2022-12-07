@@ -25,7 +25,7 @@ public class DumpCommand {
     }
 
     /**
-     * Prepares debugging logs for user.
+     * Dumps plugin logs for user.
      *
      * @param sender user who sent the command
      *

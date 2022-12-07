@@ -1,9 +1,6 @@
 package tk.taverncraft.survivaltop.gui.options;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +25,8 @@ public class StatsMenuOptions {
     private final Main main;
     private final int mainPageSize;
     private final int subPageSize;
+
+    // identifiers
     private final String mainIdentifier = "§m§s§s§t§o§p";
     private final String blockIdentifier = "§b§s§s§t§o§p";
     private final String spawnerIdentifier = "§s§s§s§t§o§p";
@@ -58,163 +57,175 @@ public class StatsMenuOptions {
     private final List<String> subPageItemLore;
     private final List<Integer> subPageItemSlots;
 
+    /**
+     * Constructor for StatsMenuOptions.
+     *
+     * @param main plugin class
+     */
     public StatsMenuOptions(Main main) {
         this.main = main;
         FileConfiguration config = main.getStatsMenuConfig();
         mainPageSize = config.getInt("main-page-size", 27);
         subPageSize = config.getInt("sub-page-size", 54);
-        mainPageTitle = config.getString("main-page-title", "%entity%'s Total Stats") + mainIdentifier;
-        subPageBlockTitle = config.getString("sub-page-block-title", "%entity%'s Block Stats") + blockIdentifier;
-        subPageSpawnerTitle = config.getString("sub-page-spawner-title", "%entity%'s Spawner Stats") + spawnerIdentifier;
-        subPageContainerTitle = config.getString("sub-page-container-title", "%entity%'s Container Stats") + containerIdentifier;
-        subPageInventoryTitle = config.getString("sub-page-inventory-title", "%entity%'s Inventory Stats") + inventoryIdentifier;
+        mainPageTitle = config.getString("main-page-title", "%entity%'s Total Stats") +
+            mainIdentifier;
+        subPageBlockTitle = config.getString("sub-page-block-title",
+                "%entity%'s Block Stats") + blockIdentifier;
+        subPageSpawnerTitle = config.getString("sub-page-spawner-title",
+                "%entity%'s Spawner Stats") + spawnerIdentifier;
+        subPageContainerTitle = config.getString("sub-page-container-title",
+                "%entity%'s Container Stats") + containerIdentifier;
+        subPageInventoryTitle = config.getString("sub-page-inventory-title",
+                "%entity%'s Inventory Stats") + inventoryIdentifier;
 
-        setupMainPageBackground(config);
-        setupSubPageBackground(config);
+        setUpMainPageBackground(config);
+        setUpSubPageBackground(config);
         subPageItemName = config.getString("sub-page-items.name");
         subPageItemLore = config.getStringList("sub-page-items.lore");
         subPageItemSlots = config.getIntegerList("sub-page-items.slots");
 
-        for (String key: config.getConfigurationSection("sub-page-buttons").getKeys(false)) {
+        for (String key: config.getConfigurationSection("sub-page-buttons")
+                .getKeys(false)) {
             setUpSubPageButton(config, key);
         }
-        for (String key : config.getConfigurationSection("main-page-buttons").getKeys(false)) {
+        for (String key : config.getConfigurationSection("main-page-buttons")
+                .getKeys(false)) {
             setUpMainPageButton(config, key);
         }
     }
 
-    private void setupMainPageBackground(FileConfiguration config) {
+    /**
+     * Sets up the background for the main page.
+     *
+     * @param config config file to refer to for setting up background
+     */
+    private void setUpMainPageBackground(FileConfiguration config) {
         for (String key : config.getConfigurationSection("main-page-background")
             .getKeys(false)) {
             int slot = Integer.parseInt(key);
-            Material material = Material.valueOf(config.getString("main-page-background." + key));
-            ItemStack itemStack = GuiUtils.createGuiItem(material, "", false, null);
+            Material material = Material.valueOf(config.getString("main-page-background." +
+                    key));
+            ItemStack itemStack = GuiUtils.createGuiItem(material, "", false,
+                    null);
             mainPageBackground.put(slot, itemStack);
         }
     }
 
-    private void setupSubPageBackground(FileConfiguration config) {
+    /**
+     * Sets up the background for the subpage.
+     *
+     * @param config config file to refer to for setting up background
+     */
+    private void setUpSubPageBackground(FileConfiguration config) {
         for (String key : config.getConfigurationSection("sub-page-background")
             .getKeys(false)) {
             int slot = Integer.parseInt(key);
-            Material material = Material.valueOf(config.getString("sub-page-background." + key));
-            ItemStack itemStack = GuiUtils.createGuiItem(material, "", false, null);
+            Material material = Material.valueOf(config.getString("sub-page-background." +
+                    key));
+            ItemStack itemStack = GuiUtils.createGuiItem(material, "", false,
+                    null);
             subPageBackground.put(slot, itemStack);
         }
     }
 
+    /**
+     * Sets up the buttons for the main page.
+     *
+     * @param config config file to refer to for setting up buttons
+     * @param button button to set up
+     */
     private void setUpMainPageButton(FileConfiguration config, String button) {
-        ConfigurationSection configurationSection = config.getConfigurationSection("main-page-buttons." + button);
+        ConfigurationSection configurationSection = config.getConfigurationSection(
+                "main-page-buttons." + button);
         int slot = configurationSection.getInt("slot");
         Material material = Material.valueOf(configurationSection.getString("material"));
         String name = configurationSection.getString("name");
         boolean isEnchanted = configurationSection.getBoolean("enchanted", false);
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted,
+                lore.toArray(new String[0]));
         mainPageButtons.put(slot, itemStack);
         mainButtonSlots.put(button, slot);
     }
 
+    /**
+     * Sets up the buttons for the subpage.
+     *
+     * @param config config file to refer to for setting up buttons
+     * @param button button to set up
+     */
     private void setUpSubPageButton(FileConfiguration config, String button) {
-        ConfigurationSection configurationSection = config.getConfigurationSection("sub-page-buttons." + button);
+        ConfigurationSection configurationSection = config.getConfigurationSection(
+                "sub-page-buttons." + button);
         int slot = configurationSection.getInt("slot");
         Material material = Material.valueOf(configurationSection.getString("material"));
         String name = configurationSection.getString("name");
         boolean isEnchanted = configurationSection.getBoolean("enchanted", false);
         List<String> lore = configurationSection.getStringList("lore");
 
-        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted, lore.toArray(new String[0]));
+        ItemStack itemStack = GuiUtils.createGuiItem(material, name, isEnchanted,
+                lore.toArray(new String[0]));
         subPageButtons.put(slot, itemStack);
         subButtonSlots.put(button, slot);
     }
 
-    public String getMainPageIdentifier() {
-        return mainIdentifier;
+    /**
+     * Creates the gui for stats.
+     *
+     * @return gui for stats
+     */
+    public StatsGui createStatsGui(String name, HashMap<String, Double> wealthBreakdown,
+            HashMap<String, MutableInt> blockList, HashMap<String, MutableInt> spawnerList,
+            HashMap<String, MutableInt> containerList, HashMap<String, MutableInt> inventoryList) {
+
+        // set up inventories
+        Inventory mainPage = prepareMainPage(name, wealthBreakdown);
+
+        ArrayList<Inventory> blockViews = prepareSubPage(blockList, name,
+                "Block Stats");
+        ArrayList<Inventory> spawnerViews = prepareSubPage(spawnerList, name,
+                "Spawner Stats");
+        ArrayList<Inventory> containerViews = prepareSubPage(containerList, name,
+                "Container Stats");
+        ArrayList<Inventory> inventoryViews = prepareSubPage(inventoryList, name,
+                "Inventory Stats");
+
+        return new StatsGui(name, mainPage, blockViews, spawnerViews, containerViews,
+                inventoryViews);
     }
 
-    public String getSubPageBlockIdentifier() {
-        return blockIdentifier;
-    }
+    /**
+     * Sets up the main page for stats.
+     *
+     * @param entityName name of entity whose stats is shown
+     * @param wealthBreakdown breakdown of wealth for entity
+     *
+     * @return an inventory gui for main page
+     */
+    public Inventory prepareMainPage(String entityName, HashMap<String, Double> wealthBreakdown) {
+        String parsedName = GuiUtils.parseName(mainPageTitle, "%entity%", entityName);
+        Inventory inv = Bukkit.createInventory(null, mainPageSize,
+            parsedName);
+        for (Map.Entry<Integer, ItemStack> map : mainPageBackground.entrySet()) {
+            inv.setItem(map.getKey(), map.getValue());
+        }
 
-    public String getSubPageSpawnerIdentifier() {
-        return spawnerIdentifier;
-    }
-
-    public String getSubPageContainerIdentifier() {
-        return containerIdentifier;
-    }
-
-    public String getSubPageInventoryIdentifier() {
-        return inventoryIdentifier;
-    }
-
-    public int getMainPageSize() {
-        return mainPageSize;
-    }
-
-    public int getSubPageSize() {
-        return subPageSize;
-    }
-
-    public String getMainPageTitle() {
-        return mainPageTitle;
-    }
-
-    public HashMap<Integer, ItemStack> getMainPageBackground() {
-        return mainPageBackground;
-    }
-
-    public HashMap<Integer, ItemStack> getMainPageButtons() {
-        return mainPageButtons;
-    }
-
-    public HashMap<Integer, ItemStack> getSubPageBackground() {
-        return subPageBackground;
-    }
-
-    public HashMap<Integer, ItemStack> getSubPageButtons() {
-        return subPageButtons;
-    }
-
-    public String getSubPageItemName() {
-        return subPageItemName;
-    }
-
-    public List<String> getSubPageItemLore() {
-        return subPageItemLore;
-    }
-
-    public int getMainMenuSlot() {
-        return subButtonSlots.get("main-menu");
-    }
-
-    public int getNextPageSlot() {
-        return subButtonSlots.get("next-page");
-    }
-
-    public int getPrevPageSlot() {
-        return subButtonSlots.get("previous-page");
-    }
-
-    public int getTotalWealthSlot() {
-        return mainButtonSlots.get("total-wealth");
-    }
-
-    public int getBlockWealthSlot() {
-        return mainButtonSlots.get("block-wealth");
-    }
-
-    public int getSpawnerWealthSlot() {
-        return mainButtonSlots.get("spawner-wealth");
-    }
-
-    public int getContainerWealthSlot() {
-        return mainButtonSlots.get("container-wealth");
-    }
-
-    public int getInventoryWealthSlot() {
-        return mainButtonSlots.get("inventory-wealth");
+        for (Map.Entry<String, Integer> map : mainButtonSlots.entrySet()) {
+            int slot = map.getValue();
+            ItemStack itemStack = mainPageButtons.get(slot);
+            ItemMeta meta = itemStack.getItemMeta();
+            List<String> parsedLore;
+            Double wealth = wealthBreakdown.get(map.getKey());
+            if (wealth == null) {
+                wealth = 0.0;
+            }
+            parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", wealth);
+            meta.setLore(parsedLore);
+            itemStack.setItemMeta(meta);
+            inv.setItem(slot, itemStack);
+        }
+        return inv;
     }
 
     /**
@@ -226,11 +237,11 @@ public class StatsMenuOptions {
      *
      * @return An array list representing pages of inventory for the view type
      */
-    private ArrayList<Inventory> prepareStatsViews(HashMap<String, MutableInt> materialList,
+    private ArrayList<Inventory> prepareSubPage(HashMap<String, MutableInt> materialList,
             String entityName, String viewType) {
         ArrayList<Inventory> entityViews = new ArrayList<>();
         int pageNum = 1;
-        Inventory entityView = initializeStatsSubPageTemplate(entityName, pageNum, viewType);
+        Inventory entityView = getSubPageTemplate(entityName, pageNum, viewType);
 
         // if no entity, return empty inventory
         if (materialList == null ) {
@@ -268,12 +279,11 @@ public class StatsMenuOptions {
                 break;
             }
 
-            List<String> lore = getSubPageItemLore();
-            List<String> parsedLore = GuiUtils.parseLore(lore, "%amount%", quantity);
+            List<String> parsedLore = GuiUtils.parseLore(subPageItemLore, "%amount%",
+                    quantity);
             parsedLore = GuiUtils.parseLore(parsedLore, "%worth%", worth);
             parsedLore = GuiUtils.parseLore(parsedLore, "%value%", worth * quantity);
-            String itemName = getSubPageItemName();
-            String parsedName = GuiUtils.parseName(itemName, "%name%", name);
+            String parsedName = GuiUtils.parseName(subPageItemName, "%name%", name);
             entityView.setItem(slot, GuiUtils.createGuiItem(material, parsedName, false,
                 parsedLore.toArray(new String[0])));
 
@@ -285,7 +295,7 @@ public class StatsMenuOptions {
                 entityViews.add(entityView);
                 pageNum++;
                 slot = 10;
-                entityView = initializeStatsSubPageTemplate(entityName, pageNum, viewType);
+                entityView = getSubPageTemplate(entityName, pageNum, viewType);
             }
         }
         entityViews.add(entityView);
@@ -301,72 +311,85 @@ public class StatsMenuOptions {
      *
      * @return an inventory gui template for subpage
      */
-    public Inventory initializeStatsSubPageTemplate(String entityName, int pageNum, String viewType) {
+    public Inventory getSubPageTemplate(String entityName, int pageNum, String viewType) {
         Inventory inv;
         String pageNumPrefix = "§" + pageNum + "§8";
-        if (viewType.equals("Block Stats")) {
-            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + GuiUtils.parseName(subPageBlockTitle, "%entity%", entityName));
-        } else if (viewType.equals("Spawner Stats")) {
-            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + GuiUtils.parseName(subPageSpawnerTitle, "%entity%", entityName));
-        } else if (viewType.equals("Container Stats")) {
-            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + GuiUtils.parseName(subPageContainerTitle, "%entity%", entityName));
-        } else {
-            inv = Bukkit.createInventory(null, getSubPageSize(), pageNumPrefix + GuiUtils.parseName(subPageInventoryTitle, "%entity%", entityName));
+        switch (viewType) {
+        case "Block Stats":
+            inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
+                GuiUtils.parseName(subPageBlockTitle, "%entity%", entityName));
+            break;
+        case "Spawner Stats":
+            inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
+                GuiUtils.parseName(subPageSpawnerTitle, "%entity%", entityName));
+            break;
+        case "Container Stats":
+            inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
+                GuiUtils.parseName(subPageContainerTitle, "%entity%", entityName));
+            break;
+        default:
+            inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
+                GuiUtils.parseName(subPageInventoryTitle, "%entity%", entityName));
+            break;
         }
 
-        for (Map.Entry<Integer, ItemStack> map : getSubPageBackground().entrySet()) {
+        for (Map.Entry<Integer, ItemStack> map : subPageBackground.entrySet()) {
             inv.setItem(map.getKey(), map.getValue());
         }
 
-        for (Map.Entry<Integer, ItemStack> map : getSubPageButtons().entrySet()) {
+        for (Map.Entry<Integer, ItemStack> map : subPageButtons.entrySet()) {
             inv.setItem(map.getKey(), map.getValue());
         }
         return inv;
     }
 
-    public StatsGui createStatsGui(String name, HashMap<String, Double> wealthBreakdown,
-            HashMap<String, MutableInt> blockList, HashMap<String, MutableInt> spawnerList,
-            HashMap<String, MutableInt> containerList, HashMap<String, MutableInt> inventoryList) {
+    // getters below are for information used in handling of inventory click events
 
-        // set up inventories
-        Inventory mainPage = getStatsMainPage(name, wealthBreakdown);
-
-        ArrayList<Inventory> blockViews = prepareStatsViews(blockList, name, "Block Stats");
-        ArrayList<Inventory> spawnerViews = prepareStatsViews(spawnerList, name, "Spawner Stats");
-        ArrayList<Inventory> containerViews = prepareStatsViews(containerList, name, "Container Stats");
-        ArrayList<Inventory> inventoryViews = prepareStatsViews(inventoryList, name, "Inventory Stats");
-
-        return new StatsGui(name, mainPage, blockViews, spawnerViews, containerViews, inventoryViews);
+    public String getMainPageIdentifier() {
+        return mainIdentifier;
     }
 
-    /**
-     * Sets up the main page for stats.
-     *
-     * @param entityName name of entity whose stats is shown
-     */
-    public Inventory getStatsMainPage(String entityName, HashMap<String, Double> wealthBreakdown) {
-        String title = getMainPageTitle();
-        String parsedName = GuiUtils.parseName(title, "%entity%", entityName);
-        Inventory inv = Bukkit.createInventory(null, getMainPageSize(),
-            parsedName);
-        for (Map.Entry<Integer, ItemStack> map : getMainPageBackground().entrySet()) {
-            inv.setItem(map.getKey(), map.getValue());
-        }
+    public String getSubPageBlockIdentifier() {
+        return blockIdentifier;
+    }
 
-        for (Map.Entry<String, Integer> map : mainButtonSlots.entrySet()) {
-            int slot = map.getValue();
-            ItemStack itemStack = mainPageButtons.get(slot);
-            ItemMeta meta = itemStack.getItemMeta();
-            List<String> parsedLore;
-            Double wealth = wealthBreakdown.get(map.getKey());
-            if (wealth == null) {
-                wealth = 0.0;
-            }
-            parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", wealth);
-            meta.setLore(parsedLore);
-            itemStack.setItemMeta(meta);
-            inv.setItem(slot, itemStack);
-        }
-        return inv;
+    public String getSubPageSpawnerIdentifier() {
+        return spawnerIdentifier;
+    }
+
+    public String getSubPageContainerIdentifier() {
+        return containerIdentifier;
+    }
+
+    public String getSubPageInventoryIdentifier() {
+        return inventoryIdentifier;
+    }
+
+    public int getMainMenuSlot() {
+        return subButtonSlots.get("main-menu");
+    }
+
+    public int getNextPageSlot() {
+        return subButtonSlots.get("next-page");
+    }
+
+    public int getPrevPageSlot() {
+        return subButtonSlots.get("previous-page");
+    }
+
+    public int getBlockWealthSlot() {
+        return mainButtonSlots.get("block-wealth");
+    }
+
+    public int getSpawnerWealthSlot() {
+        return mainButtonSlots.get("spawner-wealth");
+    }
+
+    public int getContainerWealthSlot() {
+        return mainButtonSlots.get("container-wealth");
+    }
+
+    public int getInventoryWealthSlot() {
+        return mainButtonSlots.get("inventory-wealth");
     }
 }

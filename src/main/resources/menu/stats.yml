@@ -1,4 +1,10 @@
-# options for main page of stats
+# details for menu customisation as well as more templates may be found on our wiki:
+
+#####################################################################################
+#                                                                                   #
+#                              Main Page Configurations                             #
+#                                                                                   #
+#####################################################################################
 main-page-title: "%entity%'s Total Stats"
 
 main-page-size: 27
@@ -82,8 +88,11 @@ main-page-background:
   25: BLUE_STAINED_GLASS_PANE
   26: BLUE_STAINED_GLASS_PANE
 
-
-# options for sub-pages of stats
+#####################################################################################
+#                                                                                   #
+#                               Sub Page Configurations                             #
+#                                                                                   #
+#####################################################################################
 sub-page-block-title: "%entity%'s Block Stats"
 sub-page-spawner-title: "%entity%'s Spawner Stats"
 sub-page-container-title: "%entity%'s Container Stats"

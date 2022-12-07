@@ -102,15 +102,18 @@ public class LogManager {
      */
     private void processByPlayers() {
 
-        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join", false);
-        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) * 1000;
+        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join",
+                false);
+        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) *
+                1000;
 
         // code intentionally duplicated to keep the if condition outside loop to save check time
 
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
         if (!filterLastJoin || lastJoinTime <= 0) {
             Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-                Long[] claimsInfo = this.main.getLandManager().getClaimsInfo(offlinePlayer.getName());
+                Long[] claimsInfo = this.main.getLandManager().getClaimsInfo(
+                        offlinePlayer.getName());
                 numClaims = claimsInfo[0];
                 numBlocks = claimsInfo[1];
                 numEntities++;
@@ -211,6 +214,7 @@ public class LogManager {
         config.set("land-type", main.getOptions().getLandType());
         config.set("include-spawners", main.getOptions().spawnerIsIncluded());
         config.set("include-containers", main.getOptions().containerIsIncluded());
+        config.set("container-type", main.getOptions().getContainerTypes());
         config.set("max-land-height", main.getOptions().getMaxLandHeight());
         config.set("min-land-height", main.getOptions().getMinLandHeight());
         config.set("include-inventory", main.getOptions().inventoryIsIncluded());

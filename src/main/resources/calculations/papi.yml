@@ -1,5 +1,6 @@
-# you may use {name} for entity names in your placeholders
-# for detailed guide on setting up placeholders in wealth, check out our wiki:
-# ???
+# default example is shown for a papi placeholder provided by QuickTax plugin
+# you may also use {name} for entity names in your placeholders
+# for detailed guide on setting up papi placeholders in calculation of wealth, check out our wiki:
+#
 tax-paid:
   - player;1.0;%qtax_player_total_paid%

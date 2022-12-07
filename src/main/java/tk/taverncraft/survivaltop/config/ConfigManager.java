@@ -50,6 +50,15 @@ public class ConfigManager {
     }
 
     /**
+     * Creates message lang file.
+     */
+    public void createMessageFile() {
+        String langFileName = main.getConfig().getString("lang-file");
+        FileConfiguration langConfig = getConfig("lang/" + langFileName);
+        MessageManager.setMessages(langConfig);
+    }
+
+    /**
      * Creates blocks config file.
      */
     public void createBlocksConfig() {
@@ -111,15 +120,6 @@ public class ConfigManager {
     public void createSignsConfig() {
         FileConfiguration config = getConfig("dat/signs.yml");
         main.setSignsConfig(config);
-    }
-
-    /**
-     * Creates message lang file.
-     */
-    public void createMessageFile() {
-        String langFileName = main.getConfig().getString("lang-file");
-        FileConfiguration langConfig = getConfig("lang/" + langFileName);
-        MessageManager.setMessages(langConfig);
     }
 
     /**

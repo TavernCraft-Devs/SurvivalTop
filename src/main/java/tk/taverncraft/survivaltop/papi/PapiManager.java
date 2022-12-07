@@ -6,16 +6,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 import tk.taverncraft.survivaltop.Main;
 
 /**
- * An expansion class for PAPI.
+ * Handles logic for including papi in wealth calculations.
  */
 public class PapiManager extends PlaceholderExpansion {
     private final Main main;
@@ -31,6 +31,11 @@ public class PapiManager extends PlaceholderExpansion {
         initializePlaceholders();
     }
 
+    /**
+     * Gets the list of user-specified papi categories to include.
+     *
+     * @return list of papi categories
+     */
     public List<String> getPapiCategories() {
         return new ArrayList<>(categoriesToPlaceholdersMap.keySet());
     }
@@ -40,7 +45,8 @@ public class PapiManager extends PlaceholderExpansion {
      */
     public void initializePlaceholders() {
         categoriesToPlaceholdersMap = new LinkedHashMap<>();
-        for (String category: main.getPapiConfig().getConfigurationSection("").getKeys(false)) {
+        for (String category: main.getPapiConfig().getConfigurationSection("")
+                .getKeys(false)) {
             List<String> placeholders = main.getPapiConfig().getStringList(category);
             categoriesToPlaceholdersMap.put(category, placeholders);
         }
@@ -110,9 +116,11 @@ public class PapiManager extends PlaceholderExpansion {
                     if (type.equalsIgnoreCase("GROUP")) {
                         value += getParsedValue(null, entry, group) * multiplier;
                     } else if (type.equalsIgnoreCase("PLAYER")) {
-                        List<OfflinePlayer> offlinePlayers = this.main.getGroupManager().getPlayers(group);
+                        List<OfflinePlayer> offlinePlayers = this.main.getGroupManager()
+                                .getPlayers(group);
                         for (OfflinePlayer offlinePlayer : offlinePlayers) {
-                            value += getParsedValue(offlinePlayer, entry, offlinePlayer.getName()) * multiplier;
+                            value += getParsedValue(offlinePlayer, entry,
+                                    offlinePlayer.getName()) * multiplier;
                         }
                     }
                 } catch (Exception ignored) {
@@ -123,6 +131,15 @@ public class PapiManager extends PlaceholderExpansion {
         return papiWealth;
     }
 
+    /**
+     * Parses provided placeholders into values.
+     *
+     * @param player player to parse value for
+     * @param placeholder placeholder provided
+     * @param name name of entity to use
+     *
+     * @return parsed value
+     */
     private double getParsedValue(OfflinePlayer player, String placeholder, String name) {
         String parsedName = placeholder.replaceAll("\\{name}", name);
         String strValue = PlaceholderAPI.setPlaceholders(player, parsedName);
@@ -132,6 +149,8 @@ public class PapiManager extends PlaceholderExpansion {
             return 0;
         }
     }
+
+    // section below contains functions used to retrieve papi placeholders provided by this plugin
 
     @Override
     public String getAuthor() {

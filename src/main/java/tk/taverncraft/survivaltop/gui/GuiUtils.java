@@ -1,5 +1,8 @@
 package tk.taverncraft.survivaltop.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -7,9 +10,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * GuiUtils contains generic functions that helps in creating a GUI.
+ */
 public class GuiUtils {
 
     /**
@@ -36,7 +39,7 @@ public class GuiUtils {
         if (isEnchanted) {
             try {
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
         }
@@ -59,10 +62,24 @@ public class GuiUtils {
         return item;
     }
 
+    /**
+     * Parse colour for a string.
+     *
+     * @param text string to parse colour for
+     *
+     * @return string with parsed colours
+     */
     private static String parseWithColours(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
+    /**
+     * Parse colour for strings.
+     *
+     * @param lore lore to parse colour for
+     *
+     * @return lore with parsed colours
+     */
     private static List<String> parseWithColours(String[] lore) {
         List<String> colouredLore = new ArrayList<>();
         for (String line : lore) {
@@ -71,6 +88,15 @@ public class GuiUtils {
         return colouredLore;
     }
 
+    /**
+     * Parses a lore to replace placeholder with double values.
+     *
+     * @param lore lore to parse
+     * @param placeholder placeholder to replace
+     * @param value value to use
+     *
+     * @return parsed lore
+     */
     public static List<String> parseLore(List<String> lore, String placeholder, double value) {
         List<String> parsedLore = new ArrayList<>();
         if (lore == null) {
@@ -82,6 +108,15 @@ public class GuiUtils {
         return parsedLore;
     }
 
+    /**
+     * Parses a name to replace placeholder with string values.
+     *
+     * @param lore lore to parse
+     * @param placeholder placeholder to replace
+     * @param name name to use
+     *
+     * @return parsed name
+     */
     public static String parseName(String lore, String placeholder, String name) {
         return lore.replaceAll(placeholder, name);
     }

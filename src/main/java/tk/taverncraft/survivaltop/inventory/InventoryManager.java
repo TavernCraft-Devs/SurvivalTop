@@ -45,24 +45,6 @@ public class InventoryManager {
     }
 
     /**
-     * Cleans up holders after stats update.
-     *
-     * @param id key to identify task
-     */
-    public void doCleanUp(int id) {
-        inventoryHolderMap.remove(id);
-    }
-
-    /**
-     * Creates holders for stats.
-     *
-     * @param id key to identify task
-     */
-    public void createHolder(int id) {
-        inventoryHolderMap.put(id, new InventoryHolder(inventoryMaterial));
-    }
-
-    /**
      * Initializes values of inventory items.
      */
     public void initializeWorth() {
@@ -75,7 +57,7 @@ public class InventoryManager {
     private void loadInventoryWorth() {
         inventoryWorth = new LinkedHashMap<>();
         for (String key : main.getInventoriesConfig().getConfigurationSection("")
-                .getKeys(false)) {
+            .getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null) {
@@ -87,6 +69,52 @@ public class InventoryManager {
             }
         }
         inventoryMaterial = inventoryWorth.keySet();
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param id key to identify task
+     */
+    public void createHolder(int id) {
+        inventoryHolderMap.put(id, new InventoryHolder(inventoryMaterial));
+    }
+
+    /**
+     * Cleans up holders after stats update.
+     *
+     * @param id key to identify task
+     */
+    public void doCleanUp(int id) {
+        inventoryHolderMap.remove(id);
+    }
+
+    /**
+     * Calculates inventory worth for a specified entity.
+     *
+     * @param id key to identify task
+     *
+     * @return map of sender uuid to the calculated inventory worth
+     */
+    public double calculateInventoryWorth(int id) {
+        return getAllInventoriesWorth(inventoryHolderMap.get(id));
+    }
+
+    /**
+     * Gets the total worth of inventories.
+     *
+     * @param inventoryHolder holder containing inventory item count
+     *
+     * @return double value representing total worth of inventories
+     */
+    public double getAllInventoriesWorth(InventoryHolder inventoryHolder) {
+        double totalInventoryWorth = 0;
+        HashMap<String, MutableInt> counter = inventoryHolder.getCounter();
+        for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
+            // count multiply by worth, then added to total
+            totalInventoryWorth += map.getValue().get() * inventoryWorth.get(map.getKey());
+        }
+        return totalInventoryWorth;
     }
 
     /**
@@ -164,34 +192,6 @@ public class InventoryManager {
                     itemStack.getAmount());
             }
         }
-    }
-
-    /**
-     * Calculates inventory worth for a specified entity.
-     *
-     * @param id key to identify task
-     *
-     * @return map of sender uuid to the calculated inventory worth
-     */
-    public double calculateInventoryWorth(int id) {
-        return getAllInventoriesWorth(inventoryHolderMap.get(id));
-    }
-
-    /**
-     * Gets the total worth of inventories.
-     *
-     * @param inventoryHolder holder containing inventory item count
-     *
-     * @return double value representing total worth of inventories
-     */
-    public double getAllInventoriesWorth(InventoryHolder inventoryHolder) {
-        double totalInventoryWorth = 0;
-        HashMap<String, MutableInt> counter = inventoryHolder.getCounter();
-        for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
-            // count multiply by worth, then added to total
-            totalInventoryWorth += map.getValue().get() * inventoryWorth.get(map.getKey());
-        }
-        return totalInventoryWorth;
     }
 
     /**

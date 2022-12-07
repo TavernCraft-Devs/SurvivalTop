@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import org.bukkit.inventory.Inventory;
 
+/**
+ * StatsGui handles all logic related to showing stats in a GUI.
+ */
 public class StatsGui {
     // list of inventories
     private final String name;
@@ -45,6 +48,7 @@ public class StatsGui {
      * Gets the block stats page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing block page of stats
      */
     public Inventory getBlockStatsPage(int pageNum) {
@@ -59,6 +63,7 @@ public class StatsGui {
      * Gets the spawner stats page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing spawner page of stats
      */
     public Inventory getSpawnerStatsPage(int pageNum) {
@@ -73,6 +78,7 @@ public class StatsGui {
      * Gets the container stats page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing container page of stats
      */
     public Inventory getContainerStatsPage(int pageNum) {
@@ -87,6 +93,7 @@ public class StatsGui {
      * Gets the inventory stats page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing inventory page of stats
      */
     public Inventory getInventoryStatsPage(int pageNum) {

@@ -41,32 +41,43 @@ public class EntityCache {
      * Constructor for EntityCache.
      *
      * @param balWealth balance wealth of entity
+     * @param papiWealth papi wealth of entity
      * @param blockWealth block wealth of entity
      * @param spawnerWealth spawner wealth of entity
      * @param containerWealth container wealth of entity
      * @param inventoryWealth inventory wealth of entity
      */
     public EntityCache(String name, double balWealth, LinkedHashMap<String, Double> papiWealth,
-            double blockWealth, double spawnerWealth, double containerWealth, double inventoryWealth) {
+            double blockWealth, double spawnerWealth, double containerWealth,
+            double inventoryWealth) {
         this.name = name;
         this.papiWealth = papiWealth;
         wealthBreakdown = new HashMap<>();
-        wealthBreakdown.put("balance-wealth", new BigDecimal(balWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("balance-wealth", new BigDecimal(balWealth).setScale(2,
+                RoundingMode.HALF_UP).doubleValue());
         wealthBreakdown.putAll(papiWealth);
-        wealthBreakdown.put("block-wealth", new BigDecimal(blockWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        wealthBreakdown.put("spawner-wealth", new BigDecimal(spawnerWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        wealthBreakdown.put("container-wealth", new BigDecimal(containerWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        wealthBreakdown.put("inventory-wealth", new BigDecimal(inventoryWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("block-wealth", new BigDecimal(blockWealth).setScale(2,
+                RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("spawner-wealth", new BigDecimal(spawnerWealth).setScale(2,
+                RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("container-wealth", new BigDecimal(containerWealth).setScale(2,
+                RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("inventory-wealth", new BigDecimal(inventoryWealth).setScale(2,
+                RoundingMode.HALF_UP).doubleValue());
         double landWealth = blockWealth + spawnerWealth + containerWealth;
-        wealthBreakdown.put("land-wealth", new BigDecimal(landWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        double totalWealth = papiWealth.values().stream().mapToDouble(Double::valueOf).sum()
-            + balWealth + landWealth + inventoryWealth;
-        wealthBreakdown.put("total-wealth", new BigDecimal(totalWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        wealthBreakdown.put("land-wealth", new BigDecimal(landWealth)
+                .setScale(2, RoundingMode.HALF_UP).doubleValue());
+        double totalWealth = papiWealth.values().stream().mapToDouble(Double::valueOf).sum() +
+                balWealth + landWealth + inventoryWealth;
+        wealthBreakdown.put("total-wealth", new BigDecimal(totalWealth)
+                .setScale(2, RoundingMode.HALF_UP).doubleValue());
         this.cacheTime = Instant.now().getEpochSecond();
     }
 
     /**
      * Gets the gui of the entity (if applicable).
+     *
+     * @param main plugin class
      *
      * @return gui of entity
      */
@@ -77,17 +88,26 @@ public class EntityCache {
         return gui;
     }
 
+    /**
+     * Sets the gui stats for the entity.
+     *
+     * @param main plugin class
+     */
     public void setGui(Main main) {
         this.gui = main.getGuiManager().getStatsGui(name, wealthBreakdown,
                 blockCounter, spawnerCounter, containerCounter, inventoryCounter);
     }
 
+    /**
+     * Sets the chat stats for the entity.
+     */
     public void setChat() {
         if (this.placeholders != null && this.values != null) {
             return;
         }
 
-        Stream<String> placeholdersStream = Stream.concat(Stream.of("entity"), wealthBreakdown.keySet().stream());
+        Stream<String> placeholdersStream = Stream.concat(Stream.of("entity"),
+                wealthBreakdown.keySet().stream());
         this.placeholders = placeholdersStream.map(e -> "%" + e + "%").toArray(String[]::new);
 
         Stream<String> valuesStream = Stream.concat(Stream.of(name),
@@ -96,6 +116,11 @@ public class EntityCache {
         this.values = valuesStream.toArray(String[]::new);
     }
 
+    /**
+     * Gets the name of the entity.
+     *
+     * @return name of entity
+     */
     public String getName() {
         return name;
     }
@@ -178,22 +203,49 @@ public class EntityCache {
         return cacheTime;
     }
 
-    public void setCounters(HashMap<String, MutableInt> blockCounter, HashMap<String, MutableInt> spawnerCounter,
-        HashMap<String, MutableInt> containerCounter, HashMap<String, MutableInt> inventoryCounter) {
+    /**
+     * Sets the counters of the entity.
+     *
+     * @param blockCounter counter for blocks
+     * @param spawnerCounter counter for spawners
+     * @param containerCounter counter for containers
+     * @param inventoryCounter counter for inventories
+     */
+    public void setCounters(HashMap<String, MutableInt> blockCounter,
+            HashMap<String, MutableInt> spawnerCounter,
+            HashMap<String, MutableInt> containerCounter,
+            HashMap<String, MutableInt> inventoryCounter) {
         this.blockCounter = blockCounter;
         this.spawnerCounter = spawnerCounter;
         this.containerCounter = containerCounter;
         this.inventoryCounter = inventoryCounter;
     }
 
+    /**
+     * Gets the placeholder keys used in entity cache chat stats.
+     *
+     * @return placeholder keys in entity cache chat stats
+     */
     public String[] getPlaceholders() {
         return placeholders;
     }
 
+    /**
+     * Gets the placeholder values used in entity cache chat stats.
+     *
+     * @return placeholder values in entity cache chat stats
+     */
     public String[] getValues() {
         return values;
     }
 
+    /**
+     * Checks if cache is expired.
+     *
+     * @param cacheDuration duration before expiry
+     *
+     * @return true if expired, false otherwise
+     */
     public boolean isExpired(long cacheDuration) {
         return Instant.now().getEpochSecond() - cacheTime >= cacheDuration;
     }

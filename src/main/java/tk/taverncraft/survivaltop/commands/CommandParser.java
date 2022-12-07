@@ -77,7 +77,7 @@ public class CommandParser implements CommandExecutor {
 
         // special command for stats inventory view
         case "OPENSTATSINV":
-            main.getGuiManager().openMainStatsPage(main.getSenderUuid(sender));
+            main.getGuiManager().getMainStatsPage(main.getSenderUuid(sender));
             return true;
 
         // all other cases treated as invalid

@@ -28,6 +28,11 @@ public class InfoGui {
         this.inventoryViews = inventoryViews;
     }
 
+    /**
+     * Gets the main page of info gui.
+     *
+     * @return main page of info gui
+     */
     public Inventory getMainInfoPage() {
         return mainPage;
     }
@@ -36,6 +41,7 @@ public class InfoGui {
      * Gets the block info page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing block page of info
      */
     public Inventory getBlockInfoPage(int pageNum) {
@@ -50,6 +56,7 @@ public class InfoGui {
      * Gets the spawner info page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing spawner page of info
      */
     public Inventory getSpawnerInfoPage(int pageNum) {
@@ -64,6 +71,7 @@ public class InfoGui {
      * Gets the container info page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing container page of info
      */
     public Inventory getContainerInfoPage(int pageNum) {
@@ -78,6 +86,7 @@ public class InfoGui {
      * Gets the inventory info page.
      *
      * @param pageNum page number to show
+     *
      * @return inventory showing inventory page of info
      */
     public Inventory getInventoryInfoPage(int pageNum) {

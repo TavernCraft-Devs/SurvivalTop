@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
@@ -34,6 +33,24 @@ public class BlockOperations {
     }
 
     /**
+     * Returns block operation for stats.
+     *
+     * @return block operation for stats
+     */
+    public BiFunction<Integer, Block, Boolean> getOperation() {
+        return processBlock;
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param id key to identify task
+     */
+    public void createHolder(int id) {
+        blockHolderMap.put(id, new BlockHolder(blockMaterial));
+    }
+
+    /**
      * Returns block holder for given uuid.
      *
      * @param id key to identify task
@@ -45,30 +62,12 @@ public class BlockOperations {
     }
 
     /**
-     * Returns block operation for stats.
-     *
-     * @return block operation for stats
-     */
-    public BiFunction<Integer, Block, Boolean> getOperation() {
-        return processBlock;
-    }
-
-    /**
      * Cleans up holders after stats update.
      *
      * @param id key to identify task
      */
     public void doCleanUp(int id) {
         blockHolderMap.remove(id);
-    }
-
-    /**
-     * Creates holders for stats.
-     *
-     * @param id key to identify task
-     */
-    public void createHolder(int id) {
-        blockHolderMap.put(id, new BlockHolder(blockMaterial));
     }
 
     /**

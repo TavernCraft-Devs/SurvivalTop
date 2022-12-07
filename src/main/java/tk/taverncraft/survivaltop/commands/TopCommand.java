@@ -37,19 +37,16 @@ public class TopCommand {
         }
 
         // show first page if no page number provided
+        int pageNum = 1;
         try {
-            int pageNum = Integer.parseInt(args[1]);
-            if (main.getOptions().isUseHoverableLeaderboard()) {
-                MessageManager.showHoverableLeaderboard(sender, pageNum);
-            } else {
-                MessageManager.showLeaderboard(sender, pageNum);
-            }
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            if (main.getOptions().isUseHoverableLeaderboard()) {
-                MessageManager.showHoverableLeaderboard(sender, 1);
-            } else {
-                MessageManager.showLeaderboard(sender, 1);
-            }
+            pageNum = Integer.parseInt(args[1]);
+        } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
+        }
+        if (main.getOptions().isUseHoverableLeaderboard()) {
+            MessageManager.showHoverableLeaderboard(sender, pageNum);
+        } else {
+            MessageManager.showLeaderboard(sender, pageNum,
+                    main.getOptions().getLeaderboardPositionsPerPage());
         }
         return true;
     }

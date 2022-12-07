@@ -1,7 +1,6 @@
 package tk.taverncraft.survivaltop.land.claimplugins;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.Vector;
 
 import org.bukkit.Bukkit;

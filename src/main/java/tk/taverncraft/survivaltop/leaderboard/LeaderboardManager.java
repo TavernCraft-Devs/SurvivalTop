@@ -34,10 +34,16 @@ public class LeaderboardManager {
     private Iterator<String> leaderboardTaskQueue;
     CommandSender leaderboardSender;
 
-    // cache values used for leaderboard/papi
-    private ConcurrentHashMap<String, Integer> positionCacheMap;
+    // map used during an ongoing leaderboard update
     private ConcurrentHashMap<String, EntityCache> entityCacheMap;
+
+    // maps below are used for papi
+
+    // copy is used for consistent papi values
     private ConcurrentHashMap<String, EntityCache> entityCacheMapCopy;
+
+    // cached positions
+    private ConcurrentHashMap<String, Integer> positionCacheMap;
     private ArrayList<EntityCache> entityCacheList;
 
     /**
@@ -142,26 +148,31 @@ public class LeaderboardManager {
     }
 
     /**
-     * Performs update by individual players.
+     * Sets the leaderboard task queue for players.
      */
     private void setTaskQueueForPlayers() {
-        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join", false);
-        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) * 1000;
+        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join",
+                false);
+        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) *
+                1000;
 
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
         if (!filterLastJoin || lastJoinTime <= 0) {
-            leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).iterator();
+            leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers())
+                    .map(OfflinePlayer::getName).iterator();
             return;
         }
 
         // path for if last join filter is on
         Instant instant = Instant.now();
         long currentTime = instant.getEpochSecond() * 1000;
-        leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers()).filter(p -> currentTime - p.getLastPlayed() <= lastJoinTime).map(OfflinePlayer::getName).iterator();
+        leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers())
+                .filter(p -> currentTime - p.getLastPlayed() <= lastJoinTime)
+                .map(OfflinePlayer::getName).iterator();
     }
 
     /**
-     * Performs update by groups.
+     * Sets the leaderboard task queue for groups.
      */
     private void setTaskQueueForGroups() {
         List<String> groups = this.main.getGroupManager().getGroups();
@@ -178,10 +189,12 @@ public class LeaderboardManager {
             HashMap<String, EntityCache> tempSortedCache) {
         if (main.getOptions().isUseHoverableLeaderboard()) {
             MessageManager.setUpHoverableLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0), main.getOptions().getLeaderboardPositionsPerPage());
+                    "minimum-wealth", 0.0),
+                    main.getOptions().getLeaderboardPositionsPerPage());
         } else {
             MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                "minimum-wealth", 0.0), main.getOptions().getLeaderboardPositionsPerPage());
+                    "minimum-wealth", 0.0),
+                    main.getOptions().getLeaderboardPositionsPerPage());
         }
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
         MessageManager.sendMessage(sender, "update-complete",
@@ -232,7 +245,7 @@ public class LeaderboardManager {
     }
 
     /**
-     * Set entity position and entity cache list for easy PAPI access.
+     * Sets entity position and entity cache list for easy papi access.
      *
      * @param tempSortedCache hashmap to use to generate cache for
      */
@@ -284,6 +297,39 @@ public class LeaderboardManager {
     public long getLastUpdateDuration() {
         return this.lastUpdateDuration;
     }
+
+    /**
+     * Processes task queue at end of each leaderboard task.
+     *
+     * @param name name of entity for which task just finished
+     * @param eCache entity cache of entity
+     */
+    public void processLeaderboardUpdate(String name, EntityCache eCache) {
+        entityCacheMap.put(name.toUpperCase(), eCache);
+        if (!leaderboardTaskQueue.hasNext()) {
+            HashMap<String, EntityCache> sortedMap = sortAndFilterEntities(entityCacheMap);
+            setUpEntityCache(sortedMap);
+            entityCacheMapCopy = entityCacheMap;
+            completeLeaderboardUpdate(leaderboardSender, sortedMap);
+            main.getStorageManager().saveToStorage(entityCacheList);
+        } else {
+            main.getStatsManager().getStatsForLeaderboard(leaderboardSender,
+                    leaderboardTaskQueue.next());
+        }
+    }
+
+    /**
+     * Gets the entity cache in the leaderboard.
+     *
+     * @param name name of entity
+     *
+     * @return cache of entity
+     */
+    public EntityCache getEntityCache(String name) {
+        return entityCacheMap.get(name);
+    }
+
+    // functions below are called by the papi manager to retrieve leaderboard values
 
     /**
      * Gets the name of an entity at given position.
@@ -420,28 +466,5 @@ public class LeaderboardManager {
     public String getEntityTotalWealth(String name) {
         EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getTotalWealth());
-    }
-
-    public void processLeaderboardUpdate(String name, EntityCache eCache) {
-        entityCacheMap.put(name.toUpperCase(), eCache);
-        if (!leaderboardTaskQueue.hasNext()) {
-            HashMap<String, EntityCache> sortedMap = sortAndFilterEntities(entityCacheMap);
-            setUpEntityCache(sortedMap);
-            entityCacheMapCopy = entityCacheMap;
-            completeLeaderboardUpdate(leaderboardSender, sortedMap);
-        } else {
-            main.getStatsManager().getStatsForLeaderboard(leaderboardSender, leaderboardTaskQueue.next());
-        }
-    }
-
-    /**
-     * Gets the entity cache in the leaderboard.
-     *
-     * @param name name of entity
-     *
-     * @return cache of entity
-     */
-    public EntityCache getEntityCache(String name) {
-        return entityCacheMap.get(name);
     }
 }

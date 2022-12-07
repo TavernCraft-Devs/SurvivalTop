@@ -24,7 +24,7 @@ use-gui-stats: false
 # 1 - balance between using cache and real-time calculations (recommended)
 # 2 - only uses cache calculations from leaderboard (i.e. players cannot get real-time stats)
 # you may find out more details about the calculation modes on our wiki:
-# ???
+#
 calculation-mode: 1
 
 # only used if calculation mode is 1 or 2, sets the duration before cache expires
@@ -85,6 +85,13 @@ include-land: false
 # https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
 land-type: GriefPrevention
 
+# the following 2 options are recommended to be left as default to use the heights provided by
+# the land plugin
+# if you wish to adjust this, kindly refer to a more detailed explanation on the wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
+max-land-height: default
+min-land-height: default
+
 # if true, spawners will be included as part of land wealth in calculations
 # also requires include-land to be true!
 # note that checks for spawners are more expensive and you should consider disabling this if updates take too long
@@ -100,13 +107,6 @@ include-containers: false
 container-type:
   - CHEST
   - TRAPPED_CHEST
-
-# the following 2 options are recommended to be left as default to use the heights provided by
-# the land plugin
-# if you wish to adjust this, kindly refer to a more detailed explanation on the wiki:
-# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
-max-land-height: default
-min-land-height: default
 
 #####################################################################################
 #                                                                                   #

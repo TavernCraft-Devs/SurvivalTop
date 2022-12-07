@@ -1,6 +1,7 @@
 package tk.taverncraft.survivaltop.config;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,35 +10,55 @@ import tk.taverncraft.survivaltop.Main;
 
 /**
  * Handles and stores all options loaded from configuration files. Explanations for each field
- * may be found on the wiki and won't be repeated here.
+ * may be found on the wiki and are not repeated here.
  */
 public class Options {
     private final Main main;
+
+    // general configurations
     private boolean useGuiStats;
     private int calculationMode;
+    private int cacheDuration;
+
+    // filter configurations
     private boolean filterLastJoin;
     private long filterPlayerTime;
+
+    // group configurations
     private boolean enableGroup;
     private String groupType;
+
+    // balance configurations
     private boolean includeBal;
+
+    // land configurations
     private boolean includeLand;
     private String landType;
+    private int maxLandHeight;
+    private int minLandHeight;
     private boolean includeSpawners;
     private boolean includeContainers;
+    private List<String> containerTypes;
+
+    // inventory configurations
     private boolean includeInventory;
+
+    // papi configurations
     private boolean includePapi;
+
+    // leaderboard configurations
     private int updateInterval;
     private boolean updateOnStart;
     private double minimumWealth;
     private int totalLeaderboardPositions;
     private int leaderboardPositionsPerPage;
-    private boolean useGuiLeaderboard;
     private boolean useHoverableLeaderboard;
+
+    // storage configurations
     private String storageType;
-    private int maxLandHeight;
-    private int minLandHeight;
+
+    // last plugin load/reload time
     private long lastLoadTime;
-    private int cacheDuration;
 
     /**
      * Constructor for Options.
@@ -64,8 +85,11 @@ public class Options {
         this.includeBal = config.getBoolean("include-bal", false);
         this.includeLand = config.getBoolean("include-land", false);
         this.landType = config.getString("land-type", "GriefPrevention");
+        setMaxLandHeight();
+        setMinLandHeight();
         this.includeSpawners = config.getBoolean("include-spawners", false);
         this.includeContainers = config.getBoolean("include-containers", false);
+        this.containerTypes = config.getStringList("container-type");
         this.includeInventory = config.getBoolean("include-inventory", false);
         this.includePapi = config.getBoolean("include-papi", false);
         this.updateInterval = config.getInt("update-interval", 3600);
@@ -73,15 +97,21 @@ public class Options {
         this.minimumWealth = config.getInt("minimum-wealth", 0);
         this.totalLeaderboardPositions = config.getInt("total-leaderboard-positions", -1);
         this.leaderboardPositionsPerPage = config.getInt("leaderboard-positions-per-page", 10);
-        this.useGuiLeaderboard = config.getBoolean("use-gui-leaderboard", false);
         this.useHoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
         this.storageType = config.getString("storage-type", "None");
         this.lastLoadTime = Instant.now().getEpochSecond();
-        setMaxLandHeight();
-        setMinLandHeight();
     }
 
     // getters below
+
+    public boolean isUseGuiStats() {
+        return useGuiStats;
+    }
+
+    public int getCalculationMode() {
+        return calculationMode;
+    }
+
     public boolean isCalculationMode0() {
         return calculationMode == 0;
     }
@@ -94,64 +124,8 @@ public class Options {
         return calculationMode == 2;
     }
 
-    public int getCalculationMode() {
-        return calculationMode;
-    }
-
-    public boolean balIsIncluded() {
-        return includeBal;
-    }
-
-    public boolean landIsIncluded() {
-        return includeLand;
-    }
-
-    public boolean spawnerIsIncluded() {
-        return includeLand && includeSpawners;
-    }
-
-    public boolean containerIsIncluded() {
-        return includeLand && includeContainers;
-    }
-
-    public boolean inventoryIsIncluded() {
-        return includeInventory;
-    }
-
-    public boolean papiIsIncluded() {
-        return includePapi;
-    }
-
-    public boolean groupIsEnabled() {
-        return enableGroup;
-    }
-
-    public boolean isUseGuiStats() {
-        return useGuiStats;
-    }
-
-    public int getTotalLeaderboardPositions() {
-        return totalLeaderboardPositions;
-    }
-
-    public int getLeaderboardPositionsPerPage() {
-        return leaderboardPositionsPerPage;
-    }
-
-    public boolean isUseGuiLeaderboard() {
-        return useGuiLeaderboard;
-    }
-
-    public boolean isUseHoverableLeaderboard() {
-        return useHoverableLeaderboard;
-    }
-
-    public double getMaxLandHeight() {
-        return maxLandHeight;
-    }
-
-    public double getMinLandHeight() {
-        return minLandHeight;
+    public int getCacheDuration() {
+        return cacheDuration;
     }
 
     public boolean filterLastJoin() {
@@ -162,12 +136,52 @@ public class Options {
         return filterPlayerTime;
     }
 
+    public boolean groupIsEnabled() {
+        return enableGroup;
+    }
+
     public String getGroupType() {
         return groupType;
     }
 
+    public boolean balIsIncluded() {
+        return includeBal;
+    }
+
+    public boolean landIsIncluded() {
+        return includeLand;
+    }
+
     public String getLandType() {
         return landType;
+    }
+
+    public double getMaxLandHeight() {
+        return maxLandHeight;
+    }
+
+    public double getMinLandHeight() {
+        return minLandHeight;
+    }
+
+    public boolean spawnerIsIncluded() {
+        return includeLand && includeSpawners;
+    }
+
+    public boolean containerIsIncluded() {
+        return includeLand && includeContainers;
+    }
+
+    public List<String> getContainerTypes() {
+        return containerTypes;
+    }
+
+    public boolean inventoryIsIncluded() {
+        return includeInventory;
+    }
+
+    public boolean papiIsIncluded() {
+        return includePapi;
     }
 
     public int getUpdateInterval() {
@@ -182,16 +196,24 @@ public class Options {
         return minimumWealth;
     }
 
+    public int getTotalLeaderboardPositions() {
+        return totalLeaderboardPositions;
+    }
+
+    public int getLeaderboardPositionsPerPage() {
+        return leaderboardPositionsPerPage;
+    }
+
+    public boolean isUseHoverableLeaderboard() {
+        return useHoverableLeaderboard;
+    }
+
     public String getStorageType() {
         return storageType;
     }
 
     public long getLastLoadTime() {
         return lastLoadTime;
-    }
-
-    public int getCacheDuration() {
-        return cacheDuration;
     }
 
     // setters below

@@ -13,14 +13,13 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.ChatPaginator;
 
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
-import tk.taverncraft.survivaltop.utils.types.Pair;
+import tk.taverncraft.survivaltop.utils.types.TextComponentPair;
 
 import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
 
@@ -29,8 +28,14 @@ import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
  */
 public class MessageManager {
     private static final HashMap<String, String> messageKeysMap = new HashMap<>();
+
+    // used if leaderboard is not hoverable
     private static String completeLeaderboard;
+
+    // used if leaderboard is hoverable
     private static BaseComponent[][] completeHoverableLeaderboard;
+
+    // standard text component message sent when gui stats are ready
     private static TextComponent guiStatsReadyMessage;
 
     /**
@@ -59,7 +64,7 @@ public class MessageManager {
     }
 
     /**
-     * Sends message to the sender, replacing placeholders.
+     * Sends message to the sender.
      *
      * @param sender sender to send message to
      * @param messageKey key to get message with
@@ -72,6 +77,15 @@ public class MessageManager {
         sender.sendMessage(message);
     }
 
+    /**
+     * Replaces placeholder keys with values.
+     *
+     * @param messageKey key to get message with
+     * @param keys placeholder keys
+     * @param values placeholder values
+     *
+     * @return parsed message
+     */
     private static String getParsedMessage(String messageKey, String[] keys, String[] values) {
         String message = getMessage(messageKey);
         for (int i = 0; i < keys.length; i++) {
@@ -90,6 +104,14 @@ public class MessageManager {
         return prefix.substring(0, prefix.length() - 1) + messageKeysMap.get(messageKey);
     }
 
+    /**
+     * Gets the formatting used for signs and returns the parsed lines.
+     *
+     * @param keys placeholder keys
+     * @param values placeholder values
+     *
+     * @return formatted text for signs
+     */
     public static String getSignFormat(String[] keys, String[] values) {
         String message = messageKeysMap.get("leaderboard-sign");
         for (int i = 0; i < keys.length; i++) {
@@ -99,27 +121,26 @@ public class MessageManager {
     }
 
     /**
-     * Shows leaderboard to the user.
+     * Shows non-hoverable leaderboard to the user.
      *
      * @param sender sender to send message to
      * @param pageNum page number of leaderboard
      */
-    public static void showLeaderboard(CommandSender sender, int pageNum) {
+    public static void showLeaderboard(CommandSender sender, int pageNum, int linesPerPage) {
         if (completeLeaderboard == null) {
             sendMessage(sender, "no-updated-leaderboard");
             return;
         }
 
-        int linesPerPage = 12;
         ChatPaginator.ChatPage page = ChatPaginator.paginate(completeLeaderboard, pageNum,
-                GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH, linesPerPage);
+                GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH, linesPerPage + 2);
         for (String line : page.getLines()) {
             sender.sendMessage(line);
         }
     }
 
     /**
-     * Shows leaderboard to the user.
+     * Shows hoverable leaderboard to the user.
      *
      * @param sender sender to send message to
      * @param pageNum page number of leaderboard
@@ -134,10 +155,11 @@ public class MessageManager {
     }
 
     /**
-     * Sets up message for leaderboard beforehand to improve performance.
+     * Sets up message for non-hoverable leaderboard beforehand to improve performance.
      *
      * @param leaderboard hashmap of leaderboard positions
      * @param minimumWealth minimum wealth to show on leaderboard
+     * @param positionsPerPage number of positions shown per page
      */
     public static void setUpLeaderboard(HashMap<String, EntityCache> leaderboard,
             double minimumWealth, int positionsPerPage) {
@@ -175,13 +197,24 @@ public class MessageManager {
         completeLeaderboard = message.toString();
     }
 
+    /**
+     * Sets up message for hoverable leaderboard beforehand to improve performance.
+     *
+     * @param leaderboard hashmap of leaderboard positions
+     * @param minimumWealth minimum wealth to show on leaderboard
+     * @param positionsPerPage number of positions shown per page
+     */
     public static void setUpHoverableLeaderboard(HashMap<String, EntityCache> leaderboard,
             double minimumWealth, int positionsPerPage) {
-        completeHoverableLeaderboard = new BaseComponent[(int) Math.ceil((double) leaderboard.size() / positionsPerPage)][];
+        int size = (int) Math.ceil((double) leaderboard.size() / positionsPerPage);
+        completeHoverableLeaderboard = new BaseComponent[size][];
 
-        String header = messageKeysMap.get("leaderboard-header").substring(0, messageKeysMap.get("leaderboard-header").length() - 1);
-        String footer = messageKeysMap.get("leaderboard-footer").substring(0, messageKeysMap.get("leaderboard-footer").length() - 2);
-        String messageTemplate = messageKeysMap.get("leaderboard-body").substring(0, messageKeysMap.get("leaderboard-body").length() - 1);
+        String header = messageKeysMap.get("leaderboard-header")
+                .substring(0, messageKeysMap.get("leaderboard-header").length() - 1);
+        String footer = messageKeysMap.get("leaderboard-footer")
+                .substring(0, messageKeysMap.get("leaderboard-footer").length() - 2);
+        String messageTemplate = messageKeysMap.get("leaderboard-body")
+                .substring(0, messageKeysMap.get("leaderboard-body").length() - 1);
         ComponentBuilder message = new ComponentBuilder(header);
         int position = 1;
         int currentPage = 1;
@@ -204,8 +237,10 @@ public class MessageManager {
                     RoundingMode.HALF_UP).toPlainString());
             TextComponent component = getTextComponentMessage(entry);
             eCache.setChat();
-            String parsedMessage = getParsedMessage("leaderboard-hover", eCache.getPlaceholders(), eCache.getValues());
-            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, getBaseComponentArrMessage(parsedMessage)));
+            String parsedMessage = getParsedMessage("leaderboard-hover",
+                    eCache.getPlaceholders(), eCache.getValues());
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    getBaseComponentArrMessage(parsedMessage)));
             message.append(component);
             if (position % positionsPerPage == 0) {
                 message.append(footer.replaceAll("%page%", String.valueOf(currentPage + 1)));
@@ -218,6 +253,11 @@ public class MessageManager {
         completeHoverableLeaderboard[currentPage - 1] = message.create();
     }
 
+    /**
+     * Sends clickable text component to player when gui stats are ready.
+     *
+     * @param sender player to send message to
+     */
     public static void sendGuiStatsReadyMessage(CommandSender sender) {
         if (guiStatsReadyMessage == null) {
             guiStatsReadyMessage = getTextComponentMessage(getMessage("gui-stats-ready"));
@@ -227,8 +267,14 @@ public class MessageManager {
         sender.spigot().sendMessage(guiStatsReadyMessage);
     }
 
+    /**
+     * Sends message to player when chat stats are ready.
+     *
+     * @param sender player to send message to
+     */
     public static void sendChatStatsReadyMessage(CommandSender sender, EntityCache eCache) {
-        String message = getParsedMessage("leaderboard-header", eCache.getPlaceholders(), eCache.getValues());
+        String message = getParsedMessage("leaderboard-header", eCache.getPlaceholders(),
+                eCache.getValues());
         sender.sendMessage(message);
     }
 
@@ -242,17 +288,18 @@ public class MessageManager {
     public static BaseComponent[] getBaseComponentArrMessage(String message) {
         char[] chars = message.toCharArray();
         int lastIndex = chars.length - 1;
-        List<Pair> pairs = new ArrayList<>();
+        List<TextComponentPair> textComponentPairs = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         net.md_5.bungee.api.ChatColor color = net.md_5.bungee.api.ChatColor.WHITE;
         for (int i = 0 ; i <= lastIndex; i++) {
             char c = chars[i];
             if (c == '&' && i != lastIndex) {
-                net.md_5.bungee.api.ChatColor nextColor = net.md_5.bungee.api.ChatColor.getByChar(chars[i + 1]);
+                net.md_5.bungee.api.ChatColor nextColor = net.md_5.bungee.api.ChatColor
+                        .getByChar(chars[i + 1]);
                 if (color == null) {
                     sb.append(c);
                 } else {
-                    pairs.add(new Pair(sb.toString(), color));
+                    textComponentPairs.add(new TextComponentPair(sb.toString(), color));
                     color = nextColor;
                     sb = new StringBuilder();
                 }
@@ -260,13 +307,14 @@ public class MessageManager {
                 sb.append(c);
             }
         }
-        pairs.add(new Pair(sb.toString(), color));
+        textComponentPairs.add(new TextComponentPair(sb.toString(), color));
 
         ComponentBuilder componentBuilder = new ComponentBuilder("");
-        int numPairs = pairs.size();
+        int numPairs = textComponentPairs.size();
         for (int i = 0; i < numPairs; i++) {
-            Pair pair = pairs.get(i);
-            componentBuilder.append(pair.getMessage()).color(pair.getColor());
+            TextComponentPair textComponentPair = textComponentPairs.get(i);
+            componentBuilder.append(textComponentPair.getMessage()).color(
+                    textComponentPair.getColor());
         }
         return componentBuilder.create();
     }

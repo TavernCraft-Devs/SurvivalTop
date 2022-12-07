@@ -55,17 +55,6 @@ public class SpawnerOperations {
     }
 
     /**
-     * Returns spawner holder for given uuid.
-     *
-     * @param id key to identify task
-     *
-     * @return spawner holder for given uuid
-     */
-    public SpawnerHolder getSpawnerHolder(int id) {
-        return spawnerHolderMap.get(id);
-    }
-
-    /**
      * Returns spawner operation for stats.
      *
      * @return spawner operation for stats
@@ -78,16 +67,6 @@ public class SpawnerOperations {
     }
 
     /**
-     * Cleans up holders and preprocessed spawners after stats update.
-     *
-     * @param id key to identify task
-     */
-    public void doCleanUp(int id) {
-        spawnerHolderMap.remove(id);
-        preprocessedSpawners.remove(id);
-    }
-
-    /**
      * Creates holders for stats.
      *
      * @param id key to identify task
@@ -97,6 +76,27 @@ public class SpawnerOperations {
 
         // temp array list for tracking containers
         preprocessedSpawners.put(id, new ArrayList<>());
+    }
+
+    /**
+     * Returns spawner holder for given uuid.
+     *
+     * @param id key to identify task
+     *
+     * @return spawner holder for given uuid
+     */
+    public SpawnerHolder getSpawnerHolder(int id) {
+        return spawnerHolderMap.get(id);
+    }
+
+    /**
+     * Cleans up holders and preprocessed spawners after stats update.
+     *
+     * @param id key to identify task
+     */
+    public void doCleanUp(int id) {
+        spawnerHolderMap.remove(id);
+        preprocessedSpawners.remove(id);
     }
 
     /**

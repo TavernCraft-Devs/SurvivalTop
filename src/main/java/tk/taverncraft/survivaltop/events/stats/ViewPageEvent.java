@@ -10,7 +10,6 @@ import org.bukkit.inventory.Inventory;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.options.InfoMenuOptions;
 import tk.taverncraft.survivaltop.gui.options.StatsMenuOptions;
-import tk.taverncraft.survivaltop.permissions.PermissionsManager;
 
 /**
  * ViewPageEvent checks for when a player clicks on GUI menu.
@@ -50,7 +49,7 @@ public class ViewPageEvent implements Listener {
     private final int containerInfoSlot;
     private final int inventoryInfoSlot;
 
-    // used to identify inventory gui, consider a better alternative?
+    // used to identify inventory gui, is there a better alternative that preserves customisation?
     private final String identifier = "§s§t§o§p";
 
     /**
@@ -107,37 +106,21 @@ public class ViewPageEvent implements Listener {
             e.setCancelled(true);
         }
 
-        // handle stats page and item info page differently
         int slot = e.getRawSlot();
-        if (title.endsWith(mainStatsPageIdentifier)) {
-            statsMainPageClickHandler(slot, e);
-            return;
-        }
-        if (title.endsWith(mainInfoPageIdentifier)) {
-            infoMainPageClickHandler(slot, e);
+
+        if (handleStatsMainPage(slot, e, title)) {
             return;
         }
 
-        // handle stats pagination
-        boolean isBlockStatsPage = title.endsWith(subStatsPageBlockIdentifier);
-        boolean isSpawnerStatsPage = title.endsWith(subStatsPageSpawnerIdentifier);
-        boolean isContainerStatsPage = title.endsWith(subStatsPageContainerIdentifier);
-        boolean isInventoryStatsPage = title.endsWith(subStatsPageInventoryIdentifier);
-        if (isBlockStatsPage || isSpawnerStatsPage || isContainerStatsPage || isInventoryStatsPage) {
-            statsSubPageClickHandler(slot, e, isBlockStatsPage, isSpawnerStatsPage,
-                    isContainerStatsPage, isInventoryStatsPage);
+        if (handleStatsSubPage(slot, e, title)) {
             return;
         }
 
-        // handle item info pagination
-        boolean isBlockInfoPage = title.endsWith(subInfoPageBlockIdentifier);
-        boolean isSpawnerInfoPage = title.endsWith(subInfoPageSpawnerIdentifier);
-        boolean isContainerInfoPage = title.endsWith(subInfoPageContainerIdentifier);
-        boolean isInventoryInfoPage = title.endsWith(subInfoPageInventoryIdentifier);
-        if (isBlockInfoPage || isSpawnerInfoPage || isContainerInfoPage || isInventoryInfoPage) {
-            infoSubPageClickHandler(slot, e, isBlockInfoPage, isSpawnerInfoPage,
-                    isContainerInfoPage, isInventoryInfoPage);
+        if (handleInfoMainPage(slot, e, title)) {
+            return;
         }
+
+        handleInfoSubPage(slot, e, title);
     }
 
     /**
@@ -162,8 +145,14 @@ public class ViewPageEvent implements Listener {
      *
      * @param slot slot that user clicked on
      * @param e inventory click event
+     * @param title title of inventory
+     *
+     * @return true if click is handled here, false otherwise
      */
-    private void statsMainPageClickHandler(int slot, InventoryClickEvent e) {
+    private boolean handleStatsMainPage(int slot, InventoryClickEvent e, String title) {
+        if (!title.endsWith(mainStatsPageIdentifier)) {
+            return false;
+        }
         Inventory inv = null;
         HumanEntity humanEntity = e.getWhoClicked();
         if (slot == blockWealthSlot) {
@@ -176,9 +165,10 @@ public class ViewPageEvent implements Listener {
             inv = main.getGuiManager().getInventoryStatsPage(humanEntity, 0);
         }
         if (inv == null) {
-            return;
+            return false;
         }
         humanEntity.openInventory(inv);
+        return true;
     }
 
     /**
@@ -186,40 +176,36 @@ public class ViewPageEvent implements Listener {
      *
      * @param slot slot that user clicked on
      * @param e inventory click event
-     * @param isBlockPage boolean indicating if current page is for blocks
-     * @param isSpawnerPage boolean indicating if current page is for spawners
-     * @param isContainerPage boolean indicating if current page is for containers
-     * @param isInventoryPage boolean indicating if current page is for inventories
+     * @param title title of inventory
+     *
+     * @return true if click is handled here, false otherwise
      */
-    private void statsSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
-                boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
+    private boolean handleStatsSubPage(int slot, InventoryClickEvent e, String title) {
+        HumanEntity humanEntity = e.getWhoClicked();
         if (slot == prevStatsPageSlot || slot == nextStatsPageSlot) {
-            int currPage = getCurrentPage(e.getView().getTitle());
-            int pageToGo = slot == nextStatsPageSlot ? currPage + 1 : currPage - 1;
-            if (pageToGo == -1) {
-                return;
-            }
-
+            int page = getPageToGoTo(e.getView().getTitle(), slot == nextStatsPageSlot);
             Inventory inv = null;
-            HumanEntity humanEntity = e.getWhoClicked();
-            if (isBlockPage) {
-                inv = main.getGuiManager().getBlockStatsPage(humanEntity, pageToGo);
-            } else if (isSpawnerPage) {
-                inv = main.getGuiManager().getSpawnerStatsPage(humanEntity, pageToGo);
-            } else if (isContainerPage) {
-                inv = main.getGuiManager().getContainerStatsPage(humanEntity, pageToGo);
-            } else if (isInventoryPage) {
-                inv = main.getGuiManager().getInventoryStatsPage(humanEntity, pageToGo);
+            if (title.endsWith(subStatsPageBlockIdentifier)) {
+                inv = main.getGuiManager().getBlockStatsPage(humanEntity, page);
+            } else if (title.endsWith(subStatsPageSpawnerIdentifier)) {
+                inv = main.getGuiManager().getSpawnerStatsPage(humanEntity, page);
+            } else if (title.endsWith(subStatsPageContainerIdentifier)) {
+                inv = main.getGuiManager().getContainerStatsPage(humanEntity, page);
+            } else if (title.endsWith(subStatsPageInventoryIdentifier)) {
+                inv = main.getGuiManager().getInventoryStatsPage(humanEntity, page);
             }
             if (inv == null) {
-                return;
+                return false;
             }
-            e.getWhoClicked().openInventory(inv);
+            humanEntity.openInventory(inv);
+            return true;
         }
 
         if (slot == mainStatsMenuSlot) {
-            main.getGuiManager().openMainStatsPage(e.getWhoClicked().getUniqueId());
+            main.getGuiManager().getMainStatsPage(humanEntity.getUniqueId());
+            return true;
         }
+        return false;
     }
 
     /**
@@ -227,8 +213,14 @@ public class ViewPageEvent implements Listener {
      *
      * @param slot slot that user clicked on
      * @param e inventory click event
+     * @param title title of inventory
+     *
+     * @return true if click is handled here, false otherwise
      */
-    private void infoMainPageClickHandler(int slot, InventoryClickEvent e) {
+    private boolean handleInfoMainPage(int slot, InventoryClickEvent e, String title) {
+        if (!title.endsWith(mainInfoPageIdentifier)) {
+            return false;
+        }
         Inventory inv = null;
         if (slot == blockInfoSlot) {
             inv = main.getGuiManager().getBlockInfoPage(0);
@@ -240,9 +232,10 @@ public class ViewPageEvent implements Listener {
             inv = main.getGuiManager().getInventoryInfoPage(0);
         }
         if (inv == null) {
-            return;
+            return false;
         }
         e.getWhoClicked().openInventory(inv);
+        return true;
     }
 
     /**
@@ -250,49 +243,49 @@ public class ViewPageEvent implements Listener {
      *
      * @param slot slot that user clicked on
      * @param e inventory click event
-     * @param isBlockPage boolean indicating if current page is for blocks
-     * @param isSpawnerPage boolean indicating if current page is for spawners
-     * @param isContainerPage boolean indicating if current page is for containers
-     * @param isInventoryPage boolean indicating if current page is for inventories
+     * @param title title of inventory
+     *
+     * @return true if click is handled here, false otherwise
      */
-    private void infoSubPageClickHandler(int slot, InventoryClickEvent e, boolean isBlockPage,
-            boolean isSpawnerPage, boolean isContainerPage, boolean isInventoryPage) {
+    private boolean handleInfoSubPage(int slot, InventoryClickEvent e, String title) {
         if (slot == prevInfoPageSlot || slot == nextInfoPageSlot) {
-            int currPage = getCurrentPage(e.getView().getTitle());
-            int pageToGo = slot == nextInfoPageSlot ? currPage + 1 : currPage - 1;
-            if (pageToGo == -1) {
-                return;
-            }
+            int page = getPageToGoTo(e.getView().getTitle(), slot == nextInfoPageSlot);
 
             Inventory inv = null;
-            if (isBlockPage) {
-                inv = main.getGuiManager().getBlockInfoPage(pageToGo);
-            } else if (isSpawnerPage) {
-                inv = main.getGuiManager().getSpawnerInfoPage(pageToGo);
-            } else if (isContainerPage) {
-               inv = main.getGuiManager().getContainerInfoPage(pageToGo);
-            } else if (isInventoryPage) {
-                inv = main.getGuiManager().getInventoryInfoPage(pageToGo);
+            if (title.endsWith(subInfoPageBlockIdentifier)) {
+                inv = main.getGuiManager().getBlockInfoPage(page);
+            } else if (title.endsWith(subInfoPageSpawnerIdentifier)) {
+                inv = main.getGuiManager().getSpawnerInfoPage(page);
+            } else if (title.endsWith(subInfoPageContainerIdentifier)) {
+               inv = main.getGuiManager().getContainerInfoPage(page);
+            } else if (title.endsWith(subInfoPageInventoryIdentifier)) {
+                inv = main.getGuiManager().getInventoryInfoPage(page);
             }
             if (inv == null) {
-                return;
+                return false;
             }
             e.getWhoClicked().openInventory(inv);
+            return true;
         }
 
         if (slot == mainInfoMenuSlot) {
             e.getWhoClicked().openInventory(main.getGuiManager().getMainInfoPage());
+            return true;
         }
+
+        return false;
     }
 
     /**
      * Gets the current page number
      *
      * @param title title of inventory
+     * @param isNextPage whether slot clicked is for next page
      *
      * @return current page number
      */
-    private int getCurrentPage(String title) {
-        return Integer.parseInt(title.split("§", 3)[1]);
+    private int getPageToGoTo(String title, boolean isNextPage) {
+        int currPage = Integer.parseInt(title.split("§", 3)[1]);
+        return isNextPage ? currPage + 1 : currPage - 1;
     }
 }

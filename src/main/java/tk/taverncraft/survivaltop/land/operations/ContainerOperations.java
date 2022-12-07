@@ -88,7 +88,7 @@ public class ContainerOperations {
     }
 
     /**
-     * Set up the containers chosen to be included.
+     * Sets up the containers chosen to be included.
      */
     private void setUpContainerType() {
         List<String> chosenContainers = main.getConfig().getStringList("container-type");
@@ -98,6 +98,27 @@ public class ContainerOperations {
                 containerTypes.add(material.name());
             }
         }
+    }
+
+    /**
+     * Returns container operation for stats.
+     *
+     * @return container operation for stats
+     */
+    public BiFunction<Integer, Block, Boolean> getOperation() {
+        return preprocessContainer;
+    }
+
+    /**
+     * Creates holders for stats.
+     *
+     * @param id key to identify task
+     */
+    public void createHolder(int id) {
+        containerHolderMap.put(id, new ContainerHolder(containerMaterial));
+
+        // temp array list also needed for tracking containers
+        preprocessedContainers.put(id, new ArrayList<>());
     }
 
     /**
@@ -112,15 +133,6 @@ public class ContainerOperations {
     }
 
     /**
-     * Returns container operation for stats.
-     *
-     * @return container operation for stats
-     */
-    public BiFunction<Integer, Block, Boolean> getOperation() {
-        return preprocessContainer;
-    }
-
-    /**
      * Cleans up holders and preprocessed containers after stats update.
      *
      * @param id key to identify task
@@ -128,18 +140,6 @@ public class ContainerOperations {
     public void doCleanUp(int id) {
         containerHolderMap.remove(id);
         preprocessedContainers.remove(id);
-    }
-
-    /**
-     * Creates holders for stats.
-     *
-     * @param id key to identify task
-     */
-    public void createHolder(int id) {
-        containerHolderMap.put(id, new ContainerHolder(containerMaterial));
-
-        // temp array list also needed for tracking containers
-        preprocessedContainers.put(id, new ArrayList<>());
     }
 
     /**

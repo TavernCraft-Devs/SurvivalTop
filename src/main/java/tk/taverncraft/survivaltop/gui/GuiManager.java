@@ -26,12 +26,15 @@ public class GuiManager {
     private final Main main;
     private final PermissionsManager permissionsManager;
 
+    // stats and info menu options
     private StatsMenuOptions statsOptions;
     private InfoMenuOptions infoOptions;
 
+    // a single info gui shared by all players since info are the same
     private InfoGui infoGui;
 
-    private ConcurrentHashMap<UUID, StatsGui> senderGui = new ConcurrentHashMap<>();
+    // map to track current stats gui being viewed by player
+    private final ConcurrentHashMap<UUID, StatsGui> senderGui = new ConcurrentHashMap<>();
 
     /**
      * Constructor for GuiManager.
@@ -44,16 +47,27 @@ public class GuiManager {
         initializeMenuOptions();
     }
 
+    /**
+     * Loads all menu options and set common info gui.
+     */
     public void initializeMenuOptions() {
         this.statsOptions = new StatsMenuOptions(main);
         this.infoOptions = new InfoMenuOptions(main);
-        setInfoGui();
-    }
-
-    public void setInfoGui() {
         this.infoGui = infoOptions.createInfoGui();
     }
 
+    /**
+     * Returns the stats gui for a given entity.
+     *
+     * @param name name of entity
+     * @param wealthBreakdown wealth breakdown of entity
+     * @param blockList count for blocks of entity
+     * @param spawnerList count for spawners of entity
+     * @param containerList count for containers of entity
+     * @param inventoryList count for inventories of entity
+     *
+     * @return stats gui showing stats for entity
+     */
     public StatsGui getStatsGui(String name, HashMap<String, Double> wealthBreakdown,
             HashMap<String, MutableInt> blockList, HashMap<String, MutableInt> spawnerList,
             HashMap<String, MutableInt> containerList, HashMap<String, MutableInt> inventoryList) {
@@ -67,7 +81,7 @@ public class GuiManager {
      *
      * @param uuid uuid of sender
      */
-    public void openMainStatsPage(UUID uuid) {
+    public void getMainStatsPage(UUID uuid) {
         try {
             Bukkit.getPlayer(uuid).openInventory(senderGui.get(uuid).getMainStatsPage());
         } catch (Exception e) {
@@ -76,7 +90,7 @@ public class GuiManager {
     }
 
     /**
-     * Retrieves player inventory gui stats block page.
+     * Retrieves player gui stats block page.
      *
      * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
@@ -100,7 +114,7 @@ public class GuiManager {
     }
 
     /**
-     * Retrieves player inventory gui stats spawner page.
+     * Retrieves player gui stats spawner page.
      *
      * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
@@ -124,7 +138,7 @@ public class GuiManager {
     }
 
     /**
-     * Retrieves player inventory gui stats container page.
+     * Retrieves player gui stats container page.
      *
      * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
@@ -148,7 +162,7 @@ public class GuiManager {
     }
 
     /**
-     * Retrieves player inventory gui stats inventory page.
+     * Retrieves player gui stats inventory page.
      *
      * @param humanEntity user who clicked the gui
      * @param pageNum page number to show
@@ -171,10 +185,21 @@ public class GuiManager {
         return null;
     }
 
+    /**
+     * Sets the gui being viewed by sender.
+     *
+     * @param uuid uuid of sender
+     * @param eCache entity cache to get gui stats for
+     */
     public void setSenderGui(UUID uuid, EntityCache eCache) {
         senderGui.put(uuid, eCache.getGui(main));
     }
 
+    /**
+     * Gets the main page for info.
+     *
+     * @return main page of info
+     */
     public Inventory getMainInfoPage() {
         return infoGui.getMainInfoPage();
     }
@@ -219,14 +244,31 @@ public class GuiManager {
         return infoGui.getInventoryInfoPage(pageNum);
     }
 
+    /**
+     * Gets the options for stats menu to handle inventory click events.
+     *
+     * @return options for stats menu
+     */
     public StatsMenuOptions getStatsOptions() {
         return statsOptions;
     }
 
+    /**
+     * Gets the options for info menu to handle inventory click events.
+     *
+     * @return options for info menu
+     */
     public InfoMenuOptions getInfoOptions() {
         return infoOptions;
     }
 
+    /**
+     * Gets the upper case name (group or player depending on config) for player viewing stats.
+     *
+     * @param uuid uuid of player
+     *
+     * @return upper case name for either the player name or the group of the player
+     */
     private String getUpperCaseNameForEntity(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         if (main.getOptions().groupIsEnabled()) {

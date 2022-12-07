@@ -3,7 +3,11 @@ package tk.taverncraft.survivaltop.stats.task;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Contains information related to each stats calculation task being performed currently.
+ */
 public class Task {
+    // counter for unique task id
     private static AtomicInteger taskIdCounter = new AtomicInteger(0);
 
     private final String name;
@@ -24,18 +28,38 @@ public class Task {
         this.type = type;
     }
 
+    /**
+     * Gets name of entity that task is being performed for.
+     *
+     * @return name of entity
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the start time of the task.
+     *
+     * @return start time of task
+     */
     public long getStartTime() {
         return startTime;
     }
 
+    /**
+     * Gets the type of task.
+     *
+     * @return type of task
+     */
     public TaskType getType() {
         return type;
     }
 
+    /**
+     * Gets the id of the task.
+     *
+     * @return task id
+     */
     public int getTaskId() {
         return taskId;
     }

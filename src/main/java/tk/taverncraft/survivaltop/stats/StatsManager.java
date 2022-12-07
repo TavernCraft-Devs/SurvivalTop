@@ -8,9 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -50,10 +47,22 @@ public class StatsManager {
         this.main = main;
     }
 
+    /**
+     * Gets stats for an entity to update the leaderboard.
+     *
+     * @param sender sender who requested for stats
+     * @param name name of entity to get stats for
+     */
     public void getStatsForLeaderboard(CommandSender sender, String name) {
         getRealTimeStats(sender, name, LEADERBOARD);
     }
 
+    /**
+     * Gets stats for an entity for sender who requested via stats command.
+     *
+     * @param sender sender who requested for stats
+     * @param name name of entity to get stats for
+     */
     public void getStatsForPlayer(CommandSender sender, String name) {
         creatorList.add(main.getSenderUuid(sender));
         if (main.getOptions().isCalculationMode0()) {
@@ -119,7 +128,8 @@ public class StatsManager {
             MessageManager.sendMessage(sender, "calculation-complete-cache",
                 new String[]{"%time%"},
                 new String[]{String.valueOf(timeElapsed)});
-            sendGuiInteractiveText(sender, eCache);
+            main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
+            MessageManager.sendGuiStatsReadyMessage(sender);
         } else {
             MessageManager.sendMessage(sender, "calculation-complete-cache",
                 new String[]{"%time%"},
@@ -179,7 +189,12 @@ public class StatsManager {
      * @param sender sender who requested for stats
      * @param name name of entity
      * @param id key to identify task
+     * @param papiWealth papi wealth of entity
      * @param balWealth bal wealth of the entity
+     * @param blockWealth block wealth of entity
+     * @param inventoryWealth inventory wealth of entity
+     * @param blockCounter blocks counter of entity
+     * @param inventoryCounter inventories counter of entity
      */
     private void executePostCalculationActions(CommandSender sender, String name, int id,
             double balWealth, LinkedHashMap<String, Double> papiWealth, double blockWealth,
@@ -237,7 +252,8 @@ public class StatsManager {
     }
 
     /**
-     * Helper function for preparing the GUI stats for the sender.
+     * Cleans up after an entity's stats has been retrieved. Also updates spawner/container
+     * values if applicable and sends link to gui stats in chat.
      *
      * @param sender sender who checked for stats
      * @param name name of entity
@@ -250,20 +266,11 @@ public class StatsManager {
             public void run() {
                 eCache.setGui(main);
                 entityCacheMap.put(name.toUpperCase(), eCache);
-                sendGuiInteractiveText(sender, eCache);
+                main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
+                MessageManager.sendGuiStatsReadyMessage(sender);
                 doCleanUp(id);
             }
         }.runTaskAsynchronously(main);
-    }
-
-    /**
-     * Sends text for user to click on to access gui.
-     *
-     * @param sender user who requested for stats
-     */
-    private void sendGuiInteractiveText(CommandSender sender, EntityCache eCache) {
-        main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
-        MessageManager.sendGuiStatsReadyMessage(sender);
     }
 
     /**
@@ -275,7 +282,8 @@ public class StatsManager {
      * @param id key to identify task
      * @param eCache entity cache
      */
-    private void processStatsForChat(CommandSender sender, String name, int id, EntityCache eCache) {
+    private void processStatsForChat(CommandSender sender, String name, int id,
+            EntityCache eCache) {
         eCache.setChat();
         entityCacheMap.put(name.toUpperCase(), eCache);
         MessageManager.sendChatStatsReadyMessage(sender, eCache);

@@ -1,4 +1,10 @@
-# options for main page of info
+# details for menu customisation as well as more templates may be found on our wiki:
+
+#####################################################################################
+#                                                                                   #
+#                              Main Page Configurations                             #
+#                                                                                   #
+#####################################################################################
 main-page-title: "Item Values Info"
 
 main-page-size: 27
@@ -68,7 +74,11 @@ main-page-background:
   25: BLUE_STAINED_GLASS_PANE
   26: BLUE_STAINED_GLASS_PANE
 
-# options for sub-pages of info
+#####################################################################################
+#                                                                                   #
+#                               Sub Page Configurations                             #
+#                                                                                   #
+#####################################################################################
 sub-page-block-title: "Block Info"
 sub-page-spawner-title: "Spawner Info"
 sub-page-container-title: "Container Info"
