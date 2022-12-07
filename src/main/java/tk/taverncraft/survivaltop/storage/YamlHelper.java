@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.storage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -64,13 +65,9 @@ public class YamlHelper implements StorageHelper {
         }
         entityConfig.set("entity-name", entityName);
         entityConfig.set("entity-type", entityType);
-        entityConfig.set("bal-wealth", eCache.getBalWealth());
-        entityConfig.set("land-wealth", eCache.getLandWealth());
-        entityConfig.set("block-wealth", eCache.getBlockWealth());
-        entityConfig.set("spawner-wealth", eCache.getSpawnerWealth());
-        entityConfig.set("container-wealth", eCache.getContainerWealth());
-        entityConfig.set("inv-wealth", eCache.getInventoryWealth());
-        entityConfig.set("total-wealth", eCache.getTotalWealth());
+        for (Map.Entry<String, Double> map : eCache.getPapiWealth().entrySet()) {
+            entityConfig.set(map.getKey(), map.getValue());
+        }
 
         try {
             entityConfig.save(entityFile);

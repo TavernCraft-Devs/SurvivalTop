@@ -7,6 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
@@ -53,9 +56,15 @@ public class SqlHelper implements StorageHelper {
      * @param EntityCacheList list of entities to store
      */
     public void saveToStorage(ArrayList<EntityCache> EntityCacheList) {
-        String header = "INSERT INTO " + tableName + "(ENTITY_NAME, ENTITY_TYPE, " +
-                "BALANCE_WEALTH, LAND_WEALTH, BLOCK_WEALTH, SPAWNER_WEALTH, CONTAINER_WEALTH, " +
-                "INVENTORY_WEALTH, TOTAL_WEALTH) VALUES ";
+        List<String> categories = main.getPapiManager().getPapiCategories();
+        StringBuilder columns = new StringBuilder("ENTITY-NAME, ENTITY-TYPE, TOTAL-WEALTH, " +
+            "LAND-WEALTH, BALANCE-WEALTH, BLOCK-WEALTH, SPAWNER-WEALTH, CONTAINER-WEALTH, " +
+            "INVENTORY-WEALTH, ");
+        for (String category : categories) {
+            columns.append(category.toUpperCase()).append(", ");
+        }
+        columns = new StringBuilder(columns.substring(0, columns.length() - 2));
+        String header = "INSERT INTO " + tableName + " (" + columns + ") VALUES ";
         StringBuilder body = new StringBuilder();
         int cacheSize = EntityCacheList.size();
         for (int i = 0; i < cacheSize; i++) {
@@ -66,14 +75,12 @@ public class SqlHelper implements StorageHelper {
         if (body.length() == 0) {
             return;
         }
-        String footer = " ON DUPLICATE KEY UPDATE BALANCE_WEALTH = VALUES(BALANCE_WEALTH), " +
-            "LAND_WEALTH = VALUES(LAND_WEALTH), BLOCK_WEALTH = VALUES(BLOCK_WEALTH), " +
-            "SPAWNER_WEALTH = VALUES(SPAWNER_WEALTH), " +
-            "CONTAINER_WEALTH = VALUES(CONTAINER_WEALTH), " +
-            "INVENTORY_WEALTH = VALUES(INVENTORY_WEALTH), TOTAL_WEALTH = VALUES(TOTAL_WEALTH)";
-        String finalQuery = header + body.substring(0, body.length() - 2) + footer;
-        try (Connection conn = this.connectToSql(); PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
+        String finalQuery = header + body.substring(0, body.length() - 2) + ";";
+        try (Connection conn = this.connectToSql(); PreparedStatement delStmt =
+            conn.prepareStatement("DELETE FROM " + tableName);
+            PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
             if (conn != null) {
+                delStmt.execute();
                 stmt.executeUpdate();
             }
         } catch (NullPointerException | SQLException e) {
@@ -95,17 +102,24 @@ public class SqlHelper implements StorageHelper {
                 return null;
             }
 
+            List<String> categories = main.getPapiManager().getPapiCategories();
+            StringBuilder columns = new StringBuilder("");
+            for (String category : categories) {
+                columns.append(category.toUpperCase()).append(" DECIMAL (18, 2), ");
+            }
+            columns = new StringBuilder(columns.substring(0, columns.length() - 2));
             if (!tableExists(tableName, conn)) {
                 String query = "CREATE TABLE " + tableName + "("
-                        + "ENTITY_NAME VARCHAR (36) NOT NULL, "
-                        + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
-                        + "BALANCE_WEALTH DECIMAL (18, 2), "
-                        + "LAND_WEALTH DECIMAL (18, 2), "
-                        + "BLOCK_WEALTH DECIMAL (18, 2), "
-                        + "SPAWNER_WEALTH DECIMAL (18, 2), "
-                        + "CONTAINER_WEALTH DECIMAL (18, 2), "
-                        + "INVENTORY_WEALTH DECIMAL (18, 2), "
-                        + "TOTAL_WEALTH DECIMAL (18, 2), "
+                        + "ENTITY-NAME VARCHAR (36) NOT NULL, "
+                        + "ENTITY-TYPE VARCHAR (10) NOT NULL, "
+                        + "TOTAL-WEALTH DECIMAL (18, 2), "
+                        + "LAND-WEALTH DECIMAL (18, 2), "
+                        + "BALANCE-WEALTH DECIMAL (18, 2), "
+                        + "BLOCK-WEALTH DECIMAL (18, 2), "
+                        + "SPAWNER-WEALTH DECIMAL (18, 2), "
+                        + "CONTAINER-WEALTH DECIMAL (18, 2), "
+                        + "INVENTORY-WEALTH DECIMAL (18, 2), "
+                        + columns
                         + "PRIMARY KEY (ENTITY_NAME))";
                 PreparedStatement stmt = conn.prepareStatement(query);
                 stmt.executeUpdate();
@@ -181,10 +195,17 @@ public class SqlHelper implements StorageHelper {
         if (this.main.getOptions().groupIsEnabled()) {
             entityType = "group";
         }
-        return "('" + entityName + "', '" + entityType + "', '"
-            + eCache.getBalWealth() + "', '" + eCache.getLandWealth() + "', '"
-            + eCache.getBlockWealth() + "', '" + eCache.getSpawnerWealth() + "', '"
-            + eCache.getContainerWealth() + "', '" + eCache.getInventoryWealth() + "', '"
-            + eCache.getTotalWealth() + "'), ";
+        LinkedHashMap<String, Double> papiWealth = eCache.getPapiWealth();
+        String papiValues = "', '";
+        for (Double value : papiWealth.values()) {
+            papiValues += value + "', '";
+        }
+        papiValues = papiValues.substring(0, papiValues.length() - 4) + "'), ";
+        String query = "('" + entityName + "', '" + entityType + "', '"
+            + eCache.getTotalWealth() + "', '" + eCache.getLandWealth() + "', '"
+            + eCache.getBalWealth() + "', " + eCache.getBlockWealth() + "', '"
+            + eCache.getSpawnerWealth() + "', '" + eCache.getContainerWealth() + "', '"
+            + eCache.getInventoryWealth() + "', '" + eCache.getTotalWealth() + papiValues;
+        return query;
     }
 }

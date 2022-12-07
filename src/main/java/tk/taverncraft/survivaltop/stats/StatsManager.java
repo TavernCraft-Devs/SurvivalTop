@@ -3,6 +3,7 @@ package tk.taverncraft.survivaltop.stats;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,7 +147,7 @@ public class StatsManager {
         double balWealth = 0;
         double blockValue = 0;
         double inventoryValue = 0;
-        HashMap<String, Double> papiWealth = new HashMap<>();
+        LinkedHashMap<String, Double> papiWealth = new LinkedHashMap<>();
         HashMap<String, MutableInt> blockCounter = new HashMap<>();
         HashMap<String, MutableInt> inventoryCounter = new HashMap<>();
         if (main.getOptions().landIsIncluded()) {
@@ -185,7 +186,7 @@ public class StatsManager {
      * @param balWealth bal wealth of the entity
      */
     private void executePostCalculationActions(CommandSender sender, String name, int id,
-            double balWealth, HashMap<String, Double> papiWealth, double blockWealth,
+            double balWealth, LinkedHashMap<String, Double> papiWealth, double blockWealth,
             double inventoryWealth, HashMap<String, MutableInt> blockCounter,
             HashMap<String, MutableInt> inventoryCounter) {
         new BukkitRunnable() {
@@ -336,7 +337,7 @@ public class StatsManager {
      *
      * @return double value representing entity papi wealth
      */
-    private HashMap<String, Double> getEntityPapiWealth(String name) {
+    private LinkedHashMap<String, Double> getEntityPapiWealth(String name) {
         return main.getPapiManager().getPlaceholderValForEntity(name);
     }
 

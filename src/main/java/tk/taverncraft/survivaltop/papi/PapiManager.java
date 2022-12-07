@@ -1,6 +1,8 @@
 package tk.taverncraft.survivaltop.papi;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +31,15 @@ public class PapiManager extends PlaceholderExpansion {
         initializePlaceholders();
     }
 
+    public List<String> getPapiCategories() {
+        return new ArrayList<>(categoriesToPlaceholdersMap.keySet());
+    }
+
     /**
      * Initializes all placeholders.
      */
     public void initializePlaceholders() {
-        categoriesToPlaceholdersMap = new HashMap<>();
+        categoriesToPlaceholdersMap = new LinkedHashMap<>();
         for (String category: main.getPapiConfig().getConfigurationSection("").getKeys(false)) {
             List<String> placeholders = main.getPapiConfig().getStringList(category);
             categoriesToPlaceholdersMap.put(category, placeholders);
@@ -47,7 +53,7 @@ public class PapiManager extends PlaceholderExpansion {
      *
      * @return placeholder value of entity
      */
-    public HashMap<String, Double> getPlaceholderValForEntity(String name) {
+    public LinkedHashMap<String, Double> getPlaceholderValForEntity(String name) {
         if (main.getOptions().groupIsEnabled()) {
             return getPlaceholderValByGroup(name);
         }
@@ -61,8 +67,8 @@ public class PapiManager extends PlaceholderExpansion {
      *
      * @return placeholder value of player
      */
-    public HashMap<String, Double> getPlaceholderValByPlayer(String name) {
-        HashMap<String, Double> papiWealth = new HashMap<>();
+    public LinkedHashMap<String, Double> getPlaceholderValByPlayer(String name) {
+        LinkedHashMap<String, Double> papiWealth = new LinkedHashMap<>();
         OfflinePlayer player = Bukkit.getOfflinePlayer(name);
         for (Map.Entry<String, List<String>> map : categoriesToPlaceholdersMap.entrySet()) {
                 String category = map.getKey();
@@ -73,8 +79,7 @@ public class PapiManager extends PlaceholderExpansion {
                         double multiplier = Double.parseDouble(values[1]);
                         String entry = values[2];
                         value += getParsedValue(player, entry, name) * multiplier;
-                    } catch (Exception e) {
-                        continue;
+                    } catch (Exception ignored) {
                     }
                 }
             papiWealth.put(category, value);
@@ -89,8 +94,8 @@ public class PapiManager extends PlaceholderExpansion {
      *
      * @return placeholder value of group
      */
-    private HashMap<String, Double> getPlaceholderValByGroup(String group) {
-        HashMap<String, Double> papiWealth = new HashMap<>();
+    private LinkedHashMap<String, Double> getPlaceholderValByGroup(String group) {
+        LinkedHashMap<String, Double> papiWealth = new LinkedHashMap<>();
         for (Map.Entry<String, List<String>> map : categoriesToPlaceholdersMap.entrySet()) {
             String category = map.getKey();
             List<String> placeholders = map.getValue();
@@ -110,8 +115,7 @@ public class PapiManager extends PlaceholderExpansion {
                             value += getParsedValue(offlinePlayer, entry, offlinePlayer.getName()) * multiplier;
                         }
                     }
-                } catch (Exception e) {
-                    continue;
+                } catch (Exception ignored) {
                 }
             }
             papiWealth.put(category, value);

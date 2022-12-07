@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.stream.Stream;
 
 import tk.taverncraft.survivaltop.Main;
@@ -34,6 +35,7 @@ public class EntityCache {
 
     // contains breakdown of entity wealth
     private final HashMap<String, Double> wealthBreakdown;
+    private final LinkedHashMap<String, Double> papiWealth;
 
     /**
      * Constructor for EntityCache.
@@ -44,9 +46,10 @@ public class EntityCache {
      * @param containerWealth container wealth of entity
      * @param inventoryWealth inventory wealth of entity
      */
-    public EntityCache(String name, double balWealth, HashMap<String, Double> papiWealth,
+    public EntityCache(String name, double balWealth, LinkedHashMap<String, Double> papiWealth,
             double blockWealth, double spawnerWealth, double containerWealth, double inventoryWealth) {
         this.name = name;
+        this.papiWealth = papiWealth;
         wealthBreakdown = new HashMap<>();
         wealthBreakdown.put("balance-wealth", new BigDecimal(balWealth).setScale(2, RoundingMode.HALF_UP).doubleValue());
         wealthBreakdown.putAll(papiWealth);
@@ -150,6 +153,10 @@ public class EntityCache {
      */
     public double getLandWealth() {
         return wealthBreakdown.get("land-wealth");
+    }
+
+    public LinkedHashMap<String, Double> getPapiWealth() {
+        return papiWealth;
     }
 
     /**
