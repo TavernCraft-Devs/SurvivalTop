@@ -16,8 +16,9 @@ public class StatsGui {
     private final ArrayList<Inventory> containerViews;
     private final ArrayList<Inventory> inventoryViews;
 
-    public StatsGui(String name, Inventory mainPage, ArrayList<Inventory> blockViews, ArrayList<Inventory> spawnerViews,
-            ArrayList<Inventory> containerViews, ArrayList<Inventory> inventoryViews) {
+    public StatsGui(String name, Inventory mainPage, ArrayList<Inventory> blockViews,
+            ArrayList<Inventory> spawnerViews, ArrayList<Inventory> containerViews,
+            ArrayList<Inventory> inventoryViews) {
         this.name = name;
         this.mainPage = mainPage;
         this.blockViews = blockViews;

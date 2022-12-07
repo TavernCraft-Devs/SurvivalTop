@@ -113,7 +113,7 @@ sub-page-buttons:
     slot: 47
     name: "&bPrevious Page"
     lore:
-      - "&eView previous page"
+      - "&eGo to Page &b%page%"
     material: ARROW
     enchanted: false
 
@@ -121,7 +121,7 @@ sub-page-buttons:
     slot: 51
     name: "&bNext Page"
     lore:
-      - "&eView next page"
+      - "&eGo to Page &b%page%"
     material: ARROW
     enchanted: false
 

@@ -162,6 +162,9 @@ public class ContainerOperations {
      */
     public double getAllContainersWorth(ContainerHolder containerHolder) {
         double totalContainerWorth = 0;
+        if (containerHolder == null) {
+            return 0;
+        }
         HashMap<String, MutableInt> counter = containerHolder.getCounter();
         for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total

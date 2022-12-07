@@ -90,6 +90,9 @@ public class BlockOperations {
      */
     public double getAllBlocksWorth(BlockHolder blockHolder) {
         double totalBlockWorth = 0;
+        if (blockHolder == null) {
+            return 0;
+        }
         HashMap<String, MutableInt> counter = blockHolder.getCounter();
         for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total

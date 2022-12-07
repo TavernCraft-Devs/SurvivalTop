@@ -28,6 +28,7 @@ public class StatsMenuOptions {
 
     // identifiers
     private final String mainIdentifier = "§m§s§s§t§o§p";
+    private final String statsPageIdentifier = "§s§s§t§o§p";
     private final String blockIdentifier = "§b§s§s§t§o§p";
     private final String spawnerIdentifier = "§s§s§s§t§o§p";
     private final String containerIdentifier = "§c§s§s§t§o§p";
@@ -220,7 +221,7 @@ public class StatsMenuOptions {
             if (wealth == null) {
                 wealth = 0.0;
             }
-            parsedLore = GuiUtils.parseLore(meta.getLore(), "%value%", wealth);
+            parsedLore = GuiUtils.parseWealth(meta.getLore(), "%value%", wealth);
             meta.setLore(parsedLore);
             itemStack.setItemMeta(meta);
             inv.setItem(slot, itemStack);
@@ -279,10 +280,10 @@ public class StatsMenuOptions {
                 break;
             }
 
-            List<String> parsedLore = GuiUtils.parseLore(subPageItemLore, "%amount%",
+            List<String> parsedLore = GuiUtils.parseWealth(subPageItemLore, "%amount%",
                     quantity);
-            parsedLore = GuiUtils.parseLore(parsedLore, "%worth%", worth);
-            parsedLore = GuiUtils.parseLore(parsedLore, "%value%", worth * quantity);
+            parsedLore = GuiUtils.parseWealth(parsedLore, "%worth%", worth);
+            parsedLore = GuiUtils.parseWealth(parsedLore, "%value%", worth * quantity);
             String parsedName = GuiUtils.parseName(subPageItemName, "%name%", name);
             entityView.setItem(slot, GuiUtils.createGuiItem(material, parsedName, false,
                 parsedLore.toArray(new String[0])));
@@ -338,7 +339,19 @@ public class StatsMenuOptions {
         }
 
         for (Map.Entry<Integer, ItemStack> map : subPageButtons.entrySet()) {
-            inv.setItem(map.getKey(), map.getValue());
+            int slot = map.getKey();
+            if (slot == getNextPageSlot() || slot == getPrevPageSlot()) {
+                int pageToUse = slot == getNextPageSlot() ? pageNum + 1 : pageNum - 1;
+                ItemStack itemStack = map.getValue();
+                ItemMeta meta = itemStack.getItemMeta();
+                List<String> parsedLore = GuiUtils.parsePage(meta.getLore(), "%page%",
+                        pageToUse);
+                meta.setLore(parsedLore);
+                itemStack.setItemMeta(meta);
+                inv.setItem(slot, itemStack);
+            } else {
+                inv.setItem(slot, map.getValue());
+            }
         }
         return inv;
     }
@@ -347,6 +360,10 @@ public class StatsMenuOptions {
 
     public String getMainPageIdentifier() {
         return mainIdentifier;
+    }
+
+    public String getStatsPageIdentifier() {
+        return statsPageIdentifier;
     }
 
     public String getSubPageBlockIdentifier() {

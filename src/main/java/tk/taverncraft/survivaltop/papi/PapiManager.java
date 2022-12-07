@@ -159,7 +159,7 @@ public class PapiManager extends PlaceholderExpansion {
 
     @Override
     public String getIdentifier() {
-        return main.getDescription().getPrefix();
+        return "survtop";
     }
 
     @Override

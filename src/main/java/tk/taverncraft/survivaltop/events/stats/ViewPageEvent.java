@@ -1,5 +1,6 @@
 package tk.taverncraft.survivaltop.events.stats;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +20,7 @@ public class ViewPageEvent implements Listener {
 
     // titles for stats menu
     private final String mainStatsPageIdentifier;
+    private final String subStatsPageIdentifier;
     private final String subStatsPageBlockIdentifier;
     private final String subStatsPageSpawnerIdentifier;
     private final String subStatsPageContainerIdentifier;
@@ -35,6 +37,7 @@ public class ViewPageEvent implements Listener {
 
     // titles for info menu
     private final String mainInfoPageIdentifier;
+    private final String subInfoPageIdentifier;
     private final String subInfoPageBlockIdentifier;
     private final String subInfoPageSpawnerIdentifier;
     private final String subInfoPageContainerIdentifier;
@@ -62,6 +65,7 @@ public class ViewPageEvent implements Listener {
         StatsMenuOptions statsOptions = main.getGuiManager().getStatsOptions();
 
         mainStatsPageIdentifier = statsOptions.getMainPageIdentifier();
+        subStatsPageIdentifier = statsOptions.getStatsPageIdentifier();
         subStatsPageBlockIdentifier = statsOptions.getSubPageBlockIdentifier();
         subStatsPageSpawnerIdentifier = statsOptions.getSubPageSpawnerIdentifier();
         subStatsPageContainerIdentifier = statsOptions.getSubPageContainerIdentifier();
@@ -78,6 +82,7 @@ public class ViewPageEvent implements Listener {
         InfoMenuOptions infoOptions = main.getGuiManager().getInfoOptions();
 
         mainInfoPageIdentifier = infoOptions.getMainPageIdentifier();
+        subInfoPageIdentifier = infoOptions.getInfoPageIdentifier();
         subInfoPageBlockIdentifier = infoOptions.getSubPageBlockIdentifier();
         subInfoPageSpawnerIdentifier = infoOptions.getSubPageSpawnerIdentifier();
         subInfoPageContainerIdentifier = infoOptions.getSubPageContainerIdentifier();
@@ -181,6 +186,9 @@ public class ViewPageEvent implements Listener {
      * @return true if click is handled here, false otherwise
      */
     private boolean handleStatsSubPage(int slot, InventoryClickEvent e, String title) {
+        if (!title.endsWith(subStatsPageIdentifier)) {
+            return false;
+        }
         HumanEntity humanEntity = e.getWhoClicked();
         if (slot == prevStatsPageSlot || slot == nextStatsPageSlot) {
             int page = getPageToGoTo(e.getView().getTitle(), slot == nextStatsPageSlot);
@@ -248,6 +256,9 @@ public class ViewPageEvent implements Listener {
      * @return true if click is handled here, false otherwise
      */
     private boolean handleInfoSubPage(int slot, InventoryClickEvent e, String title) {
+        if (!title.endsWith(subInfoPageIdentifier)) {
+            return false;
+        }
         if (slot == prevInfoPageSlot || slot == nextInfoPageSlot) {
             int page = getPageToGoTo(e.getView().getTitle(), slot == nextInfoPageSlot);
 

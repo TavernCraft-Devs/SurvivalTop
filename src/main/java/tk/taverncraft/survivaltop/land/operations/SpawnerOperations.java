@@ -119,6 +119,9 @@ public class SpawnerOperations {
      */
     public double getAllSpawnersWorth(SpawnerHolder spawnerHolder) {
         double totalSpawnerWorth = 0;
+        if (spawnerHolder == null) {
+            return 0;
+        }
         HashMap<String, MutableInt> counter = spawnerHolder.getCounter();
         for (Map.Entry<String, MutableInt> map : counter.entrySet()) {
             // count multiply by worth, then added to total

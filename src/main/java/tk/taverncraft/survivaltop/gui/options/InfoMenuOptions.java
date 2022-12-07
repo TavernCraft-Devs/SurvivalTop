@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import org.bukkit.inventory.meta.ItemMeta;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.GuiUtils;
 import tk.taverncraft.survivaltop.gui.types.InfoGui;
@@ -27,6 +28,7 @@ public class InfoMenuOptions {
 
     // identifiers
     private final String mainIdentifier = "§m§i§s§t§o§p";
+    private final String infoPageIdentifier = "§i§s§t§o§p";
     private final String blockIdentifier = "§b§i§s§t§o§p";
     private final String spawnerIdentifier = "§s§i§s§t§o§p";
     private final String containerIdentifier = "§c§i§s§t§o§p";
@@ -241,7 +243,7 @@ public class InfoMenuOptions {
                 material = Material.getMaterial(name);
             }
 
-            List<String> parsedLore = GuiUtils.parseLore(subPageItemLore, "%worth%",
+            List<String> parsedLore = GuiUtils.parseWealth(subPageItemLore, "%worth%",
                     worth);
             String parsedName = GuiUtils.parseName(subPageItemName, "%name%", name);
             entityView.setItem(slot, GuiUtils.createGuiItem(material, parsedName, false,
@@ -298,7 +300,19 @@ public class InfoMenuOptions {
         }
 
         for (Map.Entry<Integer, ItemStack> map : subPageButtons.entrySet()) {
-            inv.setItem(map.getKey(), map.getValue());
+            int slot = map.getKey();
+            if (slot == getNextPageSlot() || slot == getPrevPageSlot()) {
+                int pageToUse = slot == getNextPageSlot() ? pageNum + 1 : pageNum - 1;
+                ItemStack itemStack = map.getValue();
+                ItemMeta meta = itemStack.getItemMeta();
+                List<String> parsedLore = GuiUtils.parsePage(meta.getLore(), "%page%",
+                    pageToUse);
+                meta.setLore(parsedLore);
+                itemStack.setItemMeta(meta);
+                inv.setItem(slot, itemStack);
+            } else {
+                inv.setItem(slot, map.getValue());
+            }
         }
         return inv;
     }
@@ -307,6 +321,10 @@ public class InfoMenuOptions {
 
     public String getMainPageIdentifier() {
         return mainIdentifier;
+    }
+
+    public String getInfoPageIdentifier() {
+        return infoPageIdentifier;
     }
 
     public String getSubPageBlockIdentifier() {

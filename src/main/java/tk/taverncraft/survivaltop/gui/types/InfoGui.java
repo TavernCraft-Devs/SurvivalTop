@@ -19,8 +19,9 @@ public class InfoGui {
     /**
      * Constructor for InfoGui.
      */
-    public InfoGui(Inventory mainPage, ArrayList<Inventory> blockViews, ArrayList<Inventory> spawnerViews,
-                   ArrayList<Inventory> containerViews, ArrayList<Inventory> inventoryViews) {
+    public InfoGui(Inventory mainPage, ArrayList<Inventory> blockViews,
+            ArrayList<Inventory> spawnerViews, ArrayList<Inventory> containerViews,
+            ArrayList<Inventory> inventoryViews) {
         this.mainPage = mainPage;
         this.blockViews = blockViews;
         this.spawnerViews = spawnerViews;

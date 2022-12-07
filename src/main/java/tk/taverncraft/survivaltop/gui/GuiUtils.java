@@ -89,27 +89,27 @@ public class GuiUtils {
     }
 
     /**
-     * Parses a lore to replace placeholder with double values.
+     * Parses wealth placeholder in lore with wealth value.
      *
      * @param lore lore to parse
      * @param placeholder placeholder to replace
      * @param value value to use
      *
-     * @return parsed lore
+     * @return parsed wealth for lore
      */
-    public static List<String> parseLore(List<String> lore, String placeholder, double value) {
-        List<String> parsedLore = new ArrayList<>();
+    public static List<String> parseWealth(List<String> lore, String placeholder, double value) {
+        List<String> parsedWealth = new ArrayList<>();
         if (lore == null) {
-            return parsedLore;
+            return parsedWealth;
         }
         for (String s : lore) {
-            parsedLore.add(s.replaceAll(placeholder, String.valueOf(value)));
+            parsedWealth.add(s.replaceAll(placeholder, String.valueOf(value)));
         }
-        return parsedLore;
+        return parsedWealth;
     }
 
     /**
-     * Parses a name to replace placeholder with string values.
+     * Parses a name to replace placeholder with string value.
      *
      * @param lore lore to parse
      * @param placeholder placeholder to replace
@@ -119,5 +119,25 @@ public class GuiUtils {
      */
     public static String parseName(String lore, String placeholder, String name) {
         return lore.replaceAll(placeholder, name);
+    }
+
+    /**
+     * Parses page placeholder in lore with int value.
+     *
+     * @param lore lore to parse
+     * @param placeholder placeholder to replace
+     * @param page page to use
+     *
+     * @return parsed page
+     */
+    public static List<String> parsePage(List<String> lore, String placeholder, int page) {
+        List<String> parsedPage = new ArrayList<>();
+        if (lore == null) {
+            return parsedPage;
+        }
+        for (String s : lore) {
+            parsedPage.add(s.replaceAll(placeholder, String.valueOf(page)));
+        }
+        return parsedPage;
     }
 }
