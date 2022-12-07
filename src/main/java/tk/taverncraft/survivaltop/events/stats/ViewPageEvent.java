@@ -155,13 +155,13 @@ public class ViewPageEvent implements Listener {
         }
         Inventory inv = null;
         HumanEntity humanEntity = e.getWhoClicked();
-        if (slot == blockWealthSlot) {
+        if (slot == blockWealthSlot && main.getOptions().landIsIncluded()) {
             inv = main.getGuiManager().getBlockStatsPage(humanEntity, 0);
-        } else if (slot == spawnerWealthSlot) {
+        } else if (slot == spawnerWealthSlot && main.getOptions().spawnerIsIncluded()) {
             inv = main.getGuiManager().getSpawnerStatsPage(humanEntity, 0);
-        } else if (slot == containerWealthSlot) {
+        } else if (slot == containerWealthSlot && main.getOptions().containerIsIncluded()) {
             inv = main.getGuiManager().getContainerStatsPage(humanEntity, 0);
-        } else if (slot == inventoryWealthSlot) {
+        } else if (slot == inventoryWealthSlot && main.getOptions().inventoryIsIncluded()) {
             inv = main.getGuiManager().getInventoryStatsPage(humanEntity, 0);
         }
         if (inv == null) {
@@ -222,13 +222,13 @@ public class ViewPageEvent implements Listener {
             return false;
         }
         Inventory inv = null;
-        if (slot == blockInfoSlot) {
+        if (slot == blockInfoSlot && main.getOptions().landIsIncluded()) {
             inv = main.getGuiManager().getBlockInfoPage(0);
-        } else if (slot == spawnerInfoSlot) {
+        } else if (slot == spawnerInfoSlot && main.getOptions().spawnerIsIncluded()) {
             inv = main.getGuiManager().getSpawnerInfoPage(0);
-        } else if (slot == containerInfoSlot) {
+        } else if (slot == containerInfoSlot && main.getOptions().containerIsIncluded()) {
             inv = main.getGuiManager().getContainerInfoPage(0);
-        } else if (slot == inventoryInfoSlot) {
+        } else if (slot == inventoryInfoSlot && main.getOptions().inventoryIsIncluded()) {
             inv = main.getGuiManager().getInventoryInfoPage(0);
         }
         if (inv == null) {
