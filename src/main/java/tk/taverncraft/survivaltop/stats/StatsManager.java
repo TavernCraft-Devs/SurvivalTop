@@ -32,9 +32,6 @@ import static tk.taverncraft.survivaltop.stats.task.TaskType.PLAYER;
 public class StatsManager {
     private final Main main;
 
-    // boolean to allow reloads to stop current calculations
-    private boolean stopCalculations = false;
-
     // prevent stats command spam by tracking stats tasks
     private final ConcurrentHashMap<Integer, Task> taskMap = new ConcurrentHashMap<>();
 
@@ -143,7 +140,6 @@ public class StatsManager {
     public void calculateEntityStats(CommandSender sender, String name, int id) {
         main.getLandManager().setStopOperations(false);
         main.getInventoryManager().setStopOperations(false);
-        stopCalculations = false;
         double balWealth = 0;
         double blockValue = 0;
         double inventoryValue = 0;
@@ -168,7 +164,7 @@ public class StatsManager {
             papiWealth = getEntityPapiWealth(name);
         }
 
-        if (stopCalculations) {
+        if (!taskMap.containsKey(id)) {
             stopAllCalculations(sender);
             return;
         }
@@ -207,7 +203,7 @@ public class StatsManager {
                     containerCounter = main.getLandManager().getContainersForGui(id);
                 }
 
-                if (stopCalculations) {
+                if (!taskMap.containsKey(id)) {
                     stopAllCalculations(sender);
                     return;
                 }
@@ -305,7 +301,7 @@ public class StatsManager {
      */
     private void processEntityLandWealth(String name, int id) {
         main.getLandManager().createHolder(id);
-        this.main.getLandManager().processEntityLand(name, id, false);
+        this.main.getLandManager().processEntityLand(name, id);
     }
 
     /**
@@ -356,10 +352,9 @@ public class StatsManager {
      * Sets the state for calculations to stop or continue.
      */
     public void stopAllCalculations(CommandSender sender) {
-        this.stopCalculations = true;
         taskMap.clear();
-        creatorList.clear();
         this.entityCacheMap = new ConcurrentHashMap<>();
+        creatorList.clear();
         MessageManager.sendMessage(sender, "calculation-interrupted");
     }
 

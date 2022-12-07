@@ -88,10 +88,9 @@ public class LandManager {
      *
      * @param name name of entity to get land worth for
      * @param id key to identify task
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
-        landClaimPluginHandler.processEntityLand(name, id, isLeaderboardUpdate);
+    public void processEntityLand(String name, int id) {
+        landClaimPluginHandler.processEntityLand(name, id);
     }
 
     /**

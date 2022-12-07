@@ -37,6 +37,7 @@ public class LeaderboardManager {
     // cache values used for leaderboard/papi
     private ConcurrentHashMap<String, Integer> positionCacheMap;
     private ConcurrentHashMap<String, EntityCache> entityCacheMap;
+    private ConcurrentHashMap<String, EntityCache> entityCacheMapCopy;
     private ArrayList<EntityCache> entityCacheList;
 
     /**
@@ -56,6 +57,7 @@ public class LeaderboardManager {
     public void initializeValues() throws NullPointerException {
         positionCacheMap = new ConcurrentHashMap<>();
         entityCacheMap = new ConcurrentHashMap<>();
+        entityCacheMapCopy = new ConcurrentHashMap<>();
         entityCacheList = new ArrayList<>();
     }
 
@@ -344,7 +346,7 @@ public class LeaderboardManager {
      * @return balance wealth of given entity
      */
     public String getEntityBalWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getBalWealth());
     }
 
@@ -356,7 +358,7 @@ public class LeaderboardManager {
      * @return land wealth of given entity
      */
     public String getEntityLandWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getLandWealth());
     }
 
@@ -368,7 +370,7 @@ public class LeaderboardManager {
      * @return block wealth of given entity
      */
     public String getEntityBlockWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getBlockWealth());
     }
 
@@ -380,7 +382,7 @@ public class LeaderboardManager {
      * @return spawner wealth of given entity
      */
     public String getEntitySpawnerWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getSpawnerWealth());
     }
 
@@ -392,7 +394,7 @@ public class LeaderboardManager {
      * @return container wealth of given entity
      */
     public String getEntityContainerWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getContainerWealth());
     }
 
@@ -404,7 +406,7 @@ public class LeaderboardManager {
      * @return inventory wealth of given entity
      */
     public String getEntityInvWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getInventoryWealth());
     }
 
@@ -416,7 +418,7 @@ public class LeaderboardManager {
      * @return total wealth of given entity
      */
     public String getEntityTotalWealth(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
+        EntityCache eCache = entityCacheMapCopy.get(name);
         return String.format("%.02f", eCache.getTotalWealth());
     }
 
@@ -425,6 +427,7 @@ public class LeaderboardManager {
         if (!leaderboardTaskQueue.hasNext()) {
             HashMap<String, EntityCache> sortedMap = sortAndFilterEntities(entityCacheMap);
             setUpEntityCache(sortedMap);
+            entityCacheMapCopy = entityCacheMap;
             completeLeaderboardUpdate(leaderboardSender, sortedMap);
         } else {
             main.getStatsManager().getStatsForLeaderboard(leaderboardSender, leaderboardTaskQueue.next());

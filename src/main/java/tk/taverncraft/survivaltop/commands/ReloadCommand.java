@@ -51,6 +51,7 @@ public class ReloadCommand {
 
             // reinitialize manager values
             main.getStorageManager().initializeValues();
+            main.getLandManager().setStopOperations(true);
             main.getLandManager().initializeLandOperations();
             main.getLandManager().initializeLandType();
             main.getInventoryManager().setStopOperations(true);

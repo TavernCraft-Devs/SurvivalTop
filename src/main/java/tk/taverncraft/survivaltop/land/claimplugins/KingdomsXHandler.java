@@ -52,10 +52,9 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      * Processes the worth of a land.
      *
      * @param name name of entity to get land worth for
-     * @param id key to identify task
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
+     * @param id key to identify task)
      */
-    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
+    public void processEntityLand(String name, int id) {
         try {
             Set<SimpleChunkLocation> claims = getClaims(name);
             for (SimpleChunkLocation claim : claims) {

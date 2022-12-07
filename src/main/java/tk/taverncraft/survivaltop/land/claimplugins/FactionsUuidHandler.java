@@ -54,9 +54,8 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
      *
      * @param name name of entity to get land worth for
      * @param id key to identify task
-     * @param isLeaderboardUpdate true if is a leaderboard update, false otherwise (i.e. stats)
      */
-    public void processEntityLand(String name, int id, boolean isLeaderboardUpdate) {
+    public void processEntityLand(String name, int id) {
         try {
             Set<FLocation> claims = getClaims(name);
             for (FLocation claim : claims) {
