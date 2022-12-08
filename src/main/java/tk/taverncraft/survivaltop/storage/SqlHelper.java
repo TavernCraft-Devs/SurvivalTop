@@ -12,6 +12,7 @@ import java.util.List;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
+import tk.taverncraft.survivaltop.papi.PapiManager;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 
 /**
@@ -55,7 +56,11 @@ public class SqlHelper implements StorageHelper {
      * @param EntityCacheList list of entities to store
      */
     public void saveToStorage(ArrayList<EntityCache> EntityCacheList) {
-        List<String> categories = main.getPapiManager().getPapiCategories();
+        PapiManager papiManager = main.getPapiManager();
+        List<String> categories = new ArrayList<>();
+        if (papiManager != null) {
+            categories = papiManager.getPapiCategories();
+        }
         StringBuilder columns = new StringBuilder("ENTITY-NAME, ENTITY-TYPE, TOTAL-WEALTH, " +
             "LAND-WEALTH, BALANCE-WEALTH, BLOCK-WEALTH, SPAWNER-WEALTH, CONTAINER-WEALTH, " +
             "INVENTORY-WEALTH, ");
@@ -101,8 +106,12 @@ public class SqlHelper implements StorageHelper {
                 return null;
             }
 
-            List<String> categories = main.getPapiManager().getPapiCategories();
-            StringBuilder columns = new StringBuilder("");
+            PapiManager papiManager = main.getPapiManager();
+            List<String> categories = new ArrayList<>();
+            if (papiManager != null) {
+                categories = papiManager.getPapiCategories();
+            }
+            StringBuilder columns = new StringBuilder();
             for (String category : categories) {
                 columns.append(category.toUpperCase()).append(" DECIMAL (18, 2), ");
             }
@@ -195,16 +204,15 @@ public class SqlHelper implements StorageHelper {
             entityType = "group";
         }
         LinkedHashMap<String, Double> papiWealth = eCache.getPapiWealth();
-        String papiValues = "', '";
+        StringBuilder papiValues = new StringBuilder("', '");
         for (Double value : papiWealth.values()) {
-            papiValues += value + "', '";
+            papiValues.append(value).append("', '");
         }
-        papiValues = papiValues.substring(0, papiValues.length() - 4) + "'), ";
-        String query = "('" + entityName + "', '" + entityType + "', '"
+        papiValues = new StringBuilder(papiValues.substring(0, papiValues.length() - 4) + "'), ");
+        return "('" + entityName + "', '" + entityType + "', '"
             + eCache.getTotalWealth() + "', '" + eCache.getLandWealth() + "', '"
             + eCache.getBalWealth() + "', " + eCache.getBlockWealth() + "', '"
             + eCache.getSpawnerWealth() + "', '" + eCache.getContainerWealth() + "', '"
             + eCache.getInventoryWealth() + "', '" + eCache.getTotalWealth() + papiValues;
-        return query;
     }
 }

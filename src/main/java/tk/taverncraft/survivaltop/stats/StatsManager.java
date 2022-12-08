@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.papi.PapiManager;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.stats.task.Task;
 import tk.taverncraft.survivaltop.stats.task.TaskType;
@@ -367,7 +368,9 @@ public class StatsManager {
         taskMap.clear();
         this.entityCacheMap = new ConcurrentHashMap<>();
         creatorList.clear();
-        MessageManager.sendMessage(sender, "calculation-interrupted");
+        if (sender != null) {
+            MessageManager.sendMessage(sender, "calculation-interrupted");
+        }
     }
 
     /**

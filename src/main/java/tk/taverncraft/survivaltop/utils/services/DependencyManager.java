@@ -70,7 +70,12 @@ public class DependencyManager {
         }
 
         boolean groupCheckPassed = checkGroup();
-        return groupCheckPassed;
+        if (!groupCheckPassed) {
+            return false;
+        }
+
+        boolean papiCheckPassed = checkPapi();
+        return papiCheckPassed;
     }
 
     /**
@@ -170,6 +175,28 @@ public class DependencyManager {
                 LogManager.error("Failed to integrate with "
                     + depPlugin + " for group type!");
                 main.getOptions().disableGroup();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if papi dependency plugin is enabled.
+     *
+     * @return true if plugin is enabled, false otherwise
+     */
+    public boolean checkPapi() {
+        boolean enabled;
+        if (main.getOptions().papiIsIncluded()) {
+            String depPlugin = "PlaceholderAPI";
+            enabled = isDependencyEnabled(depPlugin);
+
+            if (enabled) {
+                LogManager.info("Successfully integrated with Papi!");
+            } else {
+                LogManager.error("Failed to integrate with Papi!");
+                main.getOptions().disablePapi();
                 return false;
             }
         }

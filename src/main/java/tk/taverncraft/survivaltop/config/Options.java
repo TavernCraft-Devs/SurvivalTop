@@ -255,4 +255,8 @@ public class Options {
     public void disableGroup() {
         this.enableGroup = false;
     }
+
+    public void disablePapi() {
+        this.includePapi = false;
+    }
 }

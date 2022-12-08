@@ -112,7 +112,9 @@ public class Main extends JavaPlugin {
             this.balanceManager = new BalanceManager(this);
             this.landManager = new LandManager(this);
             this.inventoryManager = new InventoryManager(this);
-            this.papiManager = new PapiManager(this);
+            if (options.papiIsIncluded() && dependencyManager.checkPapi()) {
+                this.papiManager = new PapiManager(this);
+            }
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
             this.guiManager = new GuiManager(this);
