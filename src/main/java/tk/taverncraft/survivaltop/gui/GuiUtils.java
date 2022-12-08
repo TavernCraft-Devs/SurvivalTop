@@ -1,5 +1,7 @@
 package tk.taverncraft.survivaltop.gui;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,7 +105,8 @@ public class GuiUtils {
             return parsedWealth;
         }
         for (String s : lore) {
-            parsedWealth.add(s.replaceAll(placeholder, String.valueOf(value)));
+            parsedWealth.add(s.replaceAll(placeholder, new BigDecimal(value).setScale(2,
+                RoundingMode.HALF_UP).toPlainString()));
         }
         return parsedWealth;
     }

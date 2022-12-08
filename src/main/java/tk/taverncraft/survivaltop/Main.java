@@ -112,8 +112,9 @@ public class Main extends JavaPlugin {
             this.balanceManager = new BalanceManager(this);
             this.landManager = new LandManager(this);
             this.inventoryManager = new InventoryManager(this);
-            if (options.papiIsIncluded() && dependencyManager.checkPapi()) {
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 this.papiManager = new PapiManager(this);
+                papiManager.register();
             }
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
@@ -161,23 +162,9 @@ public class Main extends JavaPlugin {
         setupEconomy();
         setupPermissions();
 
-        // placeholderapi setup
-        checkPlaceholderAPI();
-
         if (!this.dependencyManager.checkAllDependencies()) {
             LogManager.error("Some options were disabled on startup " +
                     "to prevent errors, please check your config file!");
-        }
-    }
-
-    /**
-     * Checks if PAPI is present.
-     */
-    private void checkPlaceholderAPI() {
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            LogManager.info(String.format("[%s] - PlaceholderAPI found, integrated with plugin!",
-                    getDescription().getName()));
-            papiManager.register();
         }
     }
 
