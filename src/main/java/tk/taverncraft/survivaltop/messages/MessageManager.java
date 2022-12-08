@@ -73,7 +73,7 @@ public class MessageManager {
      */
     public static void sendMessage(CommandSender sender, String messageKey, String[] keys,
             String[] values) {
-        String message = getParsedMessage(messageKey, keys, values);
+        String message = getParsedMessage(messageKey, keys, values, true);
         sender.sendMessage(message);
     }
 
@@ -83,11 +83,13 @@ public class MessageManager {
      * @param messageKey key to get message with
      * @param keys placeholder keys
      * @param values placeholder values
+     * @param includePrefix whether to include plugin prefix in message
      *
      * @return parsed message
      */
-    private static String getParsedMessage(String messageKey, String[] keys, String[] values) {
-        String message = getMessage(messageKey);
+    private static String getParsedMessage(String messageKey, String[] keys, String[] values,
+            boolean includePrefix) {
+        String message = includePrefix ? getMessage(messageKey) : messageKeysMap.get(messageKey);
         for (int i = 0; i < keys.length; i++) {
             message = message.replaceAll(keys[i], values[i]);
         }
@@ -238,7 +240,7 @@ public class MessageManager {
             TextComponent component = getTextComponentMessage(entry);
             eCache.setChat();
             String parsedMessage = getParsedMessage("leaderboard-hover",
-                    eCache.getPlaceholders(), eCache.getValues());
+                    eCache.getPlaceholders(), eCache.getValues(), false);
             component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                     getBaseComponentArrMessage(parsedMessage)));
             message.append(component);
@@ -273,8 +275,8 @@ public class MessageManager {
      * @param sender player to send message to
      */
     public static void sendChatStatsReadyMessage(CommandSender sender, EntityCache eCache) {
-        String message = getParsedMessage("leaderboard-header", eCache.getPlaceholders(),
-                eCache.getValues());
+        String message = getParsedMessage("entity-stats", eCache.getPlaceholders(),
+                eCache.getValues(), false);
         sender.sendMessage(message);
     }
 
