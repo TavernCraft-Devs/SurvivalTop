@@ -62,7 +62,7 @@ public class ReloadCommand {
             main.getGuiManager().initializeMenuOptions();
             main.getGroupManager().initializeLandType();
             main.getLogManager().stopExistingTasks();
-            main.getLeaderboardManager().stopExistingTasks();
+            main.getLeaderboardManager().stopExistingScheduleTasks();
             main.getLeaderboardManager().initializeValues();
             main.getLeaderboardManager().scheduleLeaderboardUpdate(
                     main.getConfig().getInt("update-interval"),

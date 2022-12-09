@@ -30,7 +30,7 @@ import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 public class LeaderboardManager {
     private final Main main;
     private boolean isUpdating;
-    private BukkitTask leaderboardTask;
+    private BukkitTask scheduleTask;
     private long leaderboardUpdateStartTime = -1;
     private long lastUpdateDuration = -1;
     private Iterator<String> leaderboardTaskQueue;
@@ -55,7 +55,7 @@ public class LeaderboardManager {
      */
     public LeaderboardManager(Main main) {
         this.main = main;
-        stopExistingTasks();
+        stopExistingScheduleTasks();
         initializeValues();
     }
 
@@ -81,7 +81,7 @@ public class LeaderboardManager {
 
         // if frequency is -1, then no need to schedule repeating updates
         if (frequency == -1) {
-            leaderboardTask = new BukkitRunnable() {
+            scheduleTask = new BukkitRunnable() {
 
                 @Override
                 public void run() {
@@ -91,7 +91,8 @@ public class LeaderboardManager {
                     return;
                 }
                 isUpdating = true;
-                initiateLeaderboardUpdate(Bukkit.getConsoleSender());
+                Bukkit.getScheduler().runTask(main, () ->
+                        initiateLeaderboardUpdate(Bukkit.getConsoleSender()));
                 }
 
             }.runTaskAsynchronously(main);
@@ -99,7 +100,7 @@ public class LeaderboardManager {
         }
         long interval = frequency * 20L;
         long delayTicks = delay * 20L;
-        leaderboardTask = new BukkitRunnable() {
+        scheduleTask = new BukkitRunnable() {
 
             @Override
             public void run() {
@@ -109,7 +110,8 @@ public class LeaderboardManager {
                 return;
             }
             isUpdating = true;
-            initiateLeaderboardUpdate(Bukkit.getConsoleSender());
+            Bukkit.getScheduler().runTask(main, () ->
+                    initiateLeaderboardUpdate(Bukkit.getConsoleSender()));
             }
 
         }.runTaskTimerAsynchronously(main, delayTicks, interval);
@@ -146,7 +148,7 @@ public class LeaderboardManager {
             }
         } catch (Exception e) {
             LogManager.error(e.getMessage());
-            this.main.getLeaderboardManager().stopExistingTasks();
+            this.main.getLeaderboardManager().stopExistingScheduleTasks();
         }
     }
 
@@ -263,13 +265,13 @@ public class LeaderboardManager {
     }
 
     /**
-     * Stops all existing leaderboard tasks.
+     * Stops all existing schedule tasks.
      */
-    public void stopExistingTasks() {
+    public void stopExistingScheduleTasks() {
         this.leaderboardUpdateStartTime = -1;
-        if (leaderboardTask != null) {
-            leaderboardTask.cancel();
-            leaderboardTask = null;
+        if (scheduleTask != null) {
+            scheduleTask.cancel();
+            scheduleTask = null;
         }
         this.isUpdating = false;
     }
@@ -361,7 +363,7 @@ public class LeaderboardManager {
      */
     private void parseAndRunCommand(String command) {
         if (main.getOptions().groupIsEnabled()) {
-            Pattern groupPattern = Pattern.compile("\\%(group-\\d+)\\%");
+            Pattern groupPattern = Pattern.compile("%(group-\\d+)%");
             Matcher groupMatcher = groupPattern.matcher(command);
 
             if (groupMatcher.find()) {
@@ -372,7 +374,7 @@ public class LeaderboardManager {
             }
         }
 
-        Pattern playerPattern = Pattern.compile("\\%(player-\\d+)\\%");
+        Pattern playerPattern = Pattern.compile("%(player-\\d+)%");
         Matcher playerMatcher = playerPattern.matcher(command);
 
         if (playerMatcher.find()) {
