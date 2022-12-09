@@ -1,6 +1,5 @@
 package tk.taverncraft.survivaltop.leaderboard;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -348,7 +349,50 @@ public class LeaderboardManager {
     private void runCommandsOnFinish() {
         List<String> commands = main.getOptions().getCommandsOnFinish();
         for (String command : commands) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            parseAndRunCommand(command);
+        }
+    }
+
+    /**
+     * Parses command placeholders for leaderboard entities before executing them. Supports only
+     * {player-?} and {group-?} placeholders.
+     *
+     * @param command command to parse
+     */
+    private void parseAndRunCommand(String command) {
+        Pattern playerPattern = Pattern.compile("\\{(player-\\d+)\\}");
+        Matcher playerMatcher = playerPattern.matcher(command);
+
+        if (main.getOptions().groupIsEnabled()) {
+            Pattern groupPattern = Pattern.compile("\\{(group-\\d+)\\}");
+            Matcher groupMatcher = groupPattern.matcher(command);
+
+            if (groupMatcher.find()) {
+                String placeholder = playerMatcher.group(0);
+                int index = Integer.parseInt(playerMatcher.group(1).split("-")[1]) - 1;
+                EntityCache eCache = entityCacheMapCopy.get(index);
+                command = command.replaceAll(placeholder, eCache.getName());
+            }
+        }
+
+        if (playerMatcher.find()) {
+            String placeholder = playerMatcher.group(0);
+            int index = Integer.parseInt(playerMatcher.group(1).split("-")[1]) - 1;
+            EntityCache eCache = entityCacheMapCopy.get(index);
+            if (eCache == null) {
+                return;
+            }
+            String entityName = eCache.getName();
+            if (main.getOptions().groupIsEnabled()) {
+                List<OfflinePlayer> players = main.getGroupManager().getPlayers(entityName);
+                for (OfflinePlayer player : players) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replaceAll(placeholder, player.getName()));
+                }
+            } else {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replaceAll(placeholder, entityName));
+            }
         }
     }
 
