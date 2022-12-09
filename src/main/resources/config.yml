@@ -159,12 +159,14 @@ use-hoverable-leaderboard: false
 
 # commands to run before starting a leaderboard update
 commands-on-start:
-  - broadcast &aLeaderboard update has started!
+  - broadcast &aSurvivalTop leaderboard update has started!
 
 # commands to run after finishing a leaderboard update
+# allows entity placeholders %player-(position)% and %group-(position)%
+# more information on the use of placeholders in commands may be found on our wiki:
+#
 commands-on-end:
-  - broadcast &aLeaderboard update has been completed!
-  - {player-1}
+  - broadcast &aSurvivalTop leaderboard update has been completed!
 
 #####################################################################################
 #                                                                                   #

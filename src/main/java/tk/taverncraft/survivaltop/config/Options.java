@@ -54,7 +54,7 @@ public class Options {
     private int leaderboardPositionsPerPage;
     private boolean useHoverableLeaderboard;
     private List<String> commandsOnStart;
-    private List<String> commandsOnFinish;
+    private List<String> commandsOnEnd;
 
     // storage configurations
     private String storageType;
@@ -101,7 +101,7 @@ public class Options {
         this.leaderboardPositionsPerPage = config.getInt("leaderboard-positions-per-page", 10);
         this.useHoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
         this.commandsOnStart = config.getStringList("commands-on-start");
-        this.commandsOnFinish = config.getStringList("commands-on-finish");
+        this.commandsOnEnd = config.getStringList("commands-on-end");
         this.storageType = config.getString("storage-type", "None");
         this.lastLoadTime = Instant.now().getEpochSecond();
     }
@@ -216,8 +216,8 @@ public class Options {
         return commandsOnStart;
     }
 
-    public List<String> getCommandsOnFinish() {
-        return commandsOnFinish;
+    public List<String> getCommandsOnEnd() {
+        return commandsOnEnd;
     }
 
     public String getStorageType() {

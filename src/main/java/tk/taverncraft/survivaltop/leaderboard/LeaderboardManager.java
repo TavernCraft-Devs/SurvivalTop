@@ -314,7 +314,7 @@ public class LeaderboardManager {
             setUpEntityCache(sortedMap);
             entityCacheMapCopy = entityCacheMap;
             completeLeaderboardUpdate(leaderboardSender, sortedMap);
-            runCommandsOnFinish();
+            runCommandsOnEnd();
             main.getStorageManager().saveToStorage(entityCacheList);
         } else {
             main.getStatsManager().getStatsForLeaderboard(leaderboardSender,
@@ -346,8 +346,8 @@ public class LeaderboardManager {
     /**
      * Runs user specified commands after finishing a leaderboard update.
      */
-    private void runCommandsOnFinish() {
-        List<String> commands = main.getOptions().getCommandsOnFinish();
+    private void runCommandsOnEnd() {
+        List<String> commands = main.getOptions().getCommandsOnEnd();
         for (String command : commands) {
             parseAndRunCommand(command);
         }
@@ -360,25 +360,25 @@ public class LeaderboardManager {
      * @param command command to parse
      */
     private void parseAndRunCommand(String command) {
-        Pattern playerPattern = Pattern.compile("\\{(player-\\d+)\\}");
-        Matcher playerMatcher = playerPattern.matcher(command);
-
         if (main.getOptions().groupIsEnabled()) {
-            Pattern groupPattern = Pattern.compile("\\{(group-\\d+)\\}");
+            Pattern groupPattern = Pattern.compile("\\%(group-\\d+)\\%");
             Matcher groupMatcher = groupPattern.matcher(command);
 
             if (groupMatcher.find()) {
-                String placeholder = playerMatcher.group(0);
-                int index = Integer.parseInt(playerMatcher.group(1).split("-")[1]) - 1;
-                EntityCache eCache = entityCacheMapCopy.get(index);
+                String placeholder = groupMatcher.group(0);
+                int index = Integer.parseInt(groupMatcher.group(1).split("-")[1]) - 1;
+                EntityCache eCache = entityCacheList.get(index);
                 command = command.replaceAll(placeholder, eCache.getName());
             }
         }
 
+        Pattern playerPattern = Pattern.compile("\\%(player-\\d+)\\%");
+        Matcher playerMatcher = playerPattern.matcher(command);
+
         if (playerMatcher.find()) {
             String placeholder = playerMatcher.group(0);
             int index = Integer.parseInt(playerMatcher.group(1).split("-")[1]) - 1;
-            EntityCache eCache = entityCacheMapCopy.get(index);
+            EntityCache eCache = entityCacheList.get(index);
             if (eCache == null) {
                 return;
             }
@@ -393,7 +393,9 @@ public class LeaderboardManager {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                         command.replaceAll(placeholder, entityName));
             }
+            return;
         }
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
     // functions below are called by the papi manager to retrieve leaderboard values
