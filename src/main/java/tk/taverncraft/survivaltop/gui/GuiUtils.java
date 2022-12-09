@@ -91,6 +91,26 @@ public class GuiUtils {
     }
 
     /**
+     * Parses quantity placeholder in lore with item quantity.
+     *
+     * @param lore lore to parse
+     * @param placeholder placeholder to replace
+     * @param value value to use
+     *
+     * @return parsed wealth for lore
+     */
+    public static List<String> parseQuantity(List<String> lore, String placeholder, int value) {
+        List<String> parsedWealth = new ArrayList<>();
+        if (lore == null) {
+            return parsedWealth;
+        }
+        for (String s : lore) {
+            parsedWealth.add(s.replaceAll(placeholder, String.valueOf(value)));
+        }
+        return parsedWealth;
+    }
+
+    /**
      * Parses wealth placeholder in lore with wealth value.
      *
      * @param lore lore to parse

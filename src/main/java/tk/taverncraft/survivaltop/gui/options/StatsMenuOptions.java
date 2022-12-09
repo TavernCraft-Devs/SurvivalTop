@@ -280,10 +280,11 @@ public class StatsMenuOptions {
                 break;
             }
 
-            List<String> parsedLore = GuiUtils.parseWealth(subPageItemLore, "%amount%",
+            List<String> parsedLore = GuiUtils.parseQuantity(subPageItemLore, "%amount%",
                     quantity);
             parsedLore = GuiUtils.parseWealth(parsedLore, "%worth%", worth);
-            parsedLore = GuiUtils.parseWealth(parsedLore, "%value%", worth * quantity);
+            parsedLore = GuiUtils.parseWealth(parsedLore, "%value%",
+                    worth * quantity);
             String parsedName = GuiUtils.parseName(subPageItemName, "%name%", name);
             entityView.setItem(slot, GuiUtils.createGuiItem(material, parsedName, false,
                 parsedLore.toArray(new String[0])));

@@ -1,5 +1,6 @@
 package tk.taverncraft.survivaltop.leaderboard;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,6 +139,7 @@ public class LeaderboardManager {
             } else {
                 setTaskQueueForPlayers();
             }
+            runCommandsOnStart();
             if (leaderboardTaskQueue.hasNext()) {
                 main.getStatsManager().getStatsForLeaderboard(sender, leaderboardTaskQueue.next());
             }
@@ -311,6 +313,7 @@ public class LeaderboardManager {
             setUpEntityCache(sortedMap);
             entityCacheMapCopy = entityCacheMap;
             completeLeaderboardUpdate(leaderboardSender, sortedMap);
+            runCommandsOnFinish();
             main.getStorageManager().saveToStorage(entityCacheList);
         } else {
             main.getStatsManager().getStatsForLeaderboard(leaderboardSender,
@@ -327,6 +330,26 @@ public class LeaderboardManager {
      */
     public EntityCache getEntityCache(String name) {
         return entityCacheMap.get(name);
+    }
+
+    /**
+     * Runs user specified commands at the start of a leaderboard update.
+     */
+    private void runCommandsOnStart() {
+        List<String> commands = main.getOptions().getCommandsOnStart();
+        for (String command : commands) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        }
+    }
+
+    /**
+     * Runs user specified commands after finishing a leaderboard update.
+     */
+    private void runCommandsOnFinish() {
+        List<String> commands = main.getOptions().getCommandsOnFinish();
+        for (String command : commands) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        }
     }
 
     // functions below are called by the papi manager to retrieve leaderboard values

@@ -157,6 +157,15 @@ leaderboard-positions-per-page: 10
 # disabling may improve performance on servers with little resources
 use-hoverable-leaderboard: false
 
+# commands to run before starting a leaderboard update
+commands-on-start:
+  - broadcast &aLeaderboard update has started!
+
+# commands to run after finishing a leaderboard update
+commands-on-end:
+  - broadcast &aLeaderboard update has been completed!
+  - {player-1}
+
 #####################################################################################
 #                                                                                   #
 #                               Storage Configurations                              #

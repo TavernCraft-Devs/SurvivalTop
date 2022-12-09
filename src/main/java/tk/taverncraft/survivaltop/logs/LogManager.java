@@ -205,6 +205,7 @@ public class LogManager {
         // config options
         config.set("use-gui-stats", main.getOptions().isUseGuiStats());
         config.set("calculation-mode", main.getOptions().getCalculationMode());
+        config.set("cache-duration", main.getOptions().getCacheDuration());
         config.set("filter-last-join", main.getOptions().filterLastJoin());
         config.set("filter-player-time", main.getOptions().filterPlayerTime());
         config.set("enable-group", main.getOptions().groupIsEnabled());
@@ -212,15 +213,22 @@ public class LogManager {
         config.set("include-bal", main.getOptions().balIsIncluded());
         config.set("include-land", main.getOptions().landIsIncluded());
         config.set("land-type", main.getOptions().getLandType());
+        config.set("max-land-height", main.getOptions().getMaxLandHeight());
+        config.set("min-land-height", main.getOptions().getMinLandHeight());
         config.set("include-spawners", main.getOptions().spawnerIsIncluded());
         config.set("include-containers", main.getOptions().containerIsIncluded());
         config.set("container-type", main.getOptions().getContainerTypes());
-        config.set("max-land-height", main.getOptions().getMaxLandHeight());
-        config.set("min-land-height", main.getOptions().getMinLandHeight());
         config.set("include-inventory", main.getOptions().inventoryIsIncluded());
+        config.set("include-papi", main.getOptions().papiIsIncluded());
         config.set("update-interval", main.getOptions().getUpdateInterval());
         config.set("update-on-start", main.getOptions().updateOnStart());
         config.set("minimum-wealth", main.getOptions().getMinimumWealth());
+        config.set("total-leaderboard-positions", main.getOptions().getTotalLeaderboardPositions());
+        config.set("leaderboard-positions-per-page",
+                main.getOptions().getLeaderboardPositionsPerPage());
+        config.set("use-hoverable-leaderboard", main.getOptions().isUseHoverableLeaderboard());
+        config.set("commands-on-start", main.getOptions().getCommandsOnStart());
+        config.set("commands-on-finish", main.getOptions().getCommandsOnFinish());
         config.set("storage-type", main.getOptions().getStorageType());
         config.set("last-load-time", main.getOptions().getLastLoadTime());
 
