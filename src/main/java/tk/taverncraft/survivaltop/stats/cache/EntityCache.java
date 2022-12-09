@@ -180,6 +180,20 @@ public class EntityCache {
         return wealthBreakdown.get("land-wealth");
     }
 
+    /**
+     * Gets the wealth breakdown for the entity.
+     *
+     * @return wealth breakdown of the entity
+     */
+    public HashMap<String, Double> getWealthBreakdown() {
+        return wealthBreakdown;
+    }
+
+    /**
+     * Gets the wealth values from papi.
+     *
+     * @return papi wealth of the entity
+     */
     public LinkedHashMap<String, Double> getPapiWealth() {
         return papiWealth;
     }

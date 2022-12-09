@@ -61,11 +61,11 @@ public class SqlHelper implements StorageHelper {
         if (papiManager != null) {
             categories = papiManager.getPapiCategories();
         }
-        StringBuilder columns = new StringBuilder("ENTITY-NAME, ENTITY-TYPE, TOTAL-WEALTH, " +
-            "LAND-WEALTH, BALANCE-WEALTH, BLOCK-WEALTH, SPAWNER-WEALTH, CONTAINER-WEALTH, " +
-            "INVENTORY-WEALTH, ");
+        StringBuilder columns = new StringBuilder("ENTITY_NAME, ENTITY_TYPE, TOTAL_WEALTH, " +
+            "LAND_WEALTH, BALANCE_WEALTH, BLOCK_WEALTH, SPAWNER_WEALTH, CONTAINER_WEALTH, " +
+            "INVENTORY_WEALTH, ");
         for (String category : categories) {
-            columns.append(category.toUpperCase()).append(", ");
+            columns.append(category.toUpperCase().replaceAll("-", "_")).append(", ");
         }
         columns = new StringBuilder(columns.substring(0, columns.length() - 2));
         String header = "INSERT INTO " + tableName + " (" + columns + ") VALUES ";
@@ -113,20 +113,20 @@ public class SqlHelper implements StorageHelper {
             }
             StringBuilder columns = new StringBuilder();
             for (String category : categories) {
-                columns.append(category.toUpperCase()).append(" DECIMAL (18, 2), ");
+                columns.append(category.toUpperCase().replaceAll("-", "_"))
+                        .append(" DECIMAL (18, 2), ");
             }
-            columns = new StringBuilder(columns.substring(0, columns.length() - 2));
             if (!tableExists(tableName, conn)) {
                 String query = "CREATE TABLE " + tableName + "("
-                        + "ENTITY-NAME VARCHAR (36) NOT NULL, "
-                        + "ENTITY-TYPE VARCHAR (10) NOT NULL, "
-                        + "TOTAL-WEALTH DECIMAL (18, 2), "
-                        + "LAND-WEALTH DECIMAL (18, 2), "
-                        + "BALANCE-WEALTH DECIMAL (18, 2), "
-                        + "BLOCK-WEALTH DECIMAL (18, 2), "
-                        + "SPAWNER-WEALTH DECIMAL (18, 2), "
-                        + "CONTAINER-WEALTH DECIMAL (18, 2), "
-                        + "INVENTORY-WEALTH DECIMAL (18, 2), "
+                        + "ENTITY_NAME VARCHAR (36) NOT NULL, "
+                        + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
+                        + "TOTAL_WEALTH DECIMAL (18, 2), "
+                        + "LAND_WEALTH DECIMAL (18, 2), "
+                        + "BALANCE_WEALTH DECIMAL (18, 2), "
+                        + "BLOCK_WEALTH DECIMAL (18, 2), "
+                        + "SPAWNER_WEALTH DECIMAL (18, 2), "
+                        + "CONTAINER_WEALTH DECIMAL (18, 2), "
+                        + "INVENTORY_WEALTH DECIMAL (18, 2), "
                         + columns
                         + "PRIMARY KEY (ENTITY_NAME))";
                 PreparedStatement stmt = conn.prepareStatement(query);
@@ -211,8 +211,8 @@ public class SqlHelper implements StorageHelper {
         papiValues = new StringBuilder(papiValues.substring(0, papiValues.length() - 4) + "'), ");
         return "('" + entityName + "', '" + entityType + "', '"
             + eCache.getTotalWealth() + "', '" + eCache.getLandWealth() + "', '"
-            + eCache.getBalWealth() + "', " + eCache.getBlockWealth() + "', '"
+            + eCache.getBalWealth() + "', '" + eCache.getBlockWealth() + "', '"
             + eCache.getSpawnerWealth() + "', '" + eCache.getContainerWealth() + "', '"
-            + eCache.getInventoryWealth() + "', '" + eCache.getTotalWealth() + papiValues;
+            + eCache.getInventoryWealth() + papiValues;
     }
 }

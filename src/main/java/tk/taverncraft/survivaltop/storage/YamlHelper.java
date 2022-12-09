@@ -65,7 +65,7 @@ public class YamlHelper implements StorageHelper {
         }
         entityConfig.set("entity-name", entityName);
         entityConfig.set("entity-type", entityType);
-        for (Map.Entry<String, Double> map : eCache.getPapiWealth().entrySet()) {
+        for (Map.Entry<String, Double> map : eCache.getWealthBreakdown().entrySet()) {
             entityConfig.set(map.getKey(), map.getValue());
         }
 
