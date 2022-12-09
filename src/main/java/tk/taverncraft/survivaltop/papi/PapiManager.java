@@ -45,10 +45,12 @@ public class PapiManager extends PlaceholderExpansion {
      */
     public void initializePlaceholders() {
         categoriesToPlaceholdersMap = new LinkedHashMap<>();
-        for (String category: main.getPapiConfig().getConfigurationSection("")
+        if (main.getOptions().papiIsIncluded()) {
+            for (String category : main.getPapiConfig().getConfigurationSection("")
                 .getKeys(false)) {
-            List<String> placeholders = main.getPapiConfig().getStringList(category);
-            categoriesToPlaceholdersMap.put(category, placeholders);
+                List<String> placeholders = main.getPapiConfig().getStringList(category);
+                categoriesToPlaceholdersMap.put(category, placeholders);
+            }
         }
     }
 

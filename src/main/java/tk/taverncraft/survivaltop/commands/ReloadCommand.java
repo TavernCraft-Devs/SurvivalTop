@@ -56,9 +56,7 @@ public class ReloadCommand {
             main.getLandManager().initializeLandType();
             main.getInventoryManager().setStopOperations(true);
             main.getInventoryManager().initializeWorth();
-            if (main.getPapiManager() != null) {
-                main.getPapiManager().initializePlaceholders();
-            }
+            main.getPapiManager().initializePlaceholders();
             main.getGuiManager().initializeMenuOptions();
             main.getGroupManager().initializeLandType();
             main.getLogManager().stopExistingTasks();

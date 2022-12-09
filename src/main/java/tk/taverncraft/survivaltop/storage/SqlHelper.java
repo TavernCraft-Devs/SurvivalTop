@@ -80,11 +80,9 @@ public class SqlHelper implements StorageHelper {
             return;
         }
         String finalQuery = header + body.substring(0, body.length() - 2) + ";";
-        try (Connection conn = this.connectToSql(); PreparedStatement delStmt =
-            conn.prepareStatement("DELETE FROM " + tableName);
-            PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
+        try (Connection conn = this.connectToSql(); PreparedStatement stmt =
+                conn.prepareStatement(finalQuery)) {
             if (conn != null) {
-                delStmt.execute();
                 stmt.executeUpdate();
             }
         } catch (NullPointerException | SQLException e) {
@@ -132,6 +130,9 @@ public class SqlHelper implements StorageHelper {
                 PreparedStatement stmt = conn.prepareStatement(query);
                 stmt.executeUpdate();
                 stmt.close();
+            } else {
+                PreparedStatement delStmt = conn.prepareStatement("DROP TABLE " + tableName);
+                delStmt.execute();
             }
             return conn;
 
