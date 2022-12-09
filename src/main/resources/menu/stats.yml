@@ -5,10 +5,14 @@
 #                              Main Page Configurations                             #
 #                                                                                   #
 #####################################################################################
+# title shown on main page
 main-page-title: "%entity%'s Total Stats"
 
+# size of main page, must be multiple of 9 (other values will be rounded up)
 main-page-size: 27
 
+# buttons on main page (note that only block, spawner, container and inventory buttons are clickable)
+# guide for adding custom buttons for including papi values are found on the wiki
 main-page-buttons:
   total-wealth:
     slot: 10
@@ -66,6 +70,7 @@ main-page-buttons:
     material: PLAYER_HEAD
     enchanted: false
 
+# background for main page
 main-page-background:
   0: BLUE_STAINED_GLASS_PANE
   1: BLUE_STAINED_GLASS_PANE
@@ -93,13 +98,16 @@ main-page-background:
 #                               Sub Page Configurations                             #
 #                                                                                   #
 #####################################################################################
+# titles for subpages
 sub-page-block-title: "%entity%'s Block Stats"
 sub-page-spawner-title: "%entity%'s Spawner Stats"
 sub-page-container-title: "%entity%'s Container Stats"
 sub-page-inventory-title: "%entity%'s Inventory Stats"
 
+# size of subpage, must be multiple of 9 (other values will be rounded up)
 sub-page-size: 54
 
+# buttons on subpage for returning to main menu or navigating pages
 sub-page-buttons:
   main-menu:
     slot: 49
@@ -125,6 +133,7 @@ sub-page-buttons:
     material: ARROW
     enchanted: false
 
+# layout and slots to use for showing items in subpages
 sub-page-items:
   name: "&b%name%"
   lore:
@@ -154,6 +163,7 @@ sub-page-items:
     - 33
     - 34
 
+# background for subpage
 sub-page-background:
   0: BLUE_STAINED_GLASS_PANE
   1: BLUE_STAINED_GLASS_PANE

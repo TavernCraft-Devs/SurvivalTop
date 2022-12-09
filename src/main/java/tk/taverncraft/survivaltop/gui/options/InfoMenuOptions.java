@@ -12,8 +12,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import org.bukkit.inventory.meta.ItemMeta;
+
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.gui.GuiUtils;
 import tk.taverncraft.survivaltop.gui.types.InfoGui;
@@ -66,8 +66,8 @@ public class InfoMenuOptions {
     public InfoMenuOptions(Main main) {
         this.main = main;
         FileConfiguration config = main.getInfoMenuConfig();
-        mainPageSize = config.getInt("main-page-size", 27);
-        subPageSize = config.getInt("sub-page-size", 54);
+        mainPageSize = (int) Math.round(config.getInt("main-page-size", 27) / 9.0) * 9;
+        subPageSize = (int) Math.round(config.getInt("sub-page-size", 54) / 9.0) * 9;
         mainPageTitle = config.getString("main-page-title", "Item Values Info") +
                 mainIdentifier;
         subPageBlockTitle = config.getString("sub-page-block-title", "Block Info") +
