@@ -37,7 +37,7 @@ public class ReloadCommand {
 
         try {
             // stop existing player stats calculations
-            main.getStatsManager().stopAllCalculations(null);
+            main.getStatsManager().stopAllCalculations();
 
             // reload configs and reinitialize options
             main.getConfigManager().createConfigs();

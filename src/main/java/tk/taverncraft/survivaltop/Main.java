@@ -76,7 +76,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        statsManager.stopAllCalculations(Bukkit.getConsoleSender());
+        statsManager.stopAllCalculations();
         landManager.setStopOperations(true);
         inventoryManager.setStopOperations(true);
         LogManager.info(String.format("Disabled Version %s", getDescription().getVersion()));

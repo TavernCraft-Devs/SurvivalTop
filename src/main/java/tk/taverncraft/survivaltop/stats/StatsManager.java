@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.papi.PapiManager;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.stats.task.Task;
 import tk.taverncraft.survivaltop.stats.task.TaskType;
@@ -180,7 +179,7 @@ public class StatsManager {
         }
 
         if (!taskMap.containsKey(id)) {
-            stopAllCalculations(sender);
+            MessageManager.sendMessage(sender, "calculation-interrupted");
             return;
         }
 
@@ -224,7 +223,7 @@ public class StatsManager {
                 }
 
                 if (!taskMap.containsKey(id)) {
-                    stopAllCalculations(sender);
+                    MessageManager.sendMessage(sender, "calculation-interrupted");
                     return;
                 }
 
@@ -364,13 +363,10 @@ public class StatsManager {
     /**
      * Sets the state for calculations to stop or continue.
      */
-    public void stopAllCalculations(CommandSender sender) {
+    public void stopAllCalculations() {
         taskMap.clear();
         this.entityCacheMap = new ConcurrentHashMap<>();
         creatorList.clear();
-        if (sender != null) {
-            MessageManager.sendMessage(sender, "calculation-interrupted");
-        }
     }
 
     /**
