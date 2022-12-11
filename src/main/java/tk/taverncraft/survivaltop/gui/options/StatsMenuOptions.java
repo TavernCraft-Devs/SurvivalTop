@@ -206,15 +206,14 @@ public class StatsMenuOptions {
      */
     public Inventory prepareMainPage(String entityName, HashMap<String, Double> wealthBreakdown) {
         String parsedName = GuiUtils.parseName(mainPageTitle, "%entity%", entityName);
-        Inventory inv = Bukkit.createInventory(null, mainPageSize,
-            parsedName);
+        Inventory inv = Bukkit.createInventory(null, mainPageSize, parsedName);
         for (Map.Entry<Integer, ItemStack> map : mainPageBackground.entrySet()) {
             inv.setItem(map.getKey(), map.getValue());
         }
 
         for (Map.Entry<String, Integer> map : mainButtonSlots.entrySet()) {
             int slot = map.getValue();
-            ItemStack itemStack = mainPageButtons.get(slot);
+            ItemStack itemStack = new ItemStack(mainPageButtons.get(slot));
             ItemMeta meta = itemStack.getItemMeta();
             List<String> parsedLore;
             Double wealth = wealthBreakdown.get(map.getKey());
@@ -346,7 +345,7 @@ public class StatsMenuOptions {
             }
             if (slot == getNextPageSlot() || slot == getPrevPageSlot()) {
                 int pageToUse = slot == getNextPageSlot() ? pageNum + 1 : pageNum - 1;
-                ItemStack itemStack = map.getValue();
+                ItemStack itemStack = new ItemStack(map.getValue());
                 ItemMeta meta = itemStack.getItemMeta();
                 List<String> parsedLore = GuiUtils.parsePage(meta.getLore(), "%page%",
                         pageToUse);

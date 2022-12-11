@@ -114,26 +114,24 @@ public class SqlHelper implements StorageHelper {
                 columns.append(category.toUpperCase().replaceAll("-", "_"))
                         .append(" DECIMAL (18, 2), ");
             }
-            if (!tableExists(tableName, conn)) {
-                String query = "CREATE TABLE " + tableName + "("
-                        + "ENTITY_NAME VARCHAR (36) NOT NULL, "
-                        + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
-                        + "TOTAL_WEALTH DECIMAL (18, 2), "
-                        + "LAND_WEALTH DECIMAL (18, 2), "
-                        + "BALANCE_WEALTH DECIMAL (18, 2), "
-                        + "BLOCK_WEALTH DECIMAL (18, 2), "
-                        + "SPAWNER_WEALTH DECIMAL (18, 2), "
-                        + "CONTAINER_WEALTH DECIMAL (18, 2), "
-                        + "INVENTORY_WEALTH DECIMAL (18, 2), "
-                        + columns
-                        + "PRIMARY KEY (ENTITY_NAME))";
-                PreparedStatement stmt = conn.prepareStatement(query);
-                stmt.executeUpdate();
-                stmt.close();
-            } else {
-                PreparedStatement delStmt = conn.prepareStatement("DROP TABLE " + tableName);
-                delStmt.execute();
-            }
+            PreparedStatement delStmt = conn.prepareStatement("DROP TABLE " + tableName);
+            delStmt.execute();
+            delStmt.close();
+            String query = "CREATE TABLE " + tableName + "("
+                    + "ENTITY_NAME VARCHAR (36) NOT NULL, "
+                    + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
+                    + "TOTAL_WEALTH DECIMAL (18, 2), "
+                    + "LAND_WEALTH DECIMAL (18, 2), "
+                    + "BALANCE_WEALTH DECIMAL (18, 2), "
+                    + "BLOCK_WEALTH DECIMAL (18, 2), "
+                    + "SPAWNER_WEALTH DECIMAL (18, 2), "
+                    + "CONTAINER_WEALTH DECIMAL (18, 2), "
+                    + "INVENTORY_WEALTH DECIMAL (18, 2), "
+                    + columns
+                    + "PRIMARY KEY (ENTITY_NAME))";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.executeUpdate();
+            stmt.close();
             return conn;
 
         } catch (SQLException e){
@@ -168,29 +166,6 @@ public class SqlHelper implements StorageHelper {
             LogManager.error("Unable to connect to database.");
         }
         return false;
-    }
-
-    /**
-     * Checks if table exist and create if not.
-     *
-     * @param tableName name of table
-     * @param conn an open connection
-     *
-     * @return true if table exist, false otherwise
-     */
-    public boolean tableExists(String tableName, Connection conn) throws SQLException {
-        boolean found = false;
-        DatabaseMetaData databaseMetaData = conn.getMetaData();
-        ResultSet rs = databaseMetaData.getTables(null, null,
-                tableName, null);
-        while (rs.next()) {
-            String name = rs.getString("TABLE_NAME");
-            if (tableName.equals(name)) {
-                found = true;
-                break;
-            }
-        }
-        return found;
     }
 
     /**

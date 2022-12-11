@@ -8,11 +8,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.gui.types.StatsGui;
 import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.stats.task.Task;
 import tk.taverncraft.survivaltop.stats.task.TaskType;
@@ -124,12 +127,10 @@ public class StatsManager {
 
         long timeElapsed = Instant.now().getEpochSecond() - eCache.getCacheTime();
         if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
-            main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
             MessageManager.sendMessage(sender, "calculation-complete-cache",
                 new String[]{"%time%"},
                 new String[]{String.valueOf(timeElapsed)});
-            main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
-            MessageManager.sendGuiStatsReadyMessage(sender);
+            MessageManager.sendGuiStatsReadyMessage(sender, name.toUpperCase());
         } else {
             MessageManager.sendMessage(sender, "calculation-complete-cache",
                 new String[]{"%time%"},
@@ -270,8 +271,7 @@ public class StatsManager {
             public void run() {
                 eCache.setGui(main);
                 entityCacheMap.put(name.toUpperCase(), eCache);
-                main.getGuiManager().setSenderGui(main.getSenderUuid(sender), eCache);
-                MessageManager.sendGuiStatsReadyMessage(sender);
+                MessageManager.sendGuiStatsReadyMessage(sender, name.toUpperCase());
                 doCleanUp(id);
             }
         }.runTaskAsynchronously(main);
@@ -382,6 +382,21 @@ public class StatsManager {
         int id = task.getTaskId();
         taskMap.put(id, task);
         return id;
+    }
+
+    /**
+     * Gets an entity's GUI.
+     *
+     * @param name name of entity
+     *
+     * @return GUI containing stats of entity
+     */
+    public StatsGui getEntityGui(String name) {
+        EntityCache eCache = entityCacheMap.get(name);
+        if (eCache == null) {
+            return null;
+        }
+        return eCache.getGui(main);
     }
 }
 

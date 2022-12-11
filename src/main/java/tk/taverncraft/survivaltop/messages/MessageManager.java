@@ -259,13 +259,14 @@ public class MessageManager {
      * Sends clickable text component to player when gui stats are ready.
      *
      * @param sender player to send message to
+     * @param name name of entity whose stats are being shown
      */
-    public static void sendGuiStatsReadyMessage(CommandSender sender) {
+    public static void sendGuiStatsReadyMessage(CommandSender sender, String name) {
         if (guiStatsReadyMessage == null) {
             guiStatsReadyMessage = getTextComponentMessage(getMessage("gui-stats-ready"));
         }
         guiStatsReadyMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-            "/st openstatsinv"));
+            "/st openstatsgui " + name));
         sender.spigot().sendMessage(guiStatsReadyMessage);
     }
 

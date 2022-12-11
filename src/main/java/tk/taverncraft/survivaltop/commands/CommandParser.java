@@ -76,8 +76,10 @@ public class CommandParser implements CommandExecutor {
             return new DumpCommand(main).execute(sender);
 
         // special command for stats inventory view
-        case "OPENSTATSINV":
-            main.getGuiManager().getMainStatsPage(main.getSenderUuid(sender));
+        case "OPENSTATSGUI":
+            if (args.length == 2) {
+                main.getGuiManager().getMainStatsPage(main.getSenderUuid(sender), args[1]);
+            }
             return true;
 
         // all other cases treated as invalid

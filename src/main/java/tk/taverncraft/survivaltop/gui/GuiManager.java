@@ -16,7 +16,6 @@ import tk.taverncraft.survivaltop.gui.types.InfoGui;
 import tk.taverncraft.survivaltop.gui.types.StatsGui;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.permissions.PermissionsManager;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
@@ -34,7 +33,7 @@ public class GuiManager {
     private InfoGui infoGui;
 
     // map to track current stats gui being viewed by player
-    private final ConcurrentHashMap<UUID, StatsGui> senderGui = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, String> senderGui = new ConcurrentHashMap<>();
 
     /**
      * Constructor for GuiManager.
@@ -77,13 +76,35 @@ public class GuiManager {
     }
 
     /**
-     * Special handler to open player inventory gui stats main page.
+     * Special handler to open player inventory gui stats main page when link is clicked.
+     *
+     * @param uuid uuid of sender
+     * @param name of entity
+     */
+    public void getMainStatsPage(UUID uuid, String name) {
+        try {
+            senderGui.put(uuid, name);
+            StatsGui entityGui = main.getStatsManager().getEntityGui(name);
+            if (entityGui != null) {
+                Bukkit.getPlayer(uuid).openInventory(entityGui.getMainStatsPage());
+            }
+        } catch (Exception e) {
+            LogManager.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Special handler to open player inventory gui stats main page when returning from subpages.
      *
      * @param uuid uuid of sender
      */
     public void getMainStatsPage(UUID uuid) {
         try {
-            Bukkit.getPlayer(uuid).openInventory(senderGui.get(uuid).getMainStatsPage());
+            String name = senderGui.get(uuid);
+            StatsGui entityGui = main.getStatsManager().getEntityGui(name);
+            if (entityGui != null) {
+                Bukkit.getPlayer(uuid).openInventory(entityGui.getMainStatsPage());
+            }
         } catch (Exception e) {
             LogManager.error(e.getMessage());
         }
@@ -99,15 +120,15 @@ public class GuiManager {
      */
     public Inventory getBlockStatsPage(HumanEntity humanEntity, int pageNum) {
         UUID uuid = humanEntity.getUniqueId();
-        StatsGui statsGui = senderGui.get(uuid);
-        String name = getUpperCaseNameForEntity(uuid);
-        if (name.equals(statsGui.getName().toUpperCase())) {
+        String entityName = senderGui.get(uuid);
+        String senderName = getUpperCaseNameForEntity(uuid);
+        if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return senderGui.get(uuid).getBlockStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getBlockStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return senderGui.get(uuid).getBlockStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getBlockStatsPage(pageNum);
             }
         }
         return null;
@@ -123,15 +144,15 @@ public class GuiManager {
      */
     public Inventory getSpawnerStatsPage(HumanEntity humanEntity, int pageNum) {
         UUID uuid = humanEntity.getUniqueId();
-        StatsGui statsGui = senderGui.get(uuid);
-        String name = getUpperCaseNameForEntity(uuid);
-        if (name.equals(statsGui.getName().toUpperCase())) {
+        String entityName = senderGui.get(uuid);
+        String senderName = getUpperCaseNameForEntity(uuid);
+        if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return senderGui.get(uuid).getSpawnerStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getSpawnerStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return senderGui.get(uuid).getSpawnerStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getSpawnerStatsPage(pageNum);
             }
         }
         return null;
@@ -147,15 +168,15 @@ public class GuiManager {
      */
     public Inventory getContainerStatsPage(HumanEntity humanEntity, int pageNum) {
         UUID uuid = humanEntity.getUniqueId();
-        StatsGui statsGui = senderGui.get(uuid);
-        String name = getUpperCaseNameForEntity(uuid);
-        if (name.equals(statsGui.getName().toUpperCase())) {
+        String entityName = senderGui.get(uuid);
+        String senderName = getUpperCaseNameForEntity(uuid);
+        if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return senderGui.get(uuid).getContainerStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getContainerStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return senderGui.get(uuid).getContainerStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getContainerStatsPage(pageNum);
             }
         }
         return null;
@@ -171,28 +192,18 @@ public class GuiManager {
      */
     public Inventory getInventoryStatsPage(HumanEntity humanEntity, int pageNum) {
         UUID uuid = humanEntity.getUniqueId();
-        StatsGui statsGui = senderGui.get(uuid);
-        String name = getUpperCaseNameForEntity(uuid);
-        if (name.equals(statsGui.getName().toUpperCase())) {
+        String entityName = senderGui.get(uuid);
+        String senderName = getUpperCaseNameForEntity(uuid);
+        if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return senderGui.get(uuid).getInventoryStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getInventoryStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return senderGui.get(uuid).getInventoryStatsPage(pageNum);
+                return main.getStatsManager().getEntityGui(entityName).getInventoryStatsPage(pageNum);
             }
         }
         return null;
-    }
-
-    /**
-     * Sets the gui being viewed by sender.
-     *
-     * @param uuid uuid of sender
-     * @param eCache entity cache to get gui stats for
-     */
-    public void setSenderGui(UUID uuid, EntityCache eCache) {
-        senderGui.put(uuid, eCache.getGui(main));
     }
 
     /**
