@@ -114,9 +114,11 @@ public class SqlHelper implements StorageHelper {
                 columns.append(category.toUpperCase().replaceAll("-", "_"))
                         .append(" DECIMAL (18, 2), ");
             }
-            PreparedStatement delStmt = conn.prepareStatement("DROP TABLE " + tableName);
-            delStmt.execute();
-            delStmt.close();
+            if (tableExists(tableName, conn)) {
+                PreparedStatement delStmt = conn.prepareStatement("DROP TABLE " + tableName);
+                delStmt.execute();
+                delStmt.close();
+            }
             String query = "CREATE TABLE " + tableName + "("
                     + "ENTITY_NAME VARCHAR (36) NOT NULL, "
                     + "ENTITY_TYPE VARCHAR (10) NOT NULL, "
@@ -166,6 +168,29 @@ public class SqlHelper implements StorageHelper {
             LogManager.error("Unable to connect to database.");
         }
         return false;
+    }
+
+    /**
+     * Checks if table exist and create if not.
+     *
+     * @param tableName name of table
+     * @param conn an open connection
+     *
+     * @return true if table exist, false otherwise
+     */
+    public boolean tableExists(String tableName, Connection conn) throws SQLException {
+        boolean found = false;
+        DatabaseMetaData databaseMetaData = conn.getMetaData();
+        ResultSet rs = databaseMetaData.getTables(null, null,
+            tableName, null);
+        while (rs.next()) {
+            String name = rs.getString("TABLE_NAME");
+            if (tableName.equals(name)) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
     /**
