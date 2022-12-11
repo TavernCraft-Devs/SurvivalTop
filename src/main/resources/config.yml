@@ -7,16 +7,14 @@
 # an elaborate tutorial and setup guide can be found on our wiki:
 # https://github.com/TavernCraft-Devs/SurvivalTop/wiki
 
-# the plugin also comes with placeholder api support that can be found here:
-# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#placeholderapi-support
-
 # language file to use (feel free to add your own lang file within the lang folder)
 lang-file: 'en.yml'
 
-# if true, will provide a detailed gui for viewing entity stats
-# if realtime stats are used as well, then this includes individual item/block breakdowns
-# if false, will provide only basic entity stats in chat without detailed breakdown
-# for servers very worried about lags, consider setting this to false
+# if true, will provide a gui for viewing entity stats
+# if false, will provide entity stats in chat
+# note that permission nodes are used to control whether users can view detailed breakdown in gui
+# relevant permission nodes may be found on our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#commands--permissions
 use-gui-stats: false
 
 # calculation mode to use, defaults to 1 (descriptions are below and more details are on wiki)
@@ -24,25 +22,11 @@ use-gui-stats: false
 # 1 - balance between using cache and real-time calculations (recommended)
 # 2 - only uses cache calculations from leaderboard (i.e. players cannot get real-time stats)
 # you may find out more details about the calculation modes on our wiki:
-#
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#general-configurations
 calculation-mode: 1
 
-# only used if calculation mode is 1 or 2, sets the duration before cache expires
-cache-duration: 1800
-
-#####################################################################################
-#                                                                                   #
-#                  Filter Configurations (not applicable to groups!)                #
-#                                                                                   #
-#####################################################################################
-
-# the below options only apply if you have enable-group set to false (i.e. entity = player)
-# these options are also mostly applicable to very old or large servers that find leaderboard
-# updates taking a very long time
-# for a full and clearer explanation on how to use this, please take a look at our wiki:
-# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#filter-options
-filter-last-join: false
-filter-player-time: 2592000
+# only used if calculation mode is 1 or 2, sets the duration before cache expires in seconds
+cache-duration: 3600
 
 #####################################################################################
 #                                                                                   #
@@ -59,7 +43,7 @@ enable-group: false
 
 # the group-type option only works if enable-groups is set to true with the relevant plugin installed
 # options supported for group-type can be found on our wiki:
-# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#group-options
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#group-configurations
 group-type: FactionsUuid
 
 #####################################################################################
@@ -73,7 +57,7 @@ include-bal: false
 
 #####################################################################################
 #                                                                                   #
-#                          Land Claim Plugin Configurations                         #
+#                                 Land Configurations                               #
 #                                                                                   #
 #####################################################################################
 
@@ -82,13 +66,13 @@ include-land: false
 
 # if you are intending to include land, make sure a valid land type is set below
 # options supported for land-type can be found on our wiki:
-# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-configurations
 land-type: GriefPrevention
 
 # the following 2 options are recommended to be left as default to use the heights provided by
 # the land plugin
 # if you wish to adjust this, kindly refer to a more detailed explanation on the wiki:
-# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-options
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#land-configurations
 max-land-height: default
 min-land-height: default
 
@@ -119,13 +103,18 @@ include-inventory: false
 
 #####################################################################################
 #                                                                                   #
-#                                 Papi Configurations                               #
+#                            PlaceholderAPI Configurations                          #
 #                                                                                   #
 #####################################################################################
 
-# if true, will include papi placeholders in calculating wealth
-# note that this option is not necessary for papi placeholders provided by this plugin to work
+# if true, will include papi placeholders in calculating wealth (requires placeholderapi)
+# for more information on setting up papi placeholders for wealth calculations, check our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#placeholderapi-configurations
 include-papi: false
+
+# the plugin also comes with its own papi placeholders
+# note that the above include-papi option need not be set to true to use the placeholders here:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#papi-placeholders
 
 #####################################################################################
 #                                                                                   #
@@ -144,6 +133,14 @@ update-on-start: false
 
 # minimum wealth (inclusive) required to be included on the leaderboard - 0 will disallow negative wealth on leaderboard
 minimum-wealth: 0
+
+# the below options only apply if you have enable-group set to false (i.e. entity = player)
+# these options are also mostly applicable to very old or large servers that find leaderboard
+# updates taking a very long time
+# for a full and clearer explanation on how to use this, please take a look at our wiki:
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#leaderboard-configurations
+filter-last-join: false
+filter-player-time: 2592000
 
 # total number of leaderboard positions to be shown
 # -1 means all players are shown
@@ -164,7 +161,7 @@ commands-on-start:
 # commands to run after finishing a leaderboard update
 # allows entity placeholders %player-(position)% and %group-(position)%
 # more information on the use of placeholders in commands may be found on our wiki:
-#
+# https://github.com/TavernCraft-Devs/SurvivalTop/wiki/Tutorial#leaderboard-configurations
 commands-on-end:
   - broadcast &aSurvivalTop leaderboard update has been completed!
 

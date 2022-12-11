@@ -7,7 +7,7 @@ prefix: '&6[&bSurvivalTop&6] '
 reload-success: '&aSurvivalTop has been reloaded!'
 reload-fail: '&cFailed to load config/message files. Check console for errors and double check your config or contact the author if you believe this to be an error.'
 invalid-command: '&cInvalid command, type &6/st help&c!'
-no-permission: '&cYou do not have the permission to run this command!'
+no-permission: '&cYou do not have the permission for this action!'
 entity-not-exist: '&cThe name you entered does not exist!' # %entity%
 player-only-command: '&cThis command may only be executed by an in-game player!'
 unexpected-error: '&cAn unexpected error has occurred, please contact the plugin author.'
