@@ -68,8 +68,8 @@ public class StatsMenuOptions {
         FileConfiguration config = main.getStatsMenuConfig();
         mainPageSize = (int) Math.round(config.getInt("main-page-size", 27) / 9.0) * 9;
         subPageSize = (int) Math.round(config.getInt("sub-page-size", 54) / 9.0) * 9;
-        mainPageTitle = config.getString("main-page-title", "%entity%'s Total Stats") +
-            mainIdentifier;
+        mainPageTitle = "§8" + config.getString("main-page-title",
+                "%entity%'s Total Stats") + mainIdentifier;
         subPageBlockTitle = config.getString("sub-page-block-title",
                 "%entity%'s Block Stats") + blockIdentifier;
         subPageSpawnerTitle = config.getString("sub-page-spawner-title",
@@ -206,7 +206,8 @@ public class StatsMenuOptions {
      */
     public Inventory prepareMainPage(String entityName, HashMap<String, Double> wealthBreakdown) {
         String parsedName = GuiUtils.parseName(mainPageTitle, "%entity%", entityName);
-        Inventory inv = Bukkit.createInventory(null, mainPageSize, parsedName);
+        Inventory inv = Bukkit.createInventory(null, mainPageSize,
+                GuiUtils.parseWithColours(parsedName));
         for (Map.Entry<Integer, ItemStack> map : mainPageBackground.entrySet()) {
             inv.setItem(map.getKey(), map.getValue());
         }
@@ -318,19 +319,23 @@ public class StatsMenuOptions {
         switch (viewType) {
         case "Block Stats":
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                GuiUtils.parseName(subPageBlockTitle, "%entity%", entityName));
+                GuiUtils.parseName(GuiUtils.parseWithColours(subPageBlockTitle),
+                        "%entity%", entityName));
             break;
         case "Spawner Stats":
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                GuiUtils.parseName(subPageSpawnerTitle, "%entity%", entityName));
+                GuiUtils.parseName(GuiUtils.parseWithColours(subPageSpawnerTitle),
+                        "%entity%", entityName));
             break;
         case "Container Stats":
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                GuiUtils.parseName(subPageContainerTitle, "%entity%", entityName));
+                GuiUtils.parseName(GuiUtils.parseWithColours(subPageContainerTitle),
+                        "%entity%", entityName));
             break;
         default:
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                GuiUtils.parseName(subPageInventoryTitle, "%entity%", entityName));
+                GuiUtils.parseName(GuiUtils.parseWithColours(subPageInventoryTitle),
+                        "%entity%", entityName));
             break;
         }
 

@@ -68,7 +68,7 @@ public class InfoMenuOptions {
         FileConfiguration config = main.getInfoMenuConfig();
         mainPageSize = (int) Math.round(config.getInt("main-page-size", 27) / 9.0) * 9;
         subPageSize = (int) Math.round(config.getInt("sub-page-size", 54) / 9.0) * 9;
-        mainPageTitle = config.getString("main-page-title", "Item Values Info") +
+        mainPageTitle = "§8" + config.getString("main-page-title", "Item Values Info") +
                 mainIdentifier;
         subPageBlockTitle = config.getString("sub-page-block-title", "Block Info") +
                 blockIdentifier ;
@@ -198,7 +198,8 @@ public class InfoMenuOptions {
      * @return an inventory gui for main page
      */
     public Inventory prepareMainPage() {
-        Inventory inv = Bukkit.createInventory(null, mainPageSize, mainPageTitle);
+        Inventory inv = Bukkit.createInventory(null, mainPageSize,
+                GuiUtils.parseWithColours(mainPageTitle));
         for (Map.Entry<Integer, ItemStack> map : mainPageBackground.entrySet()) {
             inv.setItem(map.getKey(), map.getValue());
         }
@@ -279,19 +280,19 @@ public class InfoMenuOptions {
         switch (viewType) {
         case "Block Info":
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                subPageBlockTitle);
+                GuiUtils.parseWithColours(subPageBlockTitle));
             break;
         case "Spawner Info":
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                subPageSpawnerTitle);
+                GuiUtils.parseWithColours(subPageSpawnerTitle));
             break;
         case "Container Info":
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                subPageContainerTitle);
+                GuiUtils.parseWithColours(subPageContainerTitle));
             break;
         default:
             inv = Bukkit.createInventory(null, subPageSize, pageNumPrefix +
-                subPageInventoryTitle);
+                GuiUtils.parseWithColours(subPageInventoryTitle));
             break;
         }
 

@@ -71,7 +71,7 @@ public class GuiUtils {
      *
      * @return string with parsed colours
      */
-    private static String parseWithColours(String text) {
+    public static String parseWithColours(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
@@ -100,14 +100,14 @@ public class GuiUtils {
      * @return parsed wealth for lore
      */
     public static List<String> parseQuantity(List<String> lore, String placeholder, int value) {
-        List<String> parsedWealth = new ArrayList<>();
+        List<String> parsedQuantity = new ArrayList<>();
         if (lore == null) {
-            return parsedWealth;
+            return parsedQuantity;
         }
         for (String s : lore) {
-            parsedWealth.add(s.replaceAll(placeholder, String.valueOf(value)));
+            parsedQuantity.add(s.replaceAll(placeholder, String.valueOf(value)));
         }
-        return parsedWealth;
+        return parsedQuantity;
     }
 
     /**
