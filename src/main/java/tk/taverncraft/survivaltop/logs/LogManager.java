@@ -226,7 +226,7 @@ public class LogManager {
         config.set("total-leaderboard-positions", main.getOptions().getTotalLeaderboardPositions());
         config.set("leaderboard-positions-per-page",
                 main.getOptions().getLeaderboardPositionsPerPage());
-        config.set("use-hoverable-leaderboard", main.getOptions().isUseHoverableLeaderboard());
+        config.set("use-interactive-leaderboard", main.getOptions().isUseInteractiveLeaderboard());
         config.set("commands-on-start", main.getOptions().getCommandsOnStart());
         config.set("commands-on-end", main.getOptions().getCommandsOnEnd());
         config.set("storage-type", main.getOptions().getStorageType());

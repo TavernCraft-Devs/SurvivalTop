@@ -29,11 +29,11 @@ import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
 public class MessageManager {
     private static final HashMap<String, String> messageKeysMap = new HashMap<>();
 
-    // used if leaderboard is not hoverable
+    // used if leaderboard is not interactive
     private static String completeLeaderboard;
 
-    // used if leaderboard is hoverable
-    private static BaseComponent[][] completeHoverableLeaderboard;
+    // used if leaderboard is interactive
+    private static BaseComponent[][] completeInteractiveLeaderboard;
 
     // standard text component message sent when gui stats are ready
     private static TextComponent guiStatsReadyMessage;
@@ -123,7 +123,7 @@ public class MessageManager {
     }
 
     /**
-     * Shows non-hoverable leaderboard to the user.
+     * Shows non-interactive leaderboard to the user.
      *
      * @param sender sender to send message to
      * @param pageNum page number of leaderboard
@@ -142,22 +142,22 @@ public class MessageManager {
     }
 
     /**
-     * Shows hoverable leaderboard to the user.
+     * Shows interactive leaderboard to the user.
      *
      * @param sender sender to send message to
      * @param pageNum page number of leaderboard
      */
-    public static void showHoverableLeaderboard(CommandSender sender, int pageNum) {
-        if (completeHoverableLeaderboard == null) {
+    public static void showInteractiveLeaderboard(CommandSender sender, int pageNum) {
+        if (completeInteractiveLeaderboard == null) {
             sendMessage(sender, "no-updated-leaderboard");
             return;
         }
 
-        sender.spigot().sendMessage(completeHoverableLeaderboard[pageNum - 1]);
+        sender.spigot().sendMessage(completeInteractiveLeaderboard[pageNum - 1]);
     }
 
     /**
-     * Sets up message for non-hoverable leaderboard beforehand to improve performance.
+     * Sets up message for non-interactive leaderboard beforehand to improve performance.
      *
      * @param leaderboard hashmap of leaderboard positions
      * @param minimumWealth minimum wealth to show on leaderboard
@@ -200,16 +200,16 @@ public class MessageManager {
     }
 
     /**
-     * Sets up message for hoverable leaderboard beforehand to improve performance.
+     * Sets up message for interactive leaderboard beforehand to improve performance.
      *
      * @param leaderboard hashmap of leaderboard positions
      * @param minimumWealth minimum wealth to show on leaderboard
      * @param positionsPerPage number of positions shown per page
      */
-    public static void setUpHoverableLeaderboard(HashMap<String, EntityCache> leaderboard,
+    public static void setUpInteractiveLeaderboard(HashMap<String, EntityCache> leaderboard,
             double minimumWealth, int positionsPerPage) {
         int size = (int) Math.ceil((double) leaderboard.size() / positionsPerPage);
-        completeHoverableLeaderboard = new BaseComponent[size][];
+        completeInteractiveLeaderboard = new BaseComponent[size][];
 
         String header = messageKeysMap.get("leaderboard-header")
                 .substring(0, messageKeysMap.get("leaderboard-header").length() - 1);
@@ -243,16 +243,18 @@ public class MessageManager {
                     eCache.getPlaceholders(), eCache.getValues(), false);
             component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                     getBaseComponentArrMessage(parsedMessage)));
+            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/st openstatsgui " + name.toUpperCase()));
             message.append(component);
             if (position % positionsPerPage == 0) {
                 message.append(footer.replaceAll("%page%", String.valueOf(currentPage + 1)));
-                completeHoverableLeaderboard[currentPage - 1] = message.create();
+                completeInteractiveLeaderboard[currentPage - 1] = message.create();
                 currentPage++;
                 message = new ComponentBuilder(header);
             }
             position++;
         }
-        completeHoverableLeaderboard[currentPage - 1] = message.create();
+        completeInteractiveLeaderboard[currentPage - 1] = message.create();
     }
 
     /**

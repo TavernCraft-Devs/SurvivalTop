@@ -52,7 +52,7 @@ public class Options {
     private double minimumWealth;
     private int totalLeaderboardPositions;
     private int leaderboardPositionsPerPage;
-    private boolean useHoverableLeaderboard;
+    private boolean useInteractiveLeaderboard;
     private List<String> commandsOnStart;
     private List<String> commandsOnEnd;
 
@@ -99,7 +99,7 @@ public class Options {
         this.minimumWealth = config.getInt("minimum-wealth", 0);
         this.totalLeaderboardPositions = config.getInt("total-leaderboard-positions", -1);
         this.leaderboardPositionsPerPage = config.getInt("leaderboard-positions-per-page", 10);
-        this.useHoverableLeaderboard = config.getBoolean("use-hoverable-leaderboard", false);
+        this.useInteractiveLeaderboard = config.getBoolean("use-interactive-leaderboard", false);
         this.commandsOnStart = config.getStringList("commands-on-start");
         this.commandsOnEnd = config.getStringList("commands-on-end");
         this.storageType = config.getString("storage-type", "None");
@@ -208,8 +208,8 @@ public class Options {
         return leaderboardPositionsPerPage;
     }
 
-    public boolean isUseHoverableLeaderboard() {
-        return useHoverableLeaderboard;
+    public boolean isUseInteractiveLeaderboard() {
+        return useInteractiveLeaderboard;
     }
 
     public List<String> getCommandsOnStart() {

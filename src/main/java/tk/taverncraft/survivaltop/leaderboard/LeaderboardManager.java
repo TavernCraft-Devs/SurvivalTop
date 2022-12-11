@@ -192,8 +192,8 @@ public class LeaderboardManager {
      */
     public void completeLeaderboardUpdate(CommandSender sender,
             HashMap<String, EntityCache> tempSortedCache) {
-        if (main.getOptions().isUseHoverableLeaderboard()) {
-            MessageManager.setUpHoverableLeaderboard(tempSortedCache, main.getConfig().getDouble(
+        if (main.getOptions().isUseInteractiveLeaderboard()) {
+            MessageManager.setUpInteractiveLeaderboard(tempSortedCache, main.getConfig().getDouble(
                     "minimum-wealth", 0.0),
                     main.getOptions().getLeaderboardPositionsPerPage());
         } else {

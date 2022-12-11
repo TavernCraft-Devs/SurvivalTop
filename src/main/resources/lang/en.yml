@@ -66,7 +66,7 @@ leaderboard-body: |
 leaderboard-footer: |
   &6Type &e/st top %page% &6to view next page
 
-# format for showing hover leaderboard
+# format for showing stats on hover (interactive leaderboard)
 # supports the following placeholders:
 # %entity%
 # %land-wealth%

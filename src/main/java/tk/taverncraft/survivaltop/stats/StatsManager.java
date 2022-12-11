@@ -394,6 +394,10 @@ public class StatsManager {
     public StatsGui getEntityGui(String name) {
         EntityCache eCache = entityCacheMap.get(name);
         if (eCache == null) {
+            eCache = main.getLeaderboardManager().getEntityCache(name);
+        }
+
+        if (eCache == null) {
             return null;
         }
         return eCache.getGui(main);

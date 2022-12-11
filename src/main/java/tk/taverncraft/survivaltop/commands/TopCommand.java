@@ -42,8 +42,8 @@ public class TopCommand {
             pageNum = Integer.parseInt(args[1]);
         } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
         }
-        if (main.getOptions().isUseHoverableLeaderboard()) {
-            MessageManager.showHoverableLeaderboard(sender, pageNum);
+        if (main.getOptions().isUseInteractiveLeaderboard()) {
+            MessageManager.showInteractiveLeaderboard(sender, pageNum);
         } else {
             MessageManager.showLeaderboard(sender, pageNum,
                     main.getOptions().getLeaderboardPositionsPerPage());

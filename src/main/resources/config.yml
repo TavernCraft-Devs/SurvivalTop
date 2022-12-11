@@ -151,8 +151,9 @@ total-leaderboard-positions: -1
 leaderboard-positions-per-page: 10
 
 # if true, will show breakdown of wealth on hover
-# disabling may improve performance on servers with little resources
-use-hoverable-leaderboard: false
+# if use-gui-stats is enabled, users can also click on the leaderboard to view entity stats in gui
+# disabling may improve performance on servers struggling with little resources
+use-interactive-leaderboard: false
 
 # commands to run before starting a leaderboard update
 commands-on-start:
