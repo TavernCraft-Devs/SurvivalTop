@@ -101,16 +101,12 @@ public class LogManager {
      * Processes claim info by players to dump for debugging.
      */
     private void processByPlayers() {
-
-        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join",
-                false);
-        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) *
-                1000;
+        long lastJoinTime = main.getOptions().filterPlayerTime() * 1000;
 
         // code intentionally duplicated to keep the if condition outside loop to save check time
 
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
-        if (!filterLastJoin || lastJoinTime <= 0) {
+        if (!main.getOptions().filterLastJoin() || lastJoinTime <= 0) {
             Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
                 Long[] claimsInfo = this.main.getLandManager().getClaimsInfo(
                         offlinePlayer.getName());

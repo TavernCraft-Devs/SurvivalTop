@@ -48,7 +48,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
     public Long[] getClaimsInfo(String name) {
         long numBlocks = 0;
         Collection<TownBlock> claims = getClaims(name);
-        int townSize = this.main.getConfig().getInt("town-block-size", 16);
+        int townSize = main.getOptions().getTownBlockSize();
         for (TownBlock claim : claims) {
             double minX = claim.getX() * townSize;
             double minY = this.main.getOptions().getMinLandHeight();
@@ -70,7 +70,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
     public void processEntityLand(String name, int id) {
         try {
             Collection<TownBlock> claims = getClaims(name);
-            int townSize = this.main.getConfig().getInt("town-block-size", 16);
+            int townSize = main.getOptions().getTownBlockSize();
             for (TownBlock claim : claims) {
                 World world = claim.getWorldCoord().getBukkitWorld();
                 double minX = claim.getX() * townSize;
@@ -139,11 +139,10 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      * @return List of claims of group
      */
     private Collection<TownBlock> getClaimsByGroup(String name) {
-        if (this.main.getConfig().getString("group-type").equalsIgnoreCase(
-                "townyadvancedtown")) {
+        if (main.getOptions().getGroupType().equalsIgnoreCase("townyadvancedtown")) {
             Town town = api.getTown(name);
             return town.getTownBlocks();
-        } else if (this.main.getConfig().getString("group-type").equalsIgnoreCase(
+        } else if (main.getOptions().getGroupType().equalsIgnoreCase(
                 "townyadvancednation")) {
             Nation nation = api.getNation(name);
             return nation.getTownBlocks();

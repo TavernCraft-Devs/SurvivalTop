@@ -37,8 +37,7 @@ public class GroupManager {
      * Initializes values for land type depending on which land plugin is used.
      */
     public void initializeLandType() throws NullPointerException {
-        String groupType = main.getConfig().getString("group-type", "factionsuuid")
-                .toLowerCase();
+        String groupType = main.getOptions().getGroupType().toLowerCase();
         switch (groupType) {
         case "factionsuuid":
         case "saberfactions":

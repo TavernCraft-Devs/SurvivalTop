@@ -33,8 +33,7 @@ public class LandManager {
      * Initializes values for land type depending on which land plugin is used.
      */
     public void initializeLandType() throws NullPointerException {
-        String landType = main.getConfig().getString(
-                "land-type", "griefprevention").toLowerCase();
+        String landType = main.getOptions().getLandType().toLowerCase();
 
         switch (landType) {
         case "residence":

@@ -138,12 +138,11 @@ public class Main extends JavaPlugin {
                     new DependencyLoadEvent(this), this);
         }
 
-        if (getConfig().getBoolean("update-on-start")) {
-            leaderboardManager.scheduleLeaderboardUpdate(getConfig().getInt(
-                    "update-interval"), 3);
+        if (options.updateOnStart()) {
+            leaderboardManager.scheduleLeaderboardUpdate(options.getUpdateInterval(), 3);
         } else {
-            leaderboardManager.scheduleLeaderboardUpdate(getConfig().getInt(
-                    "update-interval"), getConfig().getInt("update-interval"));
+            leaderboardManager.scheduleLeaderboardUpdate(options.getUpdateInterval(),
+                    options.getUpdateInterval());
         }
 
         this.getServer().getPluginManager().registerEvents(

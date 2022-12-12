@@ -97,8 +97,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
      * @return List of claims of group
      */
     private Set<SimpleChunkLocation> getClaimsByGroup(String name) {
-        if (this.main.getConfig().getString("group-type").equalsIgnoreCase(
-                "factionsuuid")) {
+        if (main.getOptions().getGroupType().equalsIgnoreCase("factionsuuid")) {
             Kingdom kingdom = Kingdoms.get().getDataHandlers().getKingdomManager().getData(name);
             return kingdom.getLandLocations();
         }

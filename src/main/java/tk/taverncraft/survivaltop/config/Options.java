@@ -58,6 +58,15 @@ public class Options {
 
     // storage configurations
     private String storageType;
+    private String host;
+    private String port;
+    private String user;
+    private String password;
+    private String databaseName;
+    private String tableName;
+
+    // miscellaneous options
+    private int townBlockSize;
 
     // last plugin load/reload time
     private long lastLoadTime;
@@ -103,6 +112,13 @@ public class Options {
         this.commandsOnStart = config.getStringList("commands-on-start");
         this.commandsOnEnd = config.getStringList("commands-on-end");
         this.storageType = config.getString("storage-type", "None");
+        this.host = config.getString("host", "127.0.0.1");
+        this.port = config.getString("port", "3306");
+        this.user = config.getString("user", "survtop");
+        this.password = config.getString("password", "password");
+        this.databaseName = config.getString("database-name", "survtop");
+        this.tableName = config.getString("table-name", "survtop");
+        this.townBlockSize = config.getInt("town-block-size", 16);
         this.lastLoadTime = Instant.now().getEpochSecond();
     }
 
@@ -222,6 +238,34 @@ public class Options {
 
     public String getStorageType() {
         return storageType;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public int getTownBlockSize() {
+        return townBlockSize;
     }
 
     public long getLastLoadTime() {

@@ -91,7 +91,7 @@ public class ContainerOperations {
      * Sets up the containers chosen to be included.
      */
     private void setUpContainerType() {
-        List<String> chosenContainers = main.getConfig().getStringList("container-type");
+        List<String> chosenContainers = main.getOptions().getContainerTypes();
         for (String container : chosenContainers) {
             Material material = Material.valueOf(container);
             if (allowedTypes.contains(material)) {

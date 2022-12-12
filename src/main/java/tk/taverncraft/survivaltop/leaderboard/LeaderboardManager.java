@@ -148,7 +148,7 @@ public class LeaderboardManager {
             }
         } catch (Exception e) {
             LogManager.error(e.getMessage());
-            this.main.getLeaderboardManager().stopExistingScheduleTasks();
+            stopExistingScheduleTasks();
         }
     }
 
@@ -156,13 +156,10 @@ public class LeaderboardManager {
      * Sets the leaderboard task queue for players.
      */
     private void setTaskQueueForPlayers() {
-        boolean filterLastJoin = this.main.getConfig().getBoolean("filter-last-join",
-                false);
-        long lastJoinTime = this.main.getConfig().getLong("last-join-time", 2592000) *
-                1000;
+        long lastJoinTime = main.getOptions().filterPlayerTime() * 1000;
 
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
-        if (!filterLastJoin || lastJoinTime <= 0) {
+        if (!main.getOptions().filterLastJoin() || lastJoinTime <= 0) {
             leaderboardTaskQueue = Arrays.stream(this.main.getServer().getOfflinePlayers())
                     .map(OfflinePlayer::getName).iterator();
             return;
@@ -193,12 +190,11 @@ public class LeaderboardManager {
     public void completeLeaderboardUpdate(CommandSender sender,
             HashMap<String, EntityCache> tempSortedCache) {
         if (main.getOptions().isUseInteractiveLeaderboard()) {
-            MessageManager.setUpInteractiveLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                    "minimum-wealth", 0.0),
+            MessageManager.setUpInteractiveLeaderboard(tempSortedCache,
+                    main.getOptions().getMinimumWealth(),
                     main.getOptions().getLeaderboardPositionsPerPage());
         } else {
-            MessageManager.setUpLeaderboard(tempSortedCache, main.getConfig().getDouble(
-                    "minimum-wealth", 0.0),
+            MessageManager.setUpLeaderboard(tempSortedCache, main.getOptions().getMinimumWealth(),
                     main.getOptions().getLeaderboardPositionsPerPage());
         }
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;

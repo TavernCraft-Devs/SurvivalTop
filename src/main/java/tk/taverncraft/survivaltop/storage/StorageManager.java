@@ -26,8 +26,7 @@ public class StorageManager {
      * Initializes all values to default and set storage type.
      */
     public void initializeValues() {
-        String storageType = main.getConfig().getString("storage-type", "none")
-                .toLowerCase();
+        String storageType = main.getOptions().getStorageType().toLowerCase();
         if (storageType.equals("mysql")) {
             storageHelper = new SqlHelper(main);
         } else if (storageType.equals("yaml")) {

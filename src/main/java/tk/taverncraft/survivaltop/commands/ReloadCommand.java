@@ -63,8 +63,8 @@ public class ReloadCommand {
             main.getLeaderboardManager().stopExistingScheduleTasks();
             main.getLeaderboardManager().initializeValues();
             main.getLeaderboardManager().scheduleLeaderboardUpdate(
-                    main.getConfig().getInt("update-interval"),
-                    main.getConfig().getInt("update-interval")
+                    main.getOptions().getUpdateInterval(),
+                    main.getOptions().getUpdateInterval()
             );
 
             MessageManager.sendMessage(sender, "reload-success");

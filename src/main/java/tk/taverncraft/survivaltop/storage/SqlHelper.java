@@ -41,13 +41,13 @@ public class SqlHelper implements StorageHelper {
      * Initialize default values for connection.
      */
     private void initializeConnectionInfo() {
-        dbName = main.getConfig().getString("database-name", "survtop");
-        tableName = main.getConfig().getString("table-name", "survtop");
-        port = main.getConfig().getString("port", "3306");
-        url = "jdbc:mysql://" + main.getConfig().getString("host") + ":"
+        dbName = main.getOptions().getDatabaseName();
+        tableName = main.getOptions().getTableName();
+        port = main.getOptions().getPort();
+        url = "jdbc:mysql://" + main.getOptions().getHost() + ":"
             + port + "/" + dbName + "?useSSL=false";
-        user = main.getConfig().getString("user", "survtop");
-        password = main.getConfig().getString("password");
+        user = main.getOptions().getUser();
+        password = main.getOptions().getPassword();
     }
 
     /**

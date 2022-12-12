@@ -125,8 +125,7 @@ public class DependencyManager {
     private boolean checkLand() {
         boolean enabled;
         if (main.getOptions().landIsIncluded()) {
-            String landType = main.getConfig().getString("land-type",
-                "griefprevention").toLowerCase();
+            String landType = main.getOptions().getLandType().toLowerCase();
             String depPlugin = pluginMap.get(landType);
             if (depPlugin == null) {
                 LogManager.error("Failed to find a dependency for "
@@ -156,9 +155,8 @@ public class DependencyManager {
      */
     private boolean checkGroup() {
         boolean enabled;
-        if (main.getConfig().getBoolean("enable-group")) {
-            String groupType = main.getConfig().getString("group-type",
-                "factionsuuid").toLowerCase();
+        if (main.getOptions().groupIsEnabled()) {
+            String groupType = main.getOptions().getGroupType().toLowerCase();
             String depPlugin = pluginMap.get(groupType);
             if (depPlugin == null) {
                 LogManager.error("Failed to find a dependency for "
