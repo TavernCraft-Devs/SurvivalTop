@@ -8,10 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import tk.taverncraft.survivaltop.Main;
@@ -100,30 +98,25 @@ public class StatsManager {
      * @param name name of entity
      */
     public void getCachedStats(CommandSender sender, String name) {
-        EntityCache eCache = entityCacheMap.get(name.toUpperCase());
+        EntityCache eCache = getLatestCache(name.toUpperCase());
         // if stats cache not found or invalid, look into leaderboard cache
-        if (eCache == null || eCache.isExpired(main.getOptions().getCacheDuration())) {
-            eCache = main.getLeaderboardManager().getEntityCache(name.toUpperCase());
-            // if leaderboard cache also not found or invalid, calculate again
-            if (eCache == null || eCache.isExpired(main.getOptions().getCacheDuration())) {
-                if (main.getOptions().isCalculationMode1()) {
-                    MessageManager.sendMessage(sender, "start-calculating-stats");
-                    getRealTimeStats(sender, name, PLAYER);
-                } else {
-                    MessageManager.sendMessage(sender, "no-updated-leaderboard");
-                    creatorList.remove(main.getSenderUuid(sender));
-                    return;
-                }
-                return;
-            }
-
-            if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
-                eCache.setGui(main);
+        if (eCache == null) {
+            if (main.getOptions().isCalculationMode1()) {
+                MessageManager.sendMessage(sender, "start-calculating-stats");
+                getRealTimeStats(sender, name, PLAYER);
             } else {
-                eCache.setChat();
+                MessageManager.sendMessage(sender, "no-updated-leaderboard");
+                creatorList.remove(main.getSenderUuid(sender));
             }
-            entityCacheMap.put(name.toUpperCase(), eCache);
+            return;
         }
+
+        if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
+            eCache.setGui(main);
+        } else {
+            eCache.setChat();
+        }
+        entityCacheMap.put(name.toUpperCase(), eCache);
 
         long timeElapsed = Instant.now().getEpochSecond() - eCache.getCacheTime();
         if (main.getOptions().isUseGuiStats() && sender instanceof Player) {
@@ -392,15 +385,45 @@ public class StatsManager {
      * @return GUI containing stats of entity
      */
     public StatsGui getEntityGui(String name) {
-        EntityCache eCache = entityCacheMap.get(name);
-        if (eCache == null) {
-            eCache = main.getLeaderboardManager().getEntityCache(name);
-        }
-
+        EntityCache eCache = getLatestCache(name);
         if (eCache == null) {
             return null;
         }
         return eCache.getGui(main);
+    }
+
+    /**
+     * Gets the latest valid cache.
+     *
+     * @param name name of entity
+     *
+     * @return latest cache for entity or null if none are found
+     */
+    public EntityCache getLatestCache(String name) {
+        EntityCache statsCache = entityCacheMap.get(name);
+        EntityCache leaderboardCache = main.getLeaderboardManager().getEntityCache(name);
+
+        if (statsCache.isExpired(main.getOptions().getCacheDuration())) {
+            statsCache = null;
+        }
+
+        if (leaderboardCache.isExpired(main.getOptions().getCacheDuration())) {
+            leaderboardCache = null;
+        }
+
+        if (statsCache != null && leaderboardCache != null) {
+            if (statsCache.getCacheTime() > leaderboardCache.getCacheTime()) {
+                return statsCache;
+            } else {
+                return leaderboardCache;
+            }
+        }
+
+        if (statsCache != null) {
+            return statsCache;
+        }
+
+        return leaderboardCache;
     }
 }
 
