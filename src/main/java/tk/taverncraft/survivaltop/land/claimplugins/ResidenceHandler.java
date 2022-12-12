@@ -14,6 +14,7 @@ import com.bekvon.bukkit.residence.protection.CuboidArea;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
  * Handles land wealth calculated using Residence plugin.
@@ -40,13 +41,13 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
      *
      * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
      */
-    public Long[] getClaimsInfo(String name) {
+    public ClaimInfo getClaimsInfo(String name) {
         long numBlocks = 0;
         List<ClaimedResidence> claims = getClaims(name);
         for (ClaimedResidence claim : claims) {
             numBlocks += claim.getTotalSize();
         }
-        return new Long[]{(long) claims.size(), numBlocks};
+        return new ClaimInfo(claims.size(), numBlocks);
     }
 
     /**

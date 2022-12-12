@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
+import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
  * Handles the dumping of information for debugging.
@@ -108,10 +109,10 @@ public class LogManager {
         // path for if last join filter is off or if last join time is set <= 0 (cannot filter)
         if (!main.getOptions().filterLastJoin() || lastJoinTime <= 0) {
             Arrays.stream(this.main.getServer().getOfflinePlayers()).forEach(offlinePlayer -> {
-                Long[] claimsInfo = this.main.getLandManager().getClaimsInfo(
+                ClaimInfo claimInfo = this.main.getLandManager().getClaimsInfo(
                         offlinePlayer.getName());
-                numClaims = claimsInfo[0];
-                numBlocks = claimsInfo[1];
+                numClaims = claimInfo.getNumClaims();
+                numBlocks = claimInfo.getNumBlocks();
                 numEntities++;
             });
             return;
@@ -124,9 +125,9 @@ public class LogManager {
             if (currentTime - offlinePlayer.getLastPlayed() > lastJoinTime) {
                 return;
             }
-            Long[] claimsInfo = this.main.getLandManager().getClaimsInfo(offlinePlayer.getName());
-            numClaims = claimsInfo[0];
-            numBlocks = claimsInfo[1];
+            ClaimInfo claimInfo = this.main.getLandManager().getClaimsInfo(offlinePlayer.getName());
+            numClaims = claimInfo.getNumClaims();
+            numBlocks = claimInfo.getNumBlocks();
             numEntities++;
         });
     }
@@ -139,9 +140,9 @@ public class LogManager {
         this.numEntities = groups.size();
         for (int i = 0; i < numEntities; i++) {
             String group = groups.get(i);
-            Long[] claimsInfo = this.main.getLandManager().getClaimsInfo(group);
-            numClaims += claimsInfo[0];
-            numBlocks += claimsInfo[1];
+            ClaimInfo claimInfo = this.main.getLandManager().getClaimsInfo(group);
+            numClaims += claimInfo.getNumClaims();
+            numBlocks += claimInfo.getNumBlocks();
         }
     }
 

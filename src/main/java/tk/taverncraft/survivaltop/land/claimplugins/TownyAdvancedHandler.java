@@ -17,6 +17,7 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
  * Handles land wealth calculated using Towny Advanced plugin.
@@ -45,7 +46,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
      *
      * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
      */
-    public Long[] getClaimsInfo(String name) {
+    public ClaimInfo getClaimsInfo(String name) {
         long numBlocks = 0;
         Collection<TownBlock> claims = getClaims(name);
         int townSize = main.getOptions().getTownBlockSize();
@@ -58,7 +59,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
             double maxZ = minZ + townSize;
             numBlocks += (maxX - minX) * (maxZ - minZ) * (maxY - minY);
         }
-        return new Long[]{(long) claims.size(), numBlocks};
+        return new ClaimInfo(claims.size(), numBlocks);
     }
 
     /**

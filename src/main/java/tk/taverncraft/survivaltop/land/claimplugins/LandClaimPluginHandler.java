@@ -1,5 +1,7 @@
 package tk.taverncraft.survivaltop.land.claimplugins;
 
+import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
+
 /**
  * Interface to get land worth from different land claim plugins.
  */
@@ -18,7 +20,7 @@ public interface LandClaimPluginHandler {
      *
      * @param name name of entity to get claim info for
      *
-     * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
+     * @return information for claim
      */
-    Long[] getClaimsInfo(String name);
+    ClaimInfo getClaimsInfo(String name);
 }

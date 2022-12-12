@@ -14,6 +14,7 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
  * Handles land wealth calculated using RedProtect plugin.
@@ -40,7 +41,7 @@ public class RedProtectHandler implements LandClaimPluginHandler  {
      *
      * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
      */
-    public Long[] getClaimsInfo(String name) {
+    public ClaimInfo getClaimsInfo(String name) {
         long numBlocks = 0;
         Set<Region> claims = getClaims(name);
         for (Region claim : claims) {
@@ -50,7 +51,7 @@ public class RedProtectHandler implements LandClaimPluginHandler  {
             double maxY = Math.min(loc1.getY(), loc2.getY());
             numBlocks += claim.getArea() * (maxY - minY);
         }
-        return new Long[]{(long) claims.size(), numBlocks};
+        return new ClaimInfo(claims.size(), numBlocks);
     }
 
     /**

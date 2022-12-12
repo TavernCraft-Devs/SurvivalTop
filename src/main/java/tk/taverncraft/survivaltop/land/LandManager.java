@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
 import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
@@ -252,7 +253,7 @@ public class LandManager {
      *
      * @return size 2 array with 1st element = number of claims and 2nd element = number of blocks
      */
-    public Long[] getClaimsInfo(String name) {
+    public ClaimInfo getClaimsInfo(String name) {
         return this.landClaimPluginHandler.getClaimsInfo(name);
     }
 
