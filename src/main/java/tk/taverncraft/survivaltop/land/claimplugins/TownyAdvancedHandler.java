@@ -16,7 +16,7 @@ import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
 import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
@@ -24,18 +24,18 @@ import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
  */
 public class TownyAdvancedHandler implements LandClaimPluginHandler {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
     private final TownyAPI api;
 
     /**
      * Constructor for TownyAdvancedHandler.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land calculations
+     * @param landProcessor helper for land calculations
      */
-    public TownyAdvancedHandler(Main main, LandOperationsHelper landOperationsHelper) {
+    public TownyAdvancedHandler(Main main, LandProcessor landProcessor) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
         this.api = TownyAPI.getInstance();
     }
 
@@ -98,7 +98,7 @@ public class TownyAdvancedHandler implements LandClaimPluginHandler {
             World world) {
         double minY = this.main.getOptions().getMinLandHeight();
         double maxY = this.main.getOptions().getMaxLandHeight();
-        landOperationsHelper.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world);
+        landProcessor.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world);
     }
 
     /**

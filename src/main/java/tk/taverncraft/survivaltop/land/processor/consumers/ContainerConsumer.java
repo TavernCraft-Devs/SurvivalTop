@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.land.operations;
+package tk.taverncraft.survivaltop.land.processor.consumers;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
@@ -21,15 +20,16 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.holders.ContainerHolder;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
+import tk.taverncraft.survivaltop.land.processor.holders.ContainerHolder;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles the logic for performing container operations when scanning locations.
  */
-public class ContainerOperations {
+public class ContainerConsumer {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
     private final LinkedHashMap<String, Double> containerWorth;
     private final Set<String> containerMaterial;
 
@@ -71,16 +71,16 @@ public class ContainerOperations {
     private Set<String> containerTypes;
 
     /**
-     * Constructor for ContainerOperations.
+     * Constructor for ContainerConsumer.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land operations
+     * @param landProcessor helper for land operations
      * @param containerWorth map of container item names to their values
      */
-    public ContainerOperations(Main main, LandOperationsHelper landOperationsHelper,
-            LinkedHashMap<String, Double> containerWorth) {
+    public ContainerConsumer(Main main, LandProcessor landProcessor,
+                             LinkedHashMap<String, Double> containerWorth) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
         this.containerWorth = containerWorth;
         this.containerTypes = new HashSet<>();
         this.containerMaterial = containerWorth.keySet();
@@ -182,7 +182,7 @@ public class ContainerOperations {
         ArrayList<Block> blocks = preprocessedContainers.get(id);
         int numBlocks = blocks.size();
         for (int i = 0; i < numBlocks; i++) {
-            if (landOperationsHelper.getStopOperations()) {
+            if (landProcessor.getStopOperations()) {
                 return;
             }
             Inventory inventory = getBlockInventory(blocks.get(i));

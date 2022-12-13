@@ -3,7 +3,7 @@ package tk.taverncraft.survivaltop.storage;
 import java.util.ArrayList;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.cache.EntityCache;
 
 /**
  * StorageManager decides the storage helper to use.

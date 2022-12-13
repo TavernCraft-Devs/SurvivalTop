@@ -12,7 +12,7 @@ import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.Claim;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
 import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
@@ -20,17 +20,17 @@ import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
  */
 public class CrashClaimHandler implements LandClaimPluginHandler {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
 
     /**
      * Constructor for CrashClaimHandler.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land calculations
+     * @param landProcessor helper for land calculations
      */
-    public CrashClaimHandler(Main main, LandOperationsHelper landOperationsHelper) {
+    public CrashClaimHandler(Main main, LandProcessor landProcessor) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
     }
 
     /**
@@ -93,7 +93,7 @@ public class CrashClaimHandler implements LandClaimPluginHandler {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = main.getOptions().getMaxLandHeight();
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        landOperationsHelper.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world);
+        landProcessor.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world);
     }
 
     /**

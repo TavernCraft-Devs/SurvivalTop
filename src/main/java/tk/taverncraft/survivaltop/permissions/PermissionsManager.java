@@ -19,8 +19,8 @@ public class PermissionsManager {
     private final String statsOthersCmdPerm = "survtop.stats.others";
     private final String topCmdPerm = "survtop.top";
     private final String updateCmdPerm = "survtop.update";
-    private final String signRemovePerm = "survtop.sign.remove";
-    private final String signAddPerm = "survtop.sign.add";
+    private final String signRemovePerm = "survtop.sign.removeTask";
+    private final String signAddPerm = "survtop.sign.addTask";
     private final String guiDetailsSelfPerm = "survtop.gui.details.self";
     private final String guiDetailsOthersPerm = "survtop.gui.details.others";
 

@@ -14,7 +14,7 @@ import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
 import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
@@ -22,17 +22,17 @@ import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
  */
 public class FactionsUuidHandler implements LandClaimPluginHandler {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
 
     /**
      * Constructor for FactionsUuidHandler.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land calculations
+     * @param landProcessor helper for land calculations
      */
-    public FactionsUuidHandler(Main main, LandOperationsHelper landOperationsHelper) {
+    public FactionsUuidHandler(Main main, LandProcessor landProcessor) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
     }
 
     /**
@@ -59,7 +59,7 @@ public class FactionsUuidHandler implements LandClaimPluginHandler {
         try {
             Set<FLocation> claims = getClaims(name);
             for (FLocation claim : claims) {
-                landOperationsHelper.processEntityChunk(id, claim.getChunk(), claim.getWorld());
+                landProcessor.processEntityChunk(id, claim.getChunk(), claim.getWorld());
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }

@@ -35,8 +35,8 @@ public class InventoryHolder {
     /**
      * Adds count to holder.
      *
-     * @param material material to add count for
-     * @param amount amount to add
+     * @param material material to addTask count for
+     * @param amount amount to addTask
      */
     public void addToHolder(String material, int amount) {
         counter.get(material).increment(amount);

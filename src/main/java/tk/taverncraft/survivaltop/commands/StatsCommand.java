@@ -68,7 +68,7 @@ public class StatsCommand {
         }
 
         // check if there is an ongoing calculation task (guard against spam)
-        if (main.getStatsManager().senderHasCalculationInProgress(sender)) {
+        if (main.getTaskManager().hasCreator(sender)) {
             MessageManager.sendMessage(sender, "calculation-in-progress");
             return;
         }
@@ -100,7 +100,7 @@ public class StatsCommand {
         }
 
         // check if there is an ongoing calculation task (guard against spam)
-        if (main.getStatsManager().senderHasCalculationInProgress(sender)) {
+        if (main.getTaskManager().hasCreator(sender)) {
             MessageManager.sendMessage(sender, "calculation-in-progress");
             return;
         }

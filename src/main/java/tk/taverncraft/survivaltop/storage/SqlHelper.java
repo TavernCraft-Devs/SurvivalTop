@@ -13,7 +13,7 @@ import java.util.List;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.papi.PapiManager;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.cache.EntityCache;
 
 /**
  * SqlHelper is responsible for reading/writing from MySQL database.

@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.stats.cache;
+package tk.taverncraft.survivaltop.cache;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -20,7 +20,7 @@ import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.messages.MessageManager;
 
 /**
- * SignHelper handles all the operations required to update/remove a leaderboard sign.
+ * SignHelper handles all the operations required to update/removeTask a leaderboard sign.
  */
 public class SignHelper {
     private final Main main;
@@ -147,8 +147,8 @@ public class SignHelper {
         String name;
         String wealth;
         try {
-            name = main.getLeaderboardManager().getEntityNameAtPosition(position - 1);
-            wealth = main.getLeaderboardManager().getEntityWealthAtPosition(position - 1);
+            name = main.getCacheManager().getEntityNameAtPosition(position - 1);
+            wealth = main.getCacheManager().getEntityWealthAtPosition(position - 1);
         } catch (IndexOutOfBoundsException ex) {
             name = savedName;
             wealth = savedWealth;

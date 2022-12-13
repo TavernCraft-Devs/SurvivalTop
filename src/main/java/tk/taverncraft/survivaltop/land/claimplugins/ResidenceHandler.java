@@ -13,7 +13,7 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
 import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
@@ -21,17 +21,17 @@ import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
  */
 public class ResidenceHandler implements LandClaimPluginHandler  {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
 
     /**
      * Constructor for ResidenceHandler.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land calculations
+     * @param landProcessor helper for land calculations
      */
-    public ResidenceHandler(Main main, LandOperationsHelper landOperationsHelper) {
+    public ResidenceHandler(Main main, LandProcessor landProcessor) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
     }
 
     /**
@@ -87,7 +87,7 @@ public class ResidenceHandler implements LandClaimPluginHandler  {
         double maxX = Math.max(l1.getX(), l2.getX()) + 1;
         double maxY = Math.max(l1.getY(), l2.getY()) + 1;
         double maxZ = Math.max(l1.getZ(), l2.getZ()) + 1;
-        landOperationsHelper.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world);
+        landProcessor.processEntityClaim(id, maxX, minX, maxY, minY, maxZ, minZ, world);
     }
 
     /**

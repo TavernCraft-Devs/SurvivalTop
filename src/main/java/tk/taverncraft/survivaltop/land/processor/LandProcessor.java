@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.land.operations;
+package tk.taverncraft.survivaltop.land.processor;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,17 +12,20 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.land.processor.consumers.BlockConsumer;
+import tk.taverncraft.survivaltop.land.processor.consumers.ContainerConsumer;
+import tk.taverncraft.survivaltop.land.processor.consumers.SpawnerConsumer;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Helper function for loading the logic of calculations.
  */
-public class LandOperationsHelper {
+public class LandProcessor {
     private final Main main;
-    private BlockOperations blockOperations;
-    private SpawnerOperations spawnerOperations;
-    private ContainerOperations containerOperations;
+    private BlockConsumer blockConsumer;
+    private SpawnerConsumer spawnerConsumer;
+    private ContainerConsumer containerConsumer;
 
     // boolean to allow reloads to stop current operations
     private boolean stopOperations = false;
@@ -36,11 +39,11 @@ public class LandOperationsHelper {
     private LinkedHashMap<String, Double> containerWorth = new LinkedHashMap<>();
 
     /**
-     * Constructor for LandOperationsHelper.
+     * Constructor for LandProcessor.
      *
      * @param main plugin class
      */
-    public LandOperationsHelper(Main main) {
+    public LandProcessor(Main main) {
         this.main = main;
         initializeWorth();
         initializeLandSubOperations();
@@ -60,9 +63,9 @@ public class LandOperationsHelper {
      * Initializes block, spawner and container operations for land.
      */
     private void initializeLandSubOperations() {
-        blockOperations = new BlockOperations(blockWorth);
-        spawnerOperations = new SpawnerOperations(main, this, spawnerWorth);
-        containerOperations = new ContainerOperations(main, this, containerWorth);
+        blockConsumer = new BlockConsumer(blockWorth);
+        spawnerConsumer = new SpawnerConsumer(main, this, spawnerWorth);
+        containerConsumer = new ContainerConsumer(main, this, containerWorth);
     }
 
     /**
@@ -72,16 +75,16 @@ public class LandOperationsHelper {
         landOperations = new ArrayList<>();
 
         if (main.getOptions().landIsIncluded()) {
-            landOperations.add(blockOperations.getOperation());
+            landOperations.add(blockConsumer.getOperation());
         } else {
             return;
         }
         if (main.getOptions().spawnerIsIncluded()) {
-            landOperations.add(spawnerOperations.getOperation());
+            landOperations.add(spawnerConsumer.getOperation());
         }
 
         if (main.getOptions().containerIsIncluded()) {
-            landOperations.add(containerOperations.getOperation());
+            landOperations.add(containerConsumer.getOperation());
         }
     }
 
@@ -148,9 +151,9 @@ public class LandOperationsHelper {
      * @param id key to identify task
      */
     public void createHolder(int id) {
-        blockOperations.createHolder(id);
-        spawnerOperations.createHolder(id);
-        containerOperations.createHolder(id);
+        blockConsumer.createHolder(id);
+        spawnerConsumer.createHolder(id);
+        containerConsumer.createHolder(id);
     }
 
     /**
@@ -159,9 +162,9 @@ public class LandOperationsHelper {
      * @param id key to identify task
      */
     public void doCleanUp(int id) {
-        blockOperations.doCleanUp(id);
-        spawnerOperations.doCleanUp(id);
-        containerOperations.doCleanUp(id);
+        blockConsumer.doCleanUp(id);
+        spawnerConsumer.doCleanUp(id);
+        containerConsumer.doCleanUp(id);
     }
 
     /**
@@ -307,7 +310,7 @@ public class LandOperationsHelper {
      * @return hashmap of block material to its worth
      */
     public HashMap<String, MutableInt> getBlocksForGui(int id) {
-        return blockOperations.getBlockHolder(id).getCounter();
+        return blockConsumer.getBlockHolder(id).getCounter();
     }
 
     /**
@@ -318,7 +321,7 @@ public class LandOperationsHelper {
      * @return hashmap of spawner entity type to its worth
      */
     public HashMap<String, MutableInt> getSpawnersForGui(int id) {
-        return spawnerOperations.getSpawnerHolder(id).getCounter();
+        return spawnerConsumer.getSpawnerHolder(id).getCounter();
     }
 
     /**
@@ -329,7 +332,7 @@ public class LandOperationsHelper {
      * @return hashmap of container item material to its worth
      */
     public HashMap<String, MutableInt> getContainersForGui(int id) {
-        return containerOperations.getContainerHolder(id).getCounter();
+        return containerConsumer.getContainerHolder(id).getCounter();
     }
 
 
@@ -339,7 +342,7 @@ public class LandOperationsHelper {
      * @param id key to identify task
      */
     public void processSpawnerTypes(int id) {
-        spawnerOperations.processSpawnerTypes(id);
+        spawnerConsumer.processSpawnerTypes(id);
     }
 
     /**
@@ -348,7 +351,7 @@ public class LandOperationsHelper {
      * @param id key to identify task
      */
     public void processContainerItems(int id) {
-        containerOperations.processContainerItems(id);
+        containerConsumer.processContainerItems(id);
     }
 
     /**
@@ -359,7 +362,7 @@ public class LandOperationsHelper {
      * @return map of sender uuid to the calculated block worth
      */
     public double calculateBlockWorth(int id) {
-        return blockOperations.calculateBlockWorth(id);
+        return blockConsumer.calculateBlockWorth(id);
     }
 
     /**
@@ -370,7 +373,7 @@ public class LandOperationsHelper {
      * @return map of sender uuid to the calculated spawner worth
      */
     public double calculateSpawnerWorth(int id) {
-        return spawnerOperations.calculateSpawnerWorth(id);
+        return spawnerConsumer.calculateSpawnerWorth(id);
     }
 
     /**
@@ -381,7 +384,7 @@ public class LandOperationsHelper {
      * @return map of sender uuid to the calculated container worth
      */
     public double calculateContainerWorth(int id) {
-        return containerOperations.calculateContainerWorth(id);
+        return containerConsumer.calculateContainerWorth(id);
     }
 
     /**

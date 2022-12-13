@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.land.operations.holders;
+package tk.taverncraft.survivaltop.land.processor.holders;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -35,7 +35,7 @@ public class SpawnerHolder {
     /**
      * Adds 1 count to holder.
      *
-     * @param entityType entity type to add count for
+     * @param entityType entity type to addTask count for
      */
     public void addToHolder(String entityType) {
         counter.get(entityType).increment();

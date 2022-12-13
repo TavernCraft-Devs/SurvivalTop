@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.land.claimplugins.*;
-import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
 import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
@@ -16,7 +16,7 @@ public class LandManager {
     private final Main main;
 
     // helper classes
-    private LandOperationsHelper landOperationsHelper;
+    private LandProcessor landProcessor;
     private LandClaimPluginHandler landClaimPluginHandler;
 
     /**
@@ -38,32 +38,32 @@ public class LandManager {
 
         switch (landType) {
         case "residence":
-            landClaimPluginHandler = new ResidenceHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new ResidenceHandler(main, landProcessor);
             return;
         case "ultimateclaims":
-            landClaimPluginHandler = new UltimateClaimsHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new UltimateClaimsHandler(main, landProcessor);
             return;
         case "griefdefender":
-            landClaimPluginHandler = new GriefDefenderHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new GriefDefenderHandler(main, landProcessor);
             return;
         case "kingdomsx":
-            landClaimPluginHandler = new KingdomsXHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new KingdomsXHandler(main, landProcessor);
             return;
         case "redprotect":
-            landClaimPluginHandler = new RedProtectHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new RedProtectHandler(main, landProcessor);
             return;
         case "crashclaim":
-            landClaimPluginHandler = new CrashClaimHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new CrashClaimHandler(main, landProcessor);
             return;
         case "factionsuuid":
         case "saberfactions":
-            landClaimPluginHandler = new FactionsUuidHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new FactionsUuidHandler(main, landProcessor);
             return;
         case "townyadvanced":
-            landClaimPluginHandler = new TownyAdvancedHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new TownyAdvancedHandler(main, landProcessor);
             return;
         default:
-            landClaimPluginHandler = new GriefPreventionHandler(main, landOperationsHelper);
+            landClaimPluginHandler = new GriefPreventionHandler(main, landProcessor);
         }
     }
 
@@ -71,7 +71,7 @@ public class LandManager {
      * Initializes land operations helper.
      */
     public void initializeLandOperations() {
-        this.landOperationsHelper = new LandOperationsHelper(main);
+        this.landProcessor = new LandProcessor(main);
     }
 
     /**
@@ -80,7 +80,7 @@ public class LandManager {
      * @param id key to identify task
      */
     public void doCleanUp(int id) {
-        landOperationsHelper.doCleanUp(id);
+        landProcessor.doCleanUp(id);
     }
 
     /**
@@ -99,7 +99,7 @@ public class LandManager {
      * @param id key to identify task
      */
     public void createHolder(int id) {
-        landOperationsHelper.createHolder(id);
+        landProcessor.createHolder(id);
     }
 
     /**
@@ -110,7 +110,7 @@ public class LandManager {
      * @return hashmap of block material to its worth
      */
     public HashMap<String, MutableInt> getBlocksForGui(int id) {
-        return landOperationsHelper.getBlocksForGui(id);
+        return landProcessor.getBlocksForGui(id);
     }
 
     /**
@@ -121,7 +121,7 @@ public class LandManager {
      * @return hashmap of spawner entity type to its worth
      */
     public HashMap<String, MutableInt> getSpawnersForGui(int id) {
-        return landOperationsHelper.getSpawnersForGui(id);
+        return landProcessor.getSpawnersForGui(id);
     }
 
     /**
@@ -132,7 +132,7 @@ public class LandManager {
      * @return hashmap of container item material to its worth
      */
     public HashMap<String, MutableInt> getContainersForGui(int id) {
-        return landOperationsHelper.getContainersForGui(id);
+        return landProcessor.getContainersForGui(id);
     }
 
     /**
@@ -141,7 +141,7 @@ public class LandManager {
      * @param id key to identify task
      */
     public void processSpawnerTypes(int id) {
-        landOperationsHelper.processSpawnerTypes(id);
+        landProcessor.processSpawnerTypes(id);
     }
 
     /**
@@ -150,7 +150,7 @@ public class LandManager {
      * @param id key to identify task
      */
     public void processContainerItems(int id) {
-        landOperationsHelper.processContainerItems(id);
+        landProcessor.processContainerItems(id);
     }
 
     /**
@@ -161,7 +161,7 @@ public class LandManager {
      * @return map of sender uuid to the calculated block worth
      */
     public double calculateBlockWorth(int id) {
-        return landOperationsHelper.calculateBlockWorth(id);
+        return landProcessor.calculateBlockWorth(id);
     }
 
     /**
@@ -172,7 +172,7 @@ public class LandManager {
      * @return map of sender uuid to the calculated spawner worth
      */
     public double calculateSpawnerWorth(int id) {
-        return landOperationsHelper.calculateSpawnerWorth(id);
+        return landProcessor.calculateSpawnerWorth(id);
     }
 
     /**
@@ -183,7 +183,7 @@ public class LandManager {
      * @return map of sender uuid to the calculated container worth
      */
     public double calculateContainerWorth(int id) {
-        return landOperationsHelper.calculateContainerWorth(id);
+        return landProcessor.calculateContainerWorth(id);
     }
 
     /**
@@ -192,7 +192,7 @@ public class LandManager {
      * @return map of block material to value
      */
     public LinkedHashMap<String, Double> getBlockWorth() {
-        return this.landOperationsHelper.getBlockWorth();
+        return this.landProcessor.getBlockWorth();
     }
 
     /**
@@ -203,7 +203,7 @@ public class LandManager {
      * @return double representing its worth
      */
     public double getBlockWorth(String material) {
-        return this.landOperationsHelper.getBlockWorth(material);
+        return this.landProcessor.getBlockWorth(material);
     }
 
     /**
@@ -212,7 +212,7 @@ public class LandManager {
      * @return map of spawner entity type to value
      */
     public LinkedHashMap<String, Double> getSpawnerWorth() {
-        return this.landOperationsHelper.getSpawnerWorth();
+        return this.landProcessor.getSpawnerWorth();
     }
 
     /**
@@ -223,7 +223,7 @@ public class LandManager {
      * @return double representing its worth
      */
     public double getSpawnerWorth(String entityType) {
-        return this.landOperationsHelper.getSpawnerWorth(entityType);
+        return this.landProcessor.getSpawnerWorth(entityType);
     }
 
     /**
@@ -232,7 +232,7 @@ public class LandManager {
      * @return map of container item material to value
      */
     public LinkedHashMap<String, Double> getContainerWorth() {
-        return this.landOperationsHelper.getContainerWorth();
+        return this.landProcessor.getContainerWorth();
     }
 
     /**
@@ -243,7 +243,7 @@ public class LandManager {
      * @return double representing its worth
      */
     public double getContainerWorth(String material) {
-        return this.landOperationsHelper.getContainerWorth(material);
+        return this.landProcessor.getContainerWorth(material);
     }
 
     /**
@@ -263,7 +263,7 @@ public class LandManager {
      * @param state state to set operations to
      */
     public void setStopOperations(boolean state) {
-        landOperationsHelper.setStopOperations(state);
+        landProcessor.setStopOperations(state);
     }
 }
 

@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.stats.task;
+package tk.taverncraft.survivaltop.task.queue;
 
 /**
  * Enum representing the 2 types of tasks. PLAYER refers to stats calculations requested by a user.

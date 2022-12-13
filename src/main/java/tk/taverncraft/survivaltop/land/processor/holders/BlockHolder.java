@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.land.operations.holders;
+package tk.taverncraft.survivaltop.land.processor.holders;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -6,17 +6,17 @@ import java.util.Set;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
- * Holder for tracking count of container items.
+ * Holder for tracking count of blocks.
  */
-public class ContainerHolder {
+public class BlockHolder {
     private final HashMap<String, MutableInt> counter;
 
     /**
-     * Constructor for ContainerHolder.
+     * Constructor for BlockHolder.
      *
-     * @param materials list of container materials
+     * @param materials list of block materials
      */
-    public ContainerHolder(Set<String> materials) {
+    public BlockHolder(Set<String> materials) {
         counter = new HashMap<>();
         for (String material : materials) {
             counter.put(material, new MutableInt());
@@ -33,12 +33,11 @@ public class ContainerHolder {
     }
 
     /**
-     * Adds count to holder.
+     * Adds 1 count to holder.
      *
-     * @param material material to add count for
-     * @param amount amount to add
+     * @param material material to addTask count for
      */
-    public void addToHolder(String material, int amount) {
-        counter.get(material).increment(amount);
+    public void addToHolder(String material) {
+        counter.get(material).increment();
     }
 }

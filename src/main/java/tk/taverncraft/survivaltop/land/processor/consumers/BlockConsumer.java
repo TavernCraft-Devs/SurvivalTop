@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.land.operations;
+package tk.taverncraft.survivaltop.land.processor.consumers;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,13 +9,13 @@ import java.util.function.BiFunction;
 
 import org.bukkit.block.Block;
 
-import tk.taverncraft.survivaltop.land.operations.holders.BlockHolder;
+import tk.taverncraft.survivaltop.land.processor.holders.BlockHolder;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles the logic for performing block operations when scanning locations.
  */
-public class BlockOperations {
+public class BlockConsumer {
     private final LinkedHashMap<String, Double> blockWorth;
     private Set<String> blockMaterial;
 
@@ -23,11 +23,11 @@ public class BlockOperations {
     private final ConcurrentHashMap<Integer, BlockHolder> blockHolderMap = new ConcurrentHashMap<>();
 
     /**
-     * Constructor for BlockOperations.
+     * Constructor for BlockConsumer.
      *
      * @param blockWorth map of block materials to their values
      */
-    public BlockOperations(LinkedHashMap<String, Double> blockWorth) {
+    public BlockConsumer(LinkedHashMap<String, Double> blockWorth) {
         this.blockWorth = blockWorth;
         this.blockMaterial = blockWorth.keySet();
     }

@@ -2,7 +2,7 @@ package tk.taverncraft.survivaltop.storage;
 
 import java.util.ArrayList;
 
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.cache.EntityCache;
 
 /**
  * Interface to determine what type of storage to use. Used to shift work to compile

@@ -49,7 +49,7 @@ public class BalanceManager {
             return Main.getEconomy().getBalance(player);
         }
          catch (Exception | NoClassDefFoundError e) {
-            // vault might throw an error here related to null user, remove when resolved
+            // vault might throw an error here related to null user, removeTask when resolved
              return 0;
         }
     }

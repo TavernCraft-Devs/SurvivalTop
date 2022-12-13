@@ -180,7 +180,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 3);
             try {
                 int index = Integer.parseInt(args[2]) - 1;
-                return main.getLeaderboardManager().getEntityNameAtPosition(index);
+                return main.getCacheManager().getEntityNameAtPosition(index);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 return "None";
             }
@@ -190,7 +190,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 3);
             try {
                 int index = Integer.parseInt(args[2]) - 1;
-                return main.getLeaderboardManager().getEntityWealthAtPosition(index);
+                return main.getCacheManager().getEntityWealthAtPosition(index);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -200,7 +200,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 3);
             try {
                 String name = getEntityName(args, player, 2);
-                return name == null ? "None" : main.getLeaderboardManager().getPositionOfEntity(name);
+                return name == null ? "None" : main.getCacheManager().getPositionOfEntity(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "None";
             }
@@ -210,7 +210,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntityBalWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntityBalWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -220,7 +220,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntityInvWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntityInvWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -230,7 +230,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntityLandWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntityLandWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -240,7 +240,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntityBlockWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntityBlockWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -250,7 +250,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntitySpawnerWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntitySpawnerWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -260,7 +260,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntityContainerWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntityContainerWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }
@@ -270,7 +270,7 @@ public class PapiManager extends PlaceholderExpansion {
             String[] args = params.split("_", 4);
             try {
                 String name = getEntityName(args, player, 3);
-                return name == null ? "0" : main.getLeaderboardManager().getEntityTotalWealth(name);
+                return name == null ? "0" : main.getCacheManager().getEntityTotalWealth(name);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 return "0";
             }

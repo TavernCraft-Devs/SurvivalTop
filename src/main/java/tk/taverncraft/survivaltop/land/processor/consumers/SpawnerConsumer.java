@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.land.operations;
+package tk.taverncraft.survivaltop.land.processor.consumers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,15 +15,16 @@ import org.bukkit.block.CreatureSpawner;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.holders.SpawnerHolder;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
+import tk.taverncraft.survivaltop.land.processor.holders.SpawnerHolder;
 import tk.taverncraft.survivaltop.utils.types.MutableInt;
 
 /**
  * Handles the logic for performing spawner operations when scanning locations.
  */
-public class SpawnerOperations {
+public class SpawnerConsumer {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
     private final LinkedHashMap<String, Double> spawnerWorth;
     private final Set<String> spawnerEntityType;
     private RoseStackerAPI rApi;
@@ -37,16 +38,16 @@ public class SpawnerOperations {
             new ConcurrentHashMap<>();
 
     /**
-     * Constructor for SpawnerOperations.
+     * Constructor for SpawnerConsumer.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land operations
+     * @param landProcessor helper for land operations
      * @param spawnerWorth map of spawner names to their values
      */
-    public SpawnerOperations(Main main, LandOperationsHelper landOperationsHelper,
-            LinkedHashMap<String, Double> spawnerWorth) {
+    public SpawnerConsumer(Main main, LandProcessor landProcessor,
+                           LinkedHashMap<String, Double> spawnerWorth) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
         this.spawnerWorth = spawnerWorth;
         this.spawnerEntityType = spawnerWorth.keySet();
         if (main.getDependencyManager().hasDependencyLoaded("RoseStacker")) {
@@ -139,7 +140,7 @@ public class SpawnerOperations {
         ArrayList<Block> blocks = preprocessedSpawners.get(id);
         int numBlocks = blocks.size();
         for (int i = 0; i < numBlocks; i++) {
-            if (landOperationsHelper.getStopOperations()) {
+            if (landProcessor.getStopOperations()) {
                 return;
             }
             Block block = blocks.get(i);

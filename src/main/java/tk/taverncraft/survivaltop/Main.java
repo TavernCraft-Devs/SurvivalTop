@@ -13,6 +13,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import tk.taverncraft.survivaltop.balance.BalanceManager;
+import tk.taverncraft.survivaltop.cache.CacheManager;
 import tk.taverncraft.survivaltop.events.leaderboard.SignBreakEvent;
 import tk.taverncraft.survivaltop.events.leaderboard.SignPlaceEvent;
 import tk.taverncraft.survivaltop.events.stats.ViewPageEvent;
@@ -29,6 +30,7 @@ import tk.taverncraft.survivaltop.stats.StatsManager;
 import tk.taverncraft.survivaltop.storage.StorageManager;
 import tk.taverncraft.survivaltop.gui.GuiManager;
 import tk.taverncraft.survivaltop.config.ConfigManager;
+import tk.taverncraft.survivaltop.task.TaskManager;
 import tk.taverncraft.survivaltop.utils.services.DependencyManager;
 import tk.taverncraft.survivaltop.papi.PapiManager;
 import tk.taverncraft.survivaltop.utils.services.PluginUpdateManager;
@@ -64,6 +66,8 @@ public class Main extends JavaPlugin {
     private StatsManager statsManager;
     private LeaderboardManager leaderboardManager;
     private StorageManager storageManager;
+    private CacheManager cacheManager;
+    private TaskManager taskManager;
     private LogManager logManager;
     private GuiManager guiManager;
 
@@ -76,7 +80,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        statsManager.stopAllCalculations();
+        taskManager.stopAllTasks();
         landManager.setStopOperations(true);
         inventoryManager.setStopOperations(true);
         LogManager.info(String.format("Disabled Version %s", getDescription().getVersion()));
@@ -107,6 +111,7 @@ public class Main extends JavaPlugin {
         try {
             this.dependencyManager = new DependencyManager(this);
             this.storageManager = new StorageManager(this);
+            this.cacheManager = new CacheManager(this);
             this.statsManager = new StatsManager(this);
             this.leaderboardManager = new LeaderboardManager(this);
             this.balanceManager = new BalanceManager(this);
@@ -116,6 +121,7 @@ public class Main extends JavaPlugin {
                 this.papiManager = new PapiManager(this);
                 papiManager.register();
             }
+            this.taskManager = new TaskManager(this);
             this.groupManager = new GroupManager(this);
             this.logManager = new LogManager(this);
             this.guiManager = new GuiManager(this);
@@ -315,6 +321,14 @@ public class Main extends JavaPlugin {
 
     public GuiManager getGuiManager() {
         return guiManager;
+    }
+
+    public CacheManager getCacheManager() {
+        return cacheManager;
+    }
+
+    public TaskManager getTaskManager() {
+        return taskManager;
     }
 
     public Options getOptions() {

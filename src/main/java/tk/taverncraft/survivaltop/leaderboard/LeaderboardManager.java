@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +18,9 @@ import org.bukkit.scheduler.BukkitTask;
 import tk.taverncraft.survivaltop.Main;
 import tk.taverncraft.survivaltop.logs.LogManager;
 import tk.taverncraft.survivaltop.messages.MessageManager;
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.cache.EntityCache;
+
+import static tk.taverncraft.survivaltop.task.queue.TaskType.LEADERBOARD;
 
 /**
  * LeaderboardManager contains the main logic related to updating the leaderboard.
@@ -36,18 +34,6 @@ public class LeaderboardManager {
     private Iterator<String> leaderboardTaskQueue;
     CommandSender leaderboardSender;
 
-    // map used during an ongoing leaderboard update
-    private ConcurrentHashMap<String, EntityCache> entityCacheMap;
-
-    // maps below are used for papi
-
-    // copy is used for consistent papi values
-    private ConcurrentHashMap<String, EntityCache> entityCacheMapCopy;
-
-    // cached positions
-    private ConcurrentHashMap<String, Integer> positionCacheMap;
-    private ArrayList<EntityCache> entityCacheList;
-
     /**
      * Constructor for LeaderboardManager.
      *
@@ -56,17 +42,6 @@ public class LeaderboardManager {
     public LeaderboardManager(Main main) {
         this.main = main;
         stopExistingScheduleTasks();
-        initializeValues();
-    }
-
-    /**
-     * Initializes all values to default.
-     */
-    public void initializeValues() throws NullPointerException {
-        positionCacheMap = new ConcurrentHashMap<>();
-        entityCacheMap = new ConcurrentHashMap<>();
-        entityCacheMapCopy = new ConcurrentHashMap<>();
-        entityCacheList = new ArrayList<>();
     }
 
     /**
@@ -144,7 +119,8 @@ public class LeaderboardManager {
             }
             runCommandsOnStart();
             if (leaderboardTaskQueue.hasNext()) {
-                main.getStatsManager().getStatsForLeaderboard(sender, leaderboardTaskQueue.next());
+                main.getTaskManager().createTask(sender, leaderboardTaskQueue.next(),
+                        LEADERBOARD);
             }
         } catch (Exception e) {
             LogManager.error(e.getMessage());
@@ -187,14 +163,14 @@ public class LeaderboardManager {
      * @param sender user executing the update
      * @param tempSortedCache temporary cache for sorted player wealth to set the leaderboard
      */
-    public void completeLeaderboardUpdate(CommandSender sender,
-            HashMap<String, EntityCache> tempSortedCache) {
+    public void completeLeaderboardUpdate(CommandSender sender) {
+        ArrayList<EntityCache> entityCacheList = main.getCacheManager().getEntityCacheList();
         if (main.getOptions().isUseInteractiveLeaderboard()) {
-            MessageManager.setUpInteractiveLeaderboard(tempSortedCache,
+            MessageManager.setUpInteractiveLeaderboard(entityCacheList,
                     main.getOptions().getMinimumWealth(),
                     main.getOptions().getLeaderboardPositionsPerPage());
         } else {
-            MessageManager.setUpLeaderboard(tempSortedCache, main.getOptions().getMinimumWealth(),
+            MessageManager.setUpLeaderboard(entityCacheList, main.getOptions().getMinimumWealth(),
                     main.getOptions().getLeaderboardPositionsPerPage());
         }
         lastUpdateDuration = Instant.now().getEpochSecond() - leaderboardUpdateStartTime;
@@ -209,55 +185,6 @@ public class LeaderboardManager {
             }
         });
         isUpdating = false;
-    }
-
-    /**
-     * Sorts entities by total wealth and filters for total leaderboard position limit shown
-     * if applicable.
-     *
-     * @param hm hashmap of entity wealth to sort
-     *
-     * @return sorted total wealth hashmap
-     */
-    private HashMap<String, EntityCache> sortAndFilterEntities(ConcurrentHashMap<String,
-        EntityCache> hm) {
-        List<Map.Entry<String, EntityCache> > list =
-            new LinkedList<>(hm.entrySet());
-
-        list.sort((o1, o2) -> (o2.getValue().getTotalWealth())
-            .compareTo(o1.getValue().getTotalWealth()));
-
-        HashMap<String, EntityCache> temp = new LinkedHashMap<>();
-        int totalLeaderboardPositions = main.getOptions().getTotalLeaderboardPositions();
-        if (totalLeaderboardPositions >= 0) {
-            for (Map.Entry<String, EntityCache> aa : list) {
-                if (totalLeaderboardPositions == 0) {
-                    break;
-                }
-                temp.put(aa.getKey(), aa.getValue());
-                totalLeaderboardPositions--;
-            }
-        } else {
-            for (Map.Entry<String, EntityCache> aa : list) {
-                temp.put(aa.getKey(), aa.getValue());
-            }
-        }
-        return temp;
-    }
-
-    /**
-     * Sets entity position and entity cache list for easy papi access.
-     *
-     * @param tempSortedCache hashmap to use to generate cache for
-     */
-    private void setUpEntityCache(HashMap<String, EntityCache> tempSortedCache) {
-        this.positionCacheMap = new ConcurrentHashMap<>();
-        int i = 0;
-        for (String nameKey : tempSortedCache.keySet()) {
-            this.positionCacheMap.put(nameKey, i);
-            i++;
-        }
-        this.entityCacheList = new ArrayList<>(tempSortedCache.values());
     }
 
     /**
@@ -306,29 +233,15 @@ public class LeaderboardManager {
      * @param eCache entity cache of entity
      */
     public void processLeaderboardUpdate(String name, EntityCache eCache) {
-        entityCacheMap.put(name.toUpperCase(), eCache);
+        main.getCacheManager().saveToLeaderboardCache(name.toUpperCase(), eCache);
         if (!leaderboardTaskQueue.hasNext()) {
-            HashMap<String, EntityCache> sortedMap = sortAndFilterEntities(entityCacheMap);
-            setUpEntityCache(sortedMap);
-            entityCacheMapCopy = entityCacheMap;
-            completeLeaderboardUpdate(leaderboardSender, sortedMap);
+            main.getCacheManager().processLeaderboardCache();
+            completeLeaderboardUpdate(leaderboardSender);
             runCommandsOnEnd();
-            main.getStorageManager().saveToStorage(entityCacheList);
         } else {
-            main.getStatsManager().getStatsForLeaderboard(leaderboardSender,
-                    leaderboardTaskQueue.next());
+            main.getTaskManager().createTask(leaderboardSender, leaderboardTaskQueue.next(),
+                    LEADERBOARD);
         }
-    }
-
-    /**
-     * Gets the entity cache in the leaderboard.
-     *
-     * @param name name of entity
-     *
-     * @return cache of entity
-     */
-    public EntityCache getEntityCache(String name) {
-        return entityCacheMap.get(name);
     }
 
     /**
@@ -365,7 +278,7 @@ public class LeaderboardManager {
             if (groupMatcher.find()) {
                 String placeholder = groupMatcher.group(0);
                 int index = Integer.parseInt(groupMatcher.group(1).split("-")[1]) - 1;
-                EntityCache eCache = entityCacheList.get(index);
+                EntityCache eCache = main.getCacheManager().getCacheAtPosition(index);
                 command = command.replaceAll(placeholder, eCache.getName());
             }
         }
@@ -376,7 +289,7 @@ public class LeaderboardManager {
         if (playerMatcher.find()) {
             String placeholder = playerMatcher.group(0);
             int index = Integer.parseInt(playerMatcher.group(1).split("-")[1]) - 1;
-            EntityCache eCache = entityCacheList.get(index);
+            EntityCache eCache = main.getCacheManager().getCacheAtPosition(index);
             if (eCache == null) {
                 return;
             }
@@ -394,144 +307,5 @@ public class LeaderboardManager {
             return;
         }
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-    }
-
-    // functions below are called by the papi manager to retrieve leaderboard values
-
-    /**
-     * Gets the name of an entity at given position.
-     *
-     * @param index position to get entity name at
-     *
-     * @return name of entity at specified position
-     */
-    public String getEntityNameAtPosition(int index) {
-        EntityCache eCache = this.entityCacheList.get(index);
-        String name = eCache.getName();
-
-        if (name == null) {
-            return "None";
-        }
-
-        return name;
-    }
-
-    /**
-     * Gets the wealth of an entity at given position.
-     *
-     * @param index position to get entity wealth at
-     *
-     * @return wealth of entity at specified position
-     */
-    public String getEntityWealthAtPosition(int index) {
-        EntityCache eCache = this.entityCacheList.get(index);
-        Double value = eCache.getTotalWealth();
-
-        if (value != null) {
-            return String.format("%.02f", value);
-        } else {
-            return "None";
-        }
-    }
-
-    /**
-     * Gets the position of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return position of given entity
-     */
-    public String getPositionOfEntity(String name) {
-        Integer position = this.positionCacheMap.get(name);
-        if (position != null) {
-            position = position + 1; // index 0
-            return String.format("%d", position);
-        } else {
-            return "None";
-        }
-    }
-
-    /**
-     * Gets the balance wealth of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return balance wealth of given entity
-     */
-    public String getEntityBalWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getBalWealth());
-    }
-
-    /**
-     * Gets the land wealth of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return land wealth of given entity
-     */
-    public String getEntityLandWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getLandWealth());
-    }
-
-    /**
-     * Gets the block wealth of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return block wealth of given entity
-     */
-    public String getEntityBlockWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getBlockWealth());
-    }
-
-    /**
-     * Gets the spawner wealth of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return spawner wealth of given entity
-     */
-    public String getEntitySpawnerWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getSpawnerWealth());
-    }
-
-    /**
-     * Gets the container wealth of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return container wealth of given entity
-     */
-    public String getEntityContainerWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getContainerWealth());
-    }
-
-    /**
-     * Gets the inventory wealth of an entity with given name.
-     *
-     * @param name name of entity
-     *
-     * @return inventory wealth of given entity
-     */
-    public String getEntityInvWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getInventoryWealth());
-    }
-
-    /**
-     * Gets the total wealth of an entity with given name.
-     *
-     * @param name of entity
-     *
-     * @return total wealth of given entity
-     */
-    public String getEntityTotalWealth(String name) {
-        EntityCache eCache = entityCacheMapCopy.get(name);
-        return String.format("%.02f", eCache.getTotalWealth());
     }
 }

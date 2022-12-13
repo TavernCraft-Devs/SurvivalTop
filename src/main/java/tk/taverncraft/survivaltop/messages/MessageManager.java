@@ -18,7 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.util.ChatPaginator;
 
-import tk.taverncraft.survivaltop.stats.cache.EntityCache;
+import tk.taverncraft.survivaltop.cache.EntityCache;
 import tk.taverncraft.survivaltop.utils.types.TextComponentPair;
 
 import static org.bukkit.util.ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH;
@@ -159,11 +159,11 @@ public class MessageManager {
     /**
      * Sets up message for non-interactive leaderboard beforehand to improve performance.
      *
-     * @param leaderboard hashmap of leaderboard positions
+     * @param entityCacheList ordered list of entities for leaderboard
      * @param minimumWealth minimum wealth to show on leaderboard
      * @param positionsPerPage number of positions shown per page
      */
-    public static void setUpLeaderboard(HashMap<String, EntityCache> leaderboard,
+    public static void setUpLeaderboard(ArrayList<EntityCache> entityCacheList,
             double minimumWealth, int positionsPerPage) {
         String header = messageKeysMap.get("leaderboard-header");
         String footer = messageKeysMap.get("leaderboard-footer");
@@ -171,7 +171,7 @@ public class MessageManager {
         StringBuilder message = new StringBuilder(header);
         int position = 1;
         int currentPage = 1;
-        for (EntityCache eCache : leaderboard.values()) {
+        for (EntityCache eCache : entityCacheList) {
             String name = eCache.getName();
 
             // handle null player names (can happen if world folder is deleted)
@@ -202,13 +202,13 @@ public class MessageManager {
     /**
      * Sets up message for interactive leaderboard beforehand to improve performance.
      *
-     * @param leaderboard hashmap of leaderboard positions
+     * @param entityCacheList ordered list of entities for leaderboard
      * @param minimumWealth minimum wealth to show on leaderboard
      * @param positionsPerPage number of positions shown per page
      */
-    public static void setUpInteractiveLeaderboard(HashMap<String, EntityCache> leaderboard,
+    public static void setUpInteractiveLeaderboard(ArrayList<EntityCache> entityCacheList,
             double minimumWealth, int positionsPerPage) {
-        int size = (int) Math.ceil((double) leaderboard.size() / positionsPerPage);
+        int size = (int) Math.ceil((double) entityCacheList.size() / positionsPerPage);
         completeInteractiveLeaderboard = new BaseComponent[size][];
 
         String header = messageKeysMap.get("leaderboard-header")
@@ -220,7 +220,7 @@ public class MessageManager {
         ComponentBuilder message = new ComponentBuilder(header);
         int position = 1;
         int currentPage = 1;
-        for (EntityCache eCache : leaderboard.values()) {
+        for (EntityCache eCache : entityCacheList) {
             String name = eCache.getName();
 
             // handle null player names (can happen if world folder is deleted)

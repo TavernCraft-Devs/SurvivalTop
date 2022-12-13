@@ -53,7 +53,7 @@ public class SignPlaceEvent implements Listener {
         Player player = e.getPlayer();
         if (!permissionsManager.hasSignAddPerm(player)) {
             e.setCancelled(true);
-            MessageManager.sendMessage(player, "no-survtop-sign-add-permission");
+            MessageManager.sendMessage(player, "no-survtop-sign-addTask-permission");
             return;
         }
 

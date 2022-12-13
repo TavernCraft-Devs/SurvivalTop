@@ -56,7 +56,7 @@ public class SignBreakEvent implements Listener {
         Player player = e.getPlayer();
         if (!permissionsManager.hasSignRemovePerm(player)) {
             e.setCancelled(true);
-            MessageManager.sendMessage(player, "no-survtop-sign-remove-permission");
+            MessageManager.sendMessage(player, "no-survtop-sign-removeTask-permission");
             return;
         }
 

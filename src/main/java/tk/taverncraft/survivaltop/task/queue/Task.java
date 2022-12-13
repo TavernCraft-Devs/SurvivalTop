@@ -1,4 +1,4 @@
-package tk.taverncraft.survivaltop.stats.task;
+package tk.taverncraft.survivaltop.task.queue;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;

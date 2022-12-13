@@ -37,7 +37,7 @@ public class ReloadCommand {
 
         try {
             // stop existing player stats calculations
-            main.getStatsManager().stopAllCalculations();
+            main.getTaskManager().stopAllTasks();
 
             // reload configs and reinitialize options
             main.getConfigManager().createConfigs();
@@ -60,8 +60,8 @@ public class ReloadCommand {
             main.getGuiManager().initializeMenuOptions();
             main.getGroupManager().initializeLandType();
             main.getLogManager().stopExistingTasks();
+            main.getCacheManager().initializeValues();
             main.getLeaderboardManager().stopExistingScheduleTasks();
-            main.getLeaderboardManager().initializeValues();
             main.getLeaderboardManager().scheduleLeaderboardUpdate(
                     main.getOptions().getUpdateInterval(),
                     main.getOptions().getUpdateInterval()

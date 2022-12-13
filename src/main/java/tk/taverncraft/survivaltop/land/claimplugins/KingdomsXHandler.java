@@ -13,7 +13,7 @@ import org.kingdoms.constants.player.KingdomPlayer;
 import org.kingdoms.main.Kingdoms;
 
 import tk.taverncraft.survivaltop.Main;
-import tk.taverncraft.survivaltop.land.operations.LandOperationsHelper;
+import tk.taverncraft.survivaltop.land.processor.LandProcessor;
 import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
 
 /**
@@ -21,17 +21,17 @@ import tk.taverncraft.survivaltop.utils.types.ClaimInfo;
  */
 public class KingdomsXHandler implements LandClaimPluginHandler {
     private final Main main;
-    private final LandOperationsHelper landOperationsHelper;
+    private final LandProcessor landProcessor;
 
     /**
      * Constructor for KingdomsXHandler.
      *
      * @param main plugin class
-     * @param landOperationsHelper helper for land calculations
+     * @param landProcessor helper for land calculations
      */
-    public KingdomsXHandler(Main main, LandOperationsHelper landOperationsHelper) {
+    public KingdomsXHandler(Main main, LandProcessor landProcessor) {
         this.main = main;
-        this.landOperationsHelper = landOperationsHelper;
+        this.landProcessor = landProcessor;
     }
 
     /**
@@ -58,7 +58,7 @@ public class KingdomsXHandler implements LandClaimPluginHandler {
         try {
             Set<SimpleChunkLocation> claims = getClaims(name);
             for (SimpleChunkLocation claim : claims) {
-                landOperationsHelper.processEntityChunk(id, claim.toChunk(), claim.getBukkitWorld());
+                landProcessor.processEntityChunk(id, claim.toChunk(), claim.getBukkitWorld());
             }
         } catch (NoClassDefFoundError | NullPointerException ignored) {
         }

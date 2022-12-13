@@ -103,7 +103,7 @@ public class Metrics {
     /**
      * Adds a custom chart.
      *
-     * @param chart The chart to add.
+     * @param chart The chart to addTask.
      */
     public void addCustomChart(CustomChart chart) {
         metricsBase.addCustomChart(chart);
