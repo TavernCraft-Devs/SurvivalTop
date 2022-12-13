@@ -65,7 +65,7 @@ public class StatsMenuOptions {
      */
     public StatsMenuOptions(Main main) {
         this.main = main;
-        FileConfiguration config = main.getStatsMenuConfig();
+        FileConfiguration config = main.getConfigManager().getStatsMenuConfig();
         mainPageSize = (int) Math.round(config.getInt("main-page-size", 27) / 9.0) * 9;
         subPageSize = (int) Math.round(config.getInt("sub-page-size", 54) / 9.0) * 9;
         mainPageTitle = "§8" + config.getString("main-page-title",

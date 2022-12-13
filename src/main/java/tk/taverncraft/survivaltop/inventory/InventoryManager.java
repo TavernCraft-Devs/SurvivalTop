@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -56,14 +57,14 @@ public class InventoryManager {
      */
     private void loadInventoryWorth() {
         inventoryWorth = new LinkedHashMap<>();
-        for (String key : main.getInventoriesConfig().getConfigurationSection("")
-            .getKeys(false)) {
+        FileConfiguration config = main.getConfigManager().getInventoriesConfig();
+        for (String key : config.getConfigurationSection("").getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null) {
                     continue;
                 }
-                inventoryWorth.put(key.toUpperCase(), main.getInventoriesConfig().getDouble(key));
+                inventoryWorth.put(key.toUpperCase(), config.getDouble(key));
             } catch (Exception e) {
                 LogManager.warn(e.getMessage());
             }

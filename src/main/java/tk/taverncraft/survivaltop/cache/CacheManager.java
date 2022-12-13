@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import tk.taverncraft.survivaltop.Main;
+import tk.taverncraft.survivaltop.gui.types.StatsGui;
 
 public class CacheManager {
     private final Main main;
@@ -138,6 +139,21 @@ public class CacheManager {
         }
 
         return leaderboardCache;
+    }
+
+    /**
+     * Gets an entity's GUI.
+     *
+     * @param name name of entity
+     *
+     * @return GUI containing stats of entity
+     */
+    public StatsGui getEntityGui(String name) {
+        EntityCache eCache = main.getCacheManager().getLatestCache(name);
+        if (eCache == null) {
+            return null;
+        }
+        return eCache.getGui(main);
     }
 
     // functions below are called by the papi manager to retrieve leaderboard values

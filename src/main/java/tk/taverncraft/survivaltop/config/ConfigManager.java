@@ -16,6 +16,17 @@ import tk.taverncraft.survivaltop.messages.MessageManager;
 public class ConfigManager {
     private final Main main;
 
+    // config
+    private FileConfiguration config;
+    private FileConfiguration blocksConfig;
+    private FileConfiguration spawnersConfig;
+    private FileConfiguration containersConfig;
+    private FileConfiguration inventoriesConfig;
+    private FileConfiguration papiConfig;
+    private FileConfiguration statsMenuConfig;
+    private FileConfiguration infoMenuConfig;
+    private FileConfiguration signsConfig;
+
     /**
      * Constructor for ConfigManager.
      *
@@ -45,8 +56,7 @@ public class ConfigManager {
      * Creates config file.
      */
     public void createConfig() {
-        FileConfiguration config = getConfig("config.yml");
-        main.setConfig(config);
+        config = getConfig("config.yml");
     }
 
     /**
@@ -62,64 +72,56 @@ public class ConfigManager {
      * Creates blocks config file.
      */
     public void createBlocksConfig() {
-        FileConfiguration config = getConfig("calculations/blocks.yml");
-        main.setBlocksConfig(config);
+        blocksConfig = getConfig("calculations/blocks.yml");
     }
 
     /**
      * Creates spawners config file.
      */
     public void createSpawnersConfig() {
-        FileConfiguration config = getConfig("calculations/spawners.yml");
-        main.setSpawnersConfig(config);
+        spawnersConfig = getConfig("calculations/spawners.yml");
     }
 
     /**
      * Creates containers config file.
      */
     public void createContainersConfig() {
-        FileConfiguration config = getConfig("calculations/containers.yml");
-        main.setContainersConfig(config);
+        containersConfig = getConfig("calculations/containers.yml");
     }
 
     /**
      * Creates inventories config file.
      */
     public void createInventoriesConfig() {
-        FileConfiguration config = getConfig("calculations/inventories.yml");
-        main.setInventoriesConfig(config);
+        inventoriesConfig = getConfig("calculations/inventories.yml");
     }
 
     /**
      * Creates papi config file.
      */
     public void createPapiConfig() {
-        FileConfiguration config = getConfig("calculations/papi.yml");
-        main.setPapiConfig(config);
+        papiConfig = getConfig("calculations/papi.yml");
     }
 
     /**
      * Creates stats menu config file.
      */
     public void createStatsMenuConfig() {
-        FileConfiguration config = getConfig("menu/stats.yml");
-        main.setStatsMenuConfig(config);
+        statsMenuConfig = getConfig("menu/stats.yml");
     }
 
     /**
      * Creates info menu config file.
      */
     public void createInfoMenuConfig() {
-        FileConfiguration config = getConfig("menu/info.yml");
-        main.setInfoMenuConfig(config);
+        infoMenuConfig = getConfig("menu/info.yml");
     }
 
     /**
      * Creates signs config file.
      */
     public void createSignsConfig() {
-        FileConfiguration config = getConfig("dat/signs.yml");
-        main.setSignsConfig(config);
+        signsConfig = getConfig("dat/signs.yml");
     }
 
     /**
@@ -144,5 +146,46 @@ public class ConfigManager {
         }
 
         return config;
+    }
+
+    public FileConfiguration getConfig() {
+        return config;
+    }
+
+    public FileConfiguration getBlocksConfig() {
+        return blocksConfig;
+    }
+
+    public FileConfiguration getSpawnersConfig() {
+        return spawnersConfig;
+    }
+
+    public FileConfiguration getContainersConfig() {
+        return containersConfig;
+    }
+
+    public FileConfiguration getInventoriesConfig() {
+        return inventoriesConfig;
+    }
+
+    public FileConfiguration getPapiConfig() {
+        return papiConfig;
+    }
+
+    public FileConfiguration getStatsMenuConfig() {
+        return statsMenuConfig;
+    }
+
+    public FileConfiguration getInfoMenuConfig() {
+        return infoMenuConfig;
+    }
+
+
+    public FileConfiguration getSignsConfig() {
+        return signsConfig;
+    }
+
+    public void setConfig(FileConfiguration config) {
+        this.config = config;
     }
 }

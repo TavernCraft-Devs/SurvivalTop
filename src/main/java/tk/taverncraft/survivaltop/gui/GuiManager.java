@@ -84,7 +84,7 @@ public class GuiManager {
     public void getMainStatsPage(UUID uuid, String name) {
         try {
             senderGui.put(uuid, name);
-            StatsGui entityGui = main.getStatsManager().getEntityGui(name);
+            StatsGui entityGui = main.getCacheManager().getEntityGui(name);
             if (entityGui != null) {
                 Bukkit.getPlayer(uuid).openInventory(entityGui.getMainStatsPage());
             }
@@ -101,7 +101,7 @@ public class GuiManager {
     public void getMainStatsPage(UUID uuid) {
         try {
             String name = senderGui.get(uuid);
-            StatsGui entityGui = main.getStatsManager().getEntityGui(name);
+            StatsGui entityGui = main.getCacheManager().getEntityGui(name);
             if (entityGui != null) {
                 Bukkit.getPlayer(uuid).openInventory(entityGui.getMainStatsPage());
             }
@@ -124,11 +124,11 @@ public class GuiManager {
         String senderName = getUpperCaseNameForEntity(uuid);
         if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getBlockStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getBlockStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getBlockStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getBlockStatsPage(pageNum);
             }
         }
         return null;
@@ -148,11 +148,11 @@ public class GuiManager {
         String senderName = getUpperCaseNameForEntity(uuid);
         if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getSpawnerStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getSpawnerStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getSpawnerStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getSpawnerStatsPage(pageNum);
             }
         }
         return null;
@@ -172,11 +172,11 @@ public class GuiManager {
         String senderName = getUpperCaseNameForEntity(uuid);
         if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getContainerStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getContainerStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getContainerStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getContainerStatsPage(pageNum);
             }
         }
         return null;
@@ -196,11 +196,11 @@ public class GuiManager {
         String senderName = getUpperCaseNameForEntity(uuid);
         if (senderName.equals(entityName)) {
             if (permissionsManager.hasGuiDetailsSelfPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getInventoryStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getInventoryStatsPage(pageNum);
             }
         } else {
             if (permissionsManager.hasGuiDetailsOthersPerm(humanEntity)) {
-                return main.getStatsManager().getEntityGui(entityName).getInventoryStatsPage(pageNum);
+                return main.getCacheManager().getEntityGui(entityName).getInventoryStatsPage(pageNum);
             }
         }
         return null;

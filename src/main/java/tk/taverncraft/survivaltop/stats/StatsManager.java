@@ -83,21 +83,6 @@ public class StatsManager {
                 eCache.getValues());
         }
     }
-
-    /**
-     * Gets an entity's GUI.
-     *
-     * @param name name of entity
-     *
-     * @return GUI containing stats of entity
-     */
-    public StatsGui getEntityGui(String name) {
-        EntityCache eCache = main.getCacheManager().getLatestCache(name);
-        if (eCache == null) {
-            return null;
-        }
-        return eCache.getGui(main);
-    }
 }
 
 

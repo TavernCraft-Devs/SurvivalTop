@@ -12,6 +12,7 @@ import org.bukkit.OfflinePlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.PlaceholderAPI;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import tk.taverncraft.survivaltop.Main;
 
 /**
@@ -45,10 +46,11 @@ public class PapiManager extends PlaceholderExpansion {
      */
     public void initializePlaceholders() {
         categoriesToPlaceholdersMap = new LinkedHashMap<>();
+        FileConfiguration config = main.getConfigManager().getPapiConfig();
         if (main.getOptions().papiIsIncluded()) {
-            for (String category : main.getPapiConfig().getConfigurationSection("")
+            for (String category : config.getConfigurationSection("")
                 .getKeys(false)) {
-                List<String> placeholders = main.getPapiConfig().getStringList(category);
+                List<String> placeholders = config.getStringList(category);
                 categoriesToPlaceholdersMap.put(category, placeholders);
             }
         }

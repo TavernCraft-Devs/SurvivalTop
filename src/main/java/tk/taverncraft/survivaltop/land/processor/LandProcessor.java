@@ -9,6 +9,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
 import tk.taverncraft.survivaltop.Main;
@@ -93,14 +94,14 @@ public class LandProcessor {
      */
     private void loadBlockWorth() {
         blockWorth = new LinkedHashMap<>();
-        for (String key : main.getBlocksConfig().getConfigurationSection("")
-                .getKeys(false)) {
+        FileConfiguration config = main.getConfigManager().getBlocksConfig();
+        for (String key : config.getConfigurationSection("").getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null || !material.isBlock() || !material.isSolid()) {
                     continue;
                 }
-                blockWorth.put(key.toUpperCase(), main.getBlocksConfig().getDouble(key));
+                blockWorth.put(key.toUpperCase(), config.getDouble(key));
             } catch (Exception e) {
                 LogManager.warn(e.getMessage());
             }
@@ -112,14 +113,14 @@ public class LandProcessor {
      */
     private void loadSpawnerWorth() {
         spawnerWorth = new LinkedHashMap<>();
-        for (String key : main.getSpawnersConfig().getConfigurationSection("")
-                .getKeys(false)) {
+        FileConfiguration config = main.getConfigManager().getSpawnersConfig();
+        for (String key : config.getConfigurationSection("").getKeys(false)) {
             try {
                 EntityType entityType = EntityType.fromName(key);
                 if (entityType == null) {
                     continue;
                 }
-                spawnerWorth.put(key.toUpperCase(), main.getSpawnersConfig().getDouble(key));
+                spawnerWorth.put(key.toUpperCase(), config.getDouble(key));
             } catch (Exception e) {
                 LogManager.warn(e.getMessage());
             }
@@ -131,14 +132,14 @@ public class LandProcessor {
      */
     private void loadContainerWorth() {
         containerWorth = new LinkedHashMap<>();
-        for (String key : main.getContainersConfig().getConfigurationSection("")
-                .getKeys(false)) {
+        FileConfiguration config = main.getConfigManager().getContainersConfig();
+        for (String key : config.getConfigurationSection("").getKeys(false)) {
             try {
                 Material material = Material.getMaterial(key);
                 if (material == null) {
                     continue;
                 }
-                containerWorth.put(key.toUpperCase(), main.getContainersConfig().getDouble(key));
+                containerWorth.put(key.toUpperCase(), config.getDouble(key));
             } catch (Exception e) {
                 LogManager.warn(e.getMessage());
             }

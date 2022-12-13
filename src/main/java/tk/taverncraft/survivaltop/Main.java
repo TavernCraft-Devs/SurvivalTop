@@ -44,17 +44,6 @@ public class Main extends JavaPlugin {
     private static Economy econ = null;
     private static Permission perms = null;
 
-    // config
-    private FileConfiguration config;
-    private FileConfiguration blocksConfig;
-    private FileConfiguration spawnersConfig;
-    private FileConfiguration containersConfig;
-    private FileConfiguration inventoriesConfig;
-    private FileConfiguration papiConfig;
-    private FileConfiguration statsMenuConfig;
-    private FileConfiguration infoMenuConfig;
-    private FileConfiguration signsConfig;
-
     // managers
     private ConfigManager configManager;
     private DependencyManager dependencyManager;
@@ -201,78 +190,6 @@ public class Main extends JavaPlugin {
 
     public static Economy getEconomy() {
         return econ;
-    }
-
-    public FileConfiguration getConfig() {
-        return config;
-    }
-
-    public FileConfiguration getBlocksConfig() {
-        return blocksConfig;
-    }
-
-    public void setBlocksConfig(FileConfiguration blocksConfig) {
-        this.blocksConfig = blocksConfig;
-    }
-
-    public FileConfiguration getSpawnersConfig() {
-        return spawnersConfig;
-    }
-
-    public void setSpawnersConfig(FileConfiguration spawnersConfig) {
-        this.spawnersConfig = spawnersConfig;
-    }
-
-    public FileConfiguration getContainersConfig() {
-        return containersConfig;
-    }
-
-    public void setContainersConfig(FileConfiguration containersConfig) {
-        this.containersConfig = containersConfig;
-    }
-
-    public FileConfiguration getInventoriesConfig() {
-        return inventoriesConfig;
-    }
-
-    public void setInventoriesConfig(FileConfiguration inventoriesConfig) {
-        this.inventoriesConfig = inventoriesConfig;
-    }
-
-    public FileConfiguration getPapiConfig() {
-        return papiConfig;
-    }
-
-    public void setPapiConfig(FileConfiguration papiConfig) {
-        this.papiConfig = papiConfig;
-    }
-
-    public FileConfiguration getStatsMenuConfig() {
-        return statsMenuConfig;
-    }
-
-    public void setStatsMenuConfig(FileConfiguration statsMenuConfig) {
-        this.statsMenuConfig = statsMenuConfig;
-    }
-
-    public FileConfiguration getInfoMenuConfig() {
-        return infoMenuConfig;
-    }
-
-    public void setInfoMenuConfig(FileConfiguration infoMenuConfig) {
-        this.infoMenuConfig = infoMenuConfig;
-    }
-
-    public FileConfiguration getSignsConfig() {
-        return signsConfig;
-    }
-
-    public void setSignsConfig(FileConfiguration signsConfig) {
-        this.signsConfig = signsConfig;
-    }
-
-    public void setConfig(FileConfiguration config) {
-        this.config = config;
     }
 
     public ConfigManager getConfigManager() {

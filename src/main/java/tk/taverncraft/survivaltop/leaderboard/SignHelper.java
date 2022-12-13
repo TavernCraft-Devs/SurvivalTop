@@ -80,7 +80,7 @@ public class SignHelper {
             main.getConfigManager().createSignsConfig();
         }
         String key = getKey(block);
-        FileConfiguration signsConfig = main.getSignsConfig();
+        FileConfiguration signsConfig = main.getConfigManager().getSignsConfig();
         signsConfig.set(key + ".x", block.getX());
         signsConfig.set(key + ".y", block.getY());
         signsConfig.set(key + ".z", block.getZ());
@@ -102,19 +102,20 @@ public class SignHelper {
      * Updates all the signs after every leaderboard update.
      */
     public void updateSigns() throws NullPointerException {
+        FileConfiguration config = main.getConfigManager().getSignsConfig();
         for (String key : Objects.requireNonNull(
-                main.getSignsConfig().getConfigurationSection("")).getKeys(false)) {
-            double x = main.getSignsConfig().getDouble(key + ".x");
-            double y = main.getSignsConfig().getDouble(key + ".y");
-            double z = main.getSignsConfig().getDouble(key + ".z");
+                config.getConfigurationSection("")).getKeys(false)) {
+            double x = config.getDouble(key + ".x");
+            double y = config.getDouble(key + ".y");
+            double z = config.getDouble(key + ".z");
             World world = Bukkit.getWorld(Objects.requireNonNull(
-                    main.getSignsConfig().getString(key + ".world")));
-            int position = main.getSignsConfig().getInt(key + ".rank");
+                config.getString(key + ".world")));
+            int position = config.getInt(key + ".rank");
             String savedName = Objects.requireNonNull(
-                    main.getSignsConfig().getString(key + ".entity"));
+                config.getString(key + ".entity"));
             String savedWealth = Objects.requireNonNull(
-                    main.getSignsConfig().getString(key + ".wealth"));
-            String direction = main.getSignsConfig().getString(key + ".direction");
+                config.getString(key + ".wealth"));
+            String direction = config.getString(key + ".direction");
             Location loc;
             try {
                 loc = new Location(world, x, y, z);
@@ -198,7 +199,7 @@ public class SignHelper {
         if (!signsFile.exists()) {
             main.getConfigManager().createSignsConfig();
         }
-        FileConfiguration signsConfig = main.getSignsConfig();
+        FileConfiguration signsConfig = main.getConfigManager().getSignsConfig();
         signsConfig.set(key, null);
         try {
             signsConfig.save(signsFile);

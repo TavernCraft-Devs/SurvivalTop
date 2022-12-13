@@ -65,7 +65,7 @@ public class InfoMenuOptions {
      */
     public InfoMenuOptions(Main main) {
         this.main = main;
-        FileConfiguration config = main.getInfoMenuConfig();
+        FileConfiguration config = main.getConfigManager().getInfoMenuConfig();
         mainPageSize = (int) Math.round(config.getInt("main-page-size", 27) / 9.0) * 9;
         subPageSize = (int) Math.round(config.getInt("sub-page-size", 54) / 9.0) * 9;
         mainPageTitle = "§8" + config.getString("main-page-title", "Item Values Info") +
